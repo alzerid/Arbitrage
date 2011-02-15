@@ -43,14 +43,8 @@ class Component
 
 	public function redirect($redirect)
 	{
-		if(strstr($redirect, "/")) //Full redirect
-		{
-			header("Location: /$redirect");
-			die();
-		}
-
-		echo "CODE REDIRECT!!!! \n";
-		var_dump($redirect);
+		$url = new URL($redirect);
+		header("Location: " . $url->getURL());
 		die();
 	}
 
