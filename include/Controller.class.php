@@ -1,27 +1,27 @@
 <?
-class Controller
+class Controller extends Component
 {
-	protected $_get;
-	protected $_post;
-	protected $_cookie;
-	protected $_session;
-
-	private $_controller;
-	private $_action;
+	private $_filters;
 
 	public function __construct($controller, $action)
 	{
-		$this->_controller = $controller;
-		$this->_action     = $action;
+		$this->_controller_name = $controller;
+		$this->_action_name     = $action;
+
+		parent::__construct();
 	}
 
 	public function execute()
 	{
-		//Setup params
-		$this->_setupParams();
+		//Get filters
+		$filters = $this->filters();
 
 		//Execute proper action
-		$action = $this->_action . "action";
+		$action = $this->_action_name . "action";
+
+		//Run before filter
+		$before_filter = ((isset($filters['before_filter']))? $filters['before_filter'] : NULL);
+		$this->_runFilter($before_filter);
 
 		//TODO: Pass params if there are any 
 		$ret = $this->$action();
@@ -30,11 +30,7 @@ class Controller
 		$this->_handleReturn($ret);
 	}
 
-	public function renderPartial($file)
-	{
-	}
-
-	public function render($view, $vars=NULL)
+	public function renderPartial($view, $vars=NULL)
 	{
 		global $_conf;
 
@@ -49,9 +45,54 @@ class Controller
 		$content = ob_get_contents();
 		ob_clean();
 
+		return $content;
+	}
+
+	public function render($view, $vars=NULL)
+	{
+		global $_conf;
+		
+		$content = $this->renderPartial($view, $vars);
+
+		if(isset($vars) && is_array($vars))
+			extract($vars);
+
 		//Get layout and render
 		$layout_path = $_conf['approotpath'] . "views/layout/layout.php";
 		require_once($layout_path);
+	}
+
+
+	protected function _getComponent($component)
+	{
+		global $_components;
+
+
+		if(isset($_components[$component]))
+		{
+			$component = $_components[$component];
+			$component->_controller_name = $this->_controller_name;
+			$component->_action_name     = $this->_action_name;
+
+			return $component;
+		}
+
+		return NULL;
+	}
+
+	protected function filters()
+	{
+		return array();
+	}
+
+	protected function _cssLink($link)
+	{
+		return "<link rel='stylesheet' type='text/css' href='/stylesheets/$link' />\n";
+	}
+
+	protected function _javascriptLink($link)
+	{
+		return "<script language='JavaScript' src='/javascript/$link'></script>\n";
 	}
 
 	private function _handleReturn($ret)
@@ -59,7 +100,7 @@ class Controller
 		global $_conf;
 
 		//Get view
-		$view = ((isset($ret['render']))? $ret['render'] : $this->_controller . "/" . $this->_action);
+		$view = ((isset($ret['render']))? $ret['render'] : $this->_controller_name . "/" . $this->_action_name);
 		$vars = ((isset($ret['variables']))? $ret['variables'] : NULL);
 
 		//No view specified use index  
@@ -70,14 +111,26 @@ class Controller
 		$this->render($view, $vars);
 	}
 
-	private function _setupParams()
+	private function _runFilter($filters)
 	{
-		$this->_get = $_GET;
-		unset($this->_get['_route']);
+		if($filters == NULL)
+			return;
 
-		$this->_post    = $_POST;
-		$this->_cookie  = $_COOKIE; 
-		$this->_session = (isset($_SESSION)? $_SESSION : NULL);
+		//Run through array
+		foreach($filters as $filter)
+		{
+			if(is_string($filter))
+				$this->$filter();
+			elseif(is_object($filter) && get_parent_class($filter) == "Filter")
+				$filter->execute();
+			elseif(is_array($filter))
+			{
+				$component = $filter['component'];
+				$method    = $filter['method'];
+
+				$component->$method();
+			}
+		}
 	}
 }
 ?>
