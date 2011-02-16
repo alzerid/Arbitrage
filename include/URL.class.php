@@ -19,18 +19,28 @@ class URL
 	{
 		if(is_array($url))
 		{
-			$url = $url[0];
-			if(strstr($url, '/'))
+			$newurl = $url[0];
+			if(strstr($newurl, '/'))
 			{
-				$ret = explode('/', $url);
+				$ret = explode('/', $newurl);
 				$this->_controller_name = $ret[0];
 				$this->_action_name     = $ret[1];
-				$this->_url = "/$url";
+				$this->_url = "/$newurl";
+			}
+
+			//Add params
+			if(isset($url[1]))
+			{
+				$params = "?";
+				foreach($url[1] as $k=>$v)
+					$params .= "$k=$v&";
+
+				$params = substr($params, 0, -1);
+				$this->_url .= $params;
 			}
 		}
 		else
 		{
-			echo "URL CLASS doesnt understand code me!!!";
 			$this->_url = $url;
 		}
 	}

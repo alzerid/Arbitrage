@@ -50,37 +50,36 @@ class Component
 
 	public function generateLink($tag, $url, $attribs = NULL)
 	{
-		if(is_string($url) && strstr($url, '/'))
+		$url = new URL($url);
+		$a   = "";
+
+		if($attribs != NULL)
 		{
-			$a = "";
-			if($attribs != NULL)
-			{
-				foreach($attribs as $k=>$v)
-					$a .= " $k=\"$v\"";
-			}
-
-			$href = "<a href=\"/$url\" $a>$tag</a>";
-			return $href;
-		}
-		elseif(is_array($url))
-		{
-			$url = $url[0];
-			if(strstr($url, '/'))
-			{
-				$a = "";
-				if($attribs != NULL)
-				{
-					foreach($attribs as $k=>$v)
-						$a .= " $k=\"$v\"";
-				}
-
-				$href = "<a href=\"/$url\" $a>$tag</a>";
-				return $href;
-			}
-
+			foreach($attribs as $k=>$v)
+				$a .= " $k=\"$v\"";
 		}
 
-		return "NEED TO CODE GENERATE LINK";
+		$href = "<a href=\"" . $url->getURL() . "\" $a>$tag</a>";
+		
+		return $href;
 	}
+
+	public function getSubArray($pre, $array)
+	{
+		$ret = array();
+		foreach($array as $k=>$v)
+		{
+			$spos = strpos($k, $pre);
+			if($spos !== false)
+				$ret[substr($k, $spos+strlen($pre))] = $v;
+		}
+
+		return $ret;
+	}
+
+	/*protected function _populateObjectVariables($vars)
+	{
+		get_object_variables(
+	}*/
 }
 ?>
