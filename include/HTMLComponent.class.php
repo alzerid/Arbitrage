@@ -82,7 +82,7 @@ class HTMLComponent extends Component
 	{
 		$ret = '';
 		foreach($attribs as $k=>$v)
-			$ret .= "$k=$v ";
+			$ret .= "$k=\"$v\" ";
 
 		return trim($ret);
 	}

@@ -33,7 +33,7 @@ class URL
 			{
 				$params = "?";
 				foreach($url[1] as $k=>$v)
-					$params .= "$k=$v&";
+					$params .= "$k=" . urlencode($v) . "&";
 
 				$params = substr($params, 0, -1);
 				$this->_url .= $params;

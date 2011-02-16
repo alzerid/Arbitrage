@@ -21,7 +21,7 @@ Class Form extends HTMLComponent
 
 	public function text($id, $attribs=array())
 	{
-		$attribs = array_merge($attribs, array('value' => $this->_values[$id]));
+		$attribs = array_merge($attribs, array('value' => (($this->_values[$id])? $this->_values[$id] : '')));
 		return HTMLComponent::inputText("{$this->id}_$id", $attribs);
 	}
 
