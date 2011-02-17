@@ -111,8 +111,11 @@ class Controller extends Component
 	protected function _populateJSControllers()
 	{
 		$ret = '';
-		foreach($this->_js_controllers as $js)
-			$ret .= "<script language='JavaScript' src='$js'></script>\n";
+		if(count($this->_js_controllers))
+		{
+			foreach($this->_js_controllers as $js)
+				$ret .= "<script language='JavaScript' src='$js'></script>\n";
+		}
 
 		return $ret;
 	}

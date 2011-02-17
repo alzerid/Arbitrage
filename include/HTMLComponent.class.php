@@ -70,6 +70,14 @@ class HTMLComponent extends Component
 		return $html;	
 	}
 
+	public static function inputButton($id, $value, $attribs=array())
+	{
+		$attribs = HTMLComponent::_generateAttribs($attribs);
+		$html    = "<button id=\"$id\" name=\"$id\" $attribs>$value</button>\n";
+
+		return $html;	
+	}
+
 	public static function inputHidden($id, $value, $attribs=array())
 	{
 		$attribs = HTMLComponent::_generateAttribs($attribs);
