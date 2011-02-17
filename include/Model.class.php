@@ -34,8 +34,8 @@ abstract class Model
 
 	abstract public function fromForm($model);
 	abstract public function toForm();
-	//abstract public function populate();
 	abstract protected function normalize();
+	abstract protected function toQuery();
 	
 	public function toArray()
 	{

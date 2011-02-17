@@ -2,6 +2,7 @@
 class Controller extends Component
 {
 	private $_filters;
+	private $_js_controllers;
 
 	public function __construct($controller, $action)
 	{
@@ -67,6 +68,13 @@ class Controller extends Component
 		return isset($this->_post['_form']);
 	}
 
+	public function includeControllerJavascript($controller=NULL)
+	{
+		if($controller == NULL)
+			$controller = $this->_controller_name;
+
+		$this->_js_controllers[] = "/cjavascript/$controller.js";
+	}
 
 	protected function _getComponent($component)
 	{
@@ -99,6 +107,16 @@ class Controller extends Component
 	{
 		return "<script language='JavaScript' src='/javascript/$link'></script>\n";
 	}
+
+	protected function _populateJSControllers()
+	{
+		$ret = '';
+		foreach($this->_js_controllers as $js)
+			$ret .= "<script language='JavaScript' src='$js'></script>\n";
+
+		return $ret;
+	}
+
 
 	private function _handleReturn($ret)
 	{

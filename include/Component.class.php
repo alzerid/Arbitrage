@@ -21,7 +21,10 @@ class Component
 			$this->_session =& $_SESSION;
 		else
 			$this->_session = NULL;
+
+		$this->_js_controllers = array();
 	}
+
 
 	static function initComponents()
 	{
@@ -77,11 +80,6 @@ class Component
 		return $ret;
 	}
 
-	public function arrayToDotNotation($name)
-	{
-		var_dump($name);
-		die();
-	}
 
 	/*protected function _populateObjectVariables($vars)
 	{
