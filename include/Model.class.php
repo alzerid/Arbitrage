@@ -20,6 +20,9 @@ abstract class Model
 
 			$this->_variables[$key] = $v;
 		}
+
+		//Normalize any variables
+		$this->normalize();
 	}
 
 	static public function requireModel($model)
@@ -29,9 +32,10 @@ abstract class Model
 		require_once($file);
 	}
 
-	abstract public function update($model);
+	abstract public function fromForm($model);
 	abstract public function toForm();
-	abstract public function populate();
+	//abstract public function populate();
+	abstract protected function normalize();
 	
 	public function toArray()
 	{

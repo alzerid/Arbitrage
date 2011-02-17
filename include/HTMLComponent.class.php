@@ -78,6 +78,14 @@ class HTMLComponent extends Component
 		return $html;	
 	}
 
+	public static function inputTextArea($id, $value = "", $attribs=array())
+	{
+		$attribs = HTMLComponent::_generateAttribs($attribs);
+		$html    = "<textarea $attribs >$value</textarea>\n";
+
+		return $html;	
+	}
+
 	private function _generateAttribs($attribs)
 	{
 		$ret = '';

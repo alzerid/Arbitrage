@@ -10,6 +10,11 @@ class URL
 		$this->normalize($url);
 	}
 
+	public function __toString()
+	{
+		return $this->_url;
+	}
+
 	public function getURL()
 	{
 		return $this->_url;

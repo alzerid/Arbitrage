@@ -21,36 +21,47 @@ Class Form extends HTMLComponent
 
 	public function text($id, $attribs=array())
 	{
-		$attribs = array_merge($attribs, array('value' => (($this->_values[$id])? $this->_values[$id] : '')));
+		$attribs = array_merge($attribs, array('value' => (($this->_getValue($id))? $this->_getValue($id) : '')));
+		$id      = $this->_normalizeName($id);
 		return HTMLComponent::inputText("{$this->id}_$id", $attribs);
 	}
 
 	public function select($id, $values, $default=array(), $attribs=array())
 	{
-		$d = $this->_values[$id];
+		$d = $this->_getValue($id);
 		if(!is_array($d))
 			$d = array($d);
 
 		$default = array_merge($default, $d);
+		$id      = $this->_normalizeName($id);
 		return HTMLComponent::inputSelect("{$this->id}_$id", $values, $default, $attribs);
 	}
 
 	public function multiSelect($id, $values, $default=array(), $attribs=array())
 	{
-		$d = $this->_values[$id];
+		$d = $this->_getValue($id);
 		if(!is_array($d))
 			$d = array($d);
 
 		$default = array_merge($default, $d);
+		$id      = $this->_normalizeName($id);
 		return HTMLComponent::inputMultiSelect("{$this->id}_$id", $values, $default, $attribs);
+	}
+
+	public function textArea($id, $value=NULL, $attribs=array())
+	{
+		$value = (($value === NULL)? $this->_getValue($id) : $value);
+		$id      = $this->_normalizeName($id);
+		return HTMLComponent::inputTextArea("{$this->id}_$id", $value, $attribs);
 	}
 
 	public function checkbox($id, $attribs=array())
 	{
-		$checked = $this->_values[$id];
+		$checked = $this->_getValue($id);
 		if($checked == true)
 			$attribs = array_merge($attribs, array('checked' => 'checked'));
 
+		$id      = $this->_normalizeName($id);
 		return HTMLComponent::inputCheckbox("{$this->id}_$id", $attribs);
 	}
 
@@ -62,8 +73,9 @@ Class Form extends HTMLComponent
 	public function hidden($id, $value=NULL, $attribs=array())
 	{
 		if($value == NULL)
-			$value = $this->_values[$id];
+			$value = $this->_getValue($id);
 
+		$id      = $this->_normalizeName($id);
 		return parent::inputHidden("{$this->id}_$id", $value, $attribs);
 	}
 
@@ -83,6 +95,38 @@ Class Form extends HTMLComponent
 
 		if($this->method == NULL)
 			$this->_properties['method'] = 'POST';
+	}
+
+	private function _getValue($id)
+	{
+		//Dot notation to array notation
+		$key = explode(".", $id);
+		if(count($key) > 1)
+		{
+			$value = $this->_values;
+			for($i=0; $i<count($key); $i++)
+				$value = $value[$key[$i]];
+		}
+		else
+			$value = $this->_values[$key[0]];
+
+		return $value;
+	}
+
+	private function _normalizeName($name)
+	{
+		//Dot notation to array notation
+		$key = explode(".", $name);
+		if(count($key) > 1)
+		{
+			$value = $key[0];
+			for($i=1; $i<count($key); $i++)
+				$value .= "[{$key[$i]}]";
+		}
+		else
+			$value = $name;
+
+		return $value;
 	}
 }
 ?>

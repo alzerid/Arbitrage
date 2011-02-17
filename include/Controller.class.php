@@ -30,15 +30,15 @@ class Controller extends Component
 		$this->_handleReturn($ret);
 	}
 
-	public function renderPartial($view, $vars=NULL)
+	public function renderPartial($view, $_vars=NULL)
 	{
 		global $_conf;
 
 		//Check if view is set
 		$view_path = $_conf['approotpath'] . "views/$view.php";
 
-		if(isset($vars) && is_array($vars))
-			extract($vars);
+		if(isset($_vars) && is_array($_vars))
+			extract($_vars);
 
 		ob_start();
 		require_once($view_path);
@@ -60,6 +60,11 @@ class Controller extends Component
 		//Get layout and render
 		$layout_path = $_conf['approotpath'] . "views/layout/layout.php";
 		require_once($layout_path);
+	}
+
+	public function isPost()
+	{
+		return isset($this->_post['_form']);
 	}
 
 

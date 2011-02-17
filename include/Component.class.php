@@ -77,6 +77,12 @@ class Component
 		return $ret;
 	}
 
+	public function arrayToDotNotation($name)
+	{
+		var_dump($name);
+		die();
+	}
+
 	/*protected function _populateObjectVariables($vars)
 	{
 		get_object_variables(
