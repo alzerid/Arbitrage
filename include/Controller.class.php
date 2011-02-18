@@ -2,7 +2,7 @@
 class Controller extends Component
 {
 	private $_filters;
-	private $_js_controllers;
+	private $_javascripts;
 
 	public function __construct($controller, $action)
 	{
@@ -43,8 +43,7 @@ class Controller extends Component
 
 		ob_start();
 		require_once($view_path);
-		$content = ob_get_contents();
-		ob_clean();
+		$content = ob_get_clean();
 
 		return $content;
 	}
@@ -73,7 +72,12 @@ class Controller extends Component
 		if($controller == NULL)
 			$controller = $this->_controller_name;
 
-		$this->_js_controllers[] = "/cjavascript/$controller.js";
+		$this->_javascripts[] = "/cjavascript/$controller.js";
+	}
+
+	public function _includeJavascriptFile($link)
+	{
+		$this->_javascripts[] = "/javascript/$link";
 	}
 
 	protected function _getComponent($component)
@@ -108,12 +112,12 @@ class Controller extends Component
 		return "<script language='JavaScript' src='/javascript/$link'></script>\n";
 	}
 
-	protected function _populateJSControllers()
+	protected function _populateJavascriptTags()
 	{
 		$ret = '';
-		if(count($this->_js_controllers))
+		if(count($this->_javascripts))
 		{
-			foreach($this->_js_controllers as $js)
+			foreach($this->_javascripts as $js)
 				$ret .= "<script language='JavaScript' src='$js'></script>\n";
 		}
 
