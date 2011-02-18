@@ -8,7 +8,7 @@ Class Form extends HTMLComponent
 	{
 		$this->_populateObjectVariables($properties);
 		$this->_values = $values;
-		echo "<form id=\"{$this->id}\" name=\"{$this->id}\" method=\"{$this->method}\">\n";
+		echo "<form id=\"{$this->id}\" name=\"{$this->id}\" method=\"{$this->method}\" action=\"{$this->action}\">\n";
 	}
 
 	public function __get($name)
@@ -95,6 +95,9 @@ Class Form extends HTMLComponent
 
 		if($this->method == NULL)
 			$this->_properties['method'] = 'POST';
+		
+		if($this->action == NULL)
+			$this->_properties['action'] = '';
 	}
 
 	private function _getValue($id)
