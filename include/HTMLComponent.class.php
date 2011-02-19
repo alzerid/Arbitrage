@@ -9,6 +9,19 @@ class HTMLComponent extends Component
 		return $html;
 	}
 
+	public static function createForm($id, $attribs=array())
+	{
+		$attribs = HTMLComponent::_generateAttribs($attribs);
+		$html    = "<form name=\"$id\">\n";
+
+		return $html;
+	}
+
+	public static function endForm()
+	{
+		return "</form>\n";
+	}
+
 	public static function inputText($id, $attribs=array())
 	{
 		$attribs = HTMLComponent::_generateAttribs($attribs);

@@ -79,7 +79,7 @@ Class Form extends HTMLComponent
 		return parent::inputHidden("{$this->id}_$id", $value, $attribs);
 	}
 
-	public function endForm()
+	public function end()
 	{
 		echo "<input type=\"hidden\" name=\"_form\" id=\"_form\" value=\"{$this->id}-form\" />\n";
 		echo "</form>\n";

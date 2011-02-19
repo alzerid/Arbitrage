@@ -21,10 +21,7 @@ class Component
 			$this->_session =& $_SESSION;
 		else
 			$this->_session = NULL;
-
-		$this->_js_controllers = array();
 	}
-
 
 	static function initComponents()
 	{
