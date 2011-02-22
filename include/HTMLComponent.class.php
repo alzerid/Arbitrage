@@ -107,6 +107,14 @@ class HTMLComponent extends Component
 		return $html;	
 	}
 
+	public static function inputFile($id, $attribs=array())
+	{
+		$attribs = HTMLComponent::_generateAttribs($attribs);
+		$html    = "<input type=\"file\" name=\"$id\" id=\"$id\" />\n";
+
+		return $html;
+	}
+
 	public static function generateLink($tag, $url, $attribs = NULL)
 	{
 		$url = new URL($url);

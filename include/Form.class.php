@@ -50,9 +50,15 @@ Class Form extends HTMLComponent
 
 	public function textArea($id, $value=NULL, $attribs=array())
 	{
-		$value = (($value === NULL)? $this->_getValue($id) : $value);
+		$value   = (($value === NULL)? $this->_getValue($id) : $value);
 		$id      = $this->_normalizeName($id);
 		return HTMLComponent::inputTextArea("{$this->id}_$id", $value, $attribs);
+	}
+
+	public function file($id, $attribs=array())
+	{
+		$id = $this->_normalizeName($id);
+		return HTMLComponent::inputFile("{$this->id}_$id", $attribs);
 	}
 
 	public function checkbox($id, $attribs=array())
