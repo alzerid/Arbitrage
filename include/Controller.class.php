@@ -113,6 +113,10 @@ class Controller extends Component
 		$view = ((isset($ret['render']))? $ret['render'] : $this->_controller_name . "/" . $this->_action_name);
 		$vars = ((isset($ret['variables']))? $ret['variables'] : NULL);
 
+		//if view is fales then return
+		if($view === false)
+			return;
+
 		//No view specified use index  
 		if(!strstr($view, "/"))
 			$view = $view . "/index";
