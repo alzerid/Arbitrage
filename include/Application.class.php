@@ -5,6 +5,7 @@ class Application
 	protected $_post;
 	protected $_cookie;
 	protected $_session;
+	protected $_files;
 
 	protected $_controller_name;
 	protected $_action_name;
@@ -27,6 +28,8 @@ class Application
 			$this->_session =& $_SESSION;
 		else
 			$this->_session = NULL;
+
+		$this->_files = ((isset($_FILES))? $_FILES : array());
 
 		$this->_modules    = array();
 		$this->_components = array();
