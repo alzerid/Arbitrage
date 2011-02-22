@@ -2,7 +2,6 @@
 class Controller extends Component
 {
 	private $_filters;
-	private $_javascripts;
 
 	public function __construct($controller, $action)
 	{
@@ -29,6 +28,12 @@ class Controller extends Component
 
 		//Handle return
 		$this->_handleReturn($ret);
+	}
+
+	public function renderModule($module)
+	{
+		$module = $this->getModule($module);
+		return $module->render();
 	}
 
 	public function renderPartial($view, $_vars=NULL)
@@ -72,29 +77,17 @@ class Controller extends Component
 		if($controller == NULL)
 			$controller = $this->_controller_name;
 
-		$this->_javascripts[] = "/cjavascript/$controller.js";
+		Application::includeJavascriptFile("/cjavascript/$controller.js");
 	}
 
-	public function _includeJavascriptFile($link)
+	public function includeJavascript($link)
 	{
-		$this->_javascripts[] = "/javascript/$link";
+		Application::includeJavascriptFile("/javascript/$link");
 	}
 
-	protected function _getComponent($component)
+	public function includeStylesheet($file)
 	{
-		global $_components;
-
-
-		if(isset($_components[$component]))
-		{
-			$component = $_components[$component];
-			$component->_controller_name = $this->_controller_name;
-			$component->_action_name     = $this->_action_name;
-
-			return $component;
-		}
-
-		return NULL;
+		Application::includeStylesheetFile("/stylesheet/$file");
 	}
 
 	protected function filters()
@@ -111,19 +104,6 @@ class Controller extends Component
 	{
 		return "<script language='JavaScript' src='/javascript/$link'></script>\n";
 	}
-
-	protected function _populateJavascriptTags()
-	{
-		$ret = '';
-		if(count($this->_javascripts))
-		{
-			foreach($this->_javascripts as $js)
-				$ret .= "<script language='JavaScript' src='$js'></script>\n";
-		}
-
-		return $ret;
-	}
-
 
 	private function _handleReturn($ret)
 	{

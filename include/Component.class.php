@@ -1,28 +1,6 @@
 <?
-class Component
+class Component extends Application
 {
-	protected $_get;
-	protected $_post;
-	protected $_cookie;
-	protected $_session;
-
-	protected $_controller_name;
-	protected $_action_name;
-
-	public function __construct()
-	{
-		$this->_get = $_GET;
-		unset($this->_get['_route']);
-
-		$this->_post     = $_POST;
-		$this->_cookie   = $_COOKIE; 
-		
-		if(isset($_SESSION))
-			$this->_session =& $_SESSION;
-		else
-			$this->_session = NULL;
-	}
-
 	static function initComponents()
 	{
 		global $_components;
@@ -37,7 +15,6 @@ class Component
 			$name = substr($name, 0, -4);
 			require_once($comp);
 			$_components[$name] = new $name;
-
 		}
 	}
 
@@ -46,22 +23,6 @@ class Component
 		$url = new URL($redirect);
 		header("Location: " . $url->getURL());
 		die();
-	}
-
-	public function generateLink($tag, $url, $attribs = NULL)
-	{
-		$url = new URL($url);
-		$a   = "";
-
-		if($attribs != NULL)
-		{
-			foreach($attribs as $k=>$v)
-				$a .= " $k=\"$v\"";
-		}
-
-		$href = "<a href=\"" . $url->getURL() . "\" $a>$tag</a>";
-		
-		return $href;
 	}
 
 	public function getSubArray($pre, $array)
@@ -76,11 +37,5 @@ class Component
 
 		return $ret;
 	}
-
-
-	/*protected function _populateObjectVariables($vars)
-	{
-		get_object_variables(
-	}*/
 }
 ?>

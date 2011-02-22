@@ -107,7 +107,23 @@ class HTMLComponent extends Component
 		return $html;	
 	}
 
-	private function _generateAttribs($attribs)
+	public static function generateLink($tag, $url, $attribs = NULL)
+	{
+		$url = new URL($url);
+		$a   = "";
+
+		if($attribs != NULL)
+		{
+			foreach($attribs as $k=>$v)
+				$a .= " $k=\"$v\"";
+		}
+
+		$href = "<a href=\"" . $url->getURL() . "\" $a>$tag</a>";
+		return $href;
+	}
+
+
+	private static function _generateAttribs($attribs)
 	{
 		$ret = '';
 		foreach($attribs as $k=>$v)
