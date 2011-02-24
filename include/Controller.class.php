@@ -41,7 +41,7 @@ class Controller extends Component
 		global $_conf;
 
 		//Check if view is set
-		$view_path = $_conf['approotpath'] . "views/$view.php";
+		$view_path = $_conf['approotpath'] . "app/views/$view.php";
 
 		if(isset($_vars) && is_array($_vars))
 			extract($_vars);
@@ -63,7 +63,7 @@ class Controller extends Component
 			extract($vars);
 
 		//Get layout and render
-		$layout_path = $_conf['approotpath'] . "views/layout/layout.php";
+		$layout_path = $_conf['approotpath'] . "app/views/layout/layout.php";
 		require_once($layout_path);
 	}
 

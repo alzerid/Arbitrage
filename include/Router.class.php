@@ -12,7 +12,7 @@ class Router
 		$view       = $route[1];
 
 		//Require once the controller
-		$controller_path = $_conf['approotpath'] . "controllers/$controller.php";
+		$controller_path = $_conf['approotpath'] . "app/controllers/$controller.php";
 		require_once($controller_path);
 
 		$controller_name = ucfirst($controller) . "Controller";

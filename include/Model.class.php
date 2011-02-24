@@ -28,7 +28,7 @@ abstract class Model
 	static public function requireModel($model)
 	{
 		global $_conf;
-		$file = $_conf['approotpath'] . "models/" . strtolower($model) . ".php";
+		$file = $_conf['approotpath'] . "app/models/" . strtolower($model) . ".php";
 		require_once($file);
 	}
 
