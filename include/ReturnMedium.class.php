@@ -9,6 +9,7 @@ define('RM_USER', 2);
 
 class ReturnMedium
 {
+	private $skipheader;
 	private $errorno;
 	private $message;
 	private $user;
@@ -16,9 +17,10 @@ class ReturnMedium
 
 	public function __construct($type=RM_JSON)
 	{
-    $this->errorno = 0;
-    $this->message = "";
-    $this->user    = NULL;
+		$this->skipheader = false;
+    $this->errorno    = 0;
+    $this->message    = "";
+    $this->user       = NULL;
 
     $this->setType($type);
 	}
@@ -75,13 +77,17 @@ class ReturnMedium
 				$arr = array(APP_XML_NAME => $result);
 				$xml = new XMLDomConstruct('1.0', 'utf-8');
 
-				header('Content-Type: text/xml');
+				if(!$this->skipheader)
+					header('Content-Type: text/xml');
+
 				$xml->fromMixed($arr);
 				$result = $xml->saveXML();
 				break;
 
 			case RM_JSON:
-				header('Content-Type: application/json');
+				if(!$this->skipheader)
+					header('Content-Type: application/json');
+
 				$result = json_encode($result);
 				break;
 		}
@@ -103,6 +109,11 @@ class ReturnMedium
 	public function setUser($user)
 	{
 		$this->user = $user;
+	}
+
+	public function setSkipHeader($bool)
+	{
+		$this->skipheader = $bool;
 	}
 
 	/**************/
