@@ -109,20 +109,25 @@ class Controller extends Component
 	{
 		global $_conf;
 
-		//Get view
-		$view = ((isset($ret['render']))? $ret['render'] : $this->_controller_name . "/" . $this->_action_name);
-		$vars = ((isset($ret['variables']))? $ret['variables'] : NULL);
+		if(isset($ret['render']) && get_class($ret['render']) == "ReturnMedium")
+			echo $ret['render']->render();
+		else
+		{
+			//Get view
+			$view = ((isset($ret['render']))? $ret['render'] : $this->_controller_name . "/" . $this->_action_name);
+			$vars = ((isset($ret['variables']))? $ret['variables'] : NULL);
 
-		//if view is fales then return
-		if($view === false)
-			return;
+			//if view is fales then return
+			if($view === false)
+				return;
 
-		//No view specified use index  
-		if(!strstr($view, "/"))
-			$view = $view . "/index";
-		
-		//require the file
-		$this->render($view, $vars);
+			//No view specified use index  
+			if(!strstr($view, "/"))
+				$view = $view . "/index";
+			
+			//require the file
+			$this->render($view, $vars);
+		}
 	}
 
 	private function _runFilter($filters)
