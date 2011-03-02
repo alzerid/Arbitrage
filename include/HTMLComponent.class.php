@@ -35,12 +35,15 @@ class HTMLComponent extends Component
 		$attribs = HTMLComponent::_generateAttribs($attribs);
 		$html  = "<select name=\"$id\" id=\"$id\" $attribs>\n";
 
-		foreach($values as $k=>$v)
+		if(count($values))
 		{
-			$s = '';
-			if(in_array($k, $selected))
-				$s = "selected";
-			$html .= "<option value=\"$k\" $s>$v</option>\n";
+			foreach($values as $k=>$v)
+			{
+				$s = '';
+				if(in_array($k, $selected))
+					$s = "selected";
+				$html .= "<option value=\"$k\" $s>$v</option>\n";
+			}
 		}
 
 		$html .= "</select>\n";
