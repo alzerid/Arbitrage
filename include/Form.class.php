@@ -6,6 +6,10 @@ Class Form extends HTMLComponent
 
 	public function __construct($properties, $values = NULL)
 	{
+		//check if $values is a model
+		if(gettype($values) == "object" && is_subclass_of($values, 'Model'))
+			$values = $values->toArray();
+		
 		$this->_populateObjectVariables($properties);
 		$this->_values = $values;
 		echo "<form id=\"{$this->id}\" name=\"{$this->id}\" method=\"{$this->method}\" action=\"{$this->action}\">\n";
@@ -21,7 +25,9 @@ Class Form extends HTMLComponent
 
 	public function text($id, $attribs=array())
 	{
-		$attribs = array_merge($attribs, array('value' => (($this->_getValue($id))? $this->_getValue($id) : '')));
+		$value   = $this->_getValue($id);
+		$value   = ((isset($value))? $value: '');
+		$attribs = array_merge($attribs, array('value' => $value));
 		$id      = $this->_normalizeName($id);
 		return HTMLComponent::inputText("{$this->id}_$id", $attribs);
 	}
