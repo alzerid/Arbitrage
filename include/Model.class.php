@@ -21,6 +21,8 @@ abstract class Model
 		$this->_variables = array();
 		$this->_originals = array();
 
+		//If pre is defined, then we will be doing updates and not saves...
+		$vars = array();
 		if(count($data))
 		{
 			foreach($data as $k=>$v)
@@ -36,8 +38,13 @@ abstract class Model
 				else
 					$key = $k;
 
-				$this->_originals[$key] = $v;
+				$vars[$key] = $v;
 			}
+
+			if($pre == '')
+				$this->_originals = $vars;
+			else
+				$this->_variables = $vars;
 
 			//Normalize any variables
 			$this->normalize();
@@ -64,19 +71,19 @@ abstract class Model
 	abstract public function findOne($condition = array());
 	abstract public function remove($condition = array());
 
-
+	//Normalize data
 	abstract protected function normalize();
 	
 	public function toArray()
 	{
 		$vars = array();
+
+		//Go through the originals first
 		foreach($this->_originals as $key=>$value)
-		{
-			if(isset($this->_variables[$key]))
-				$vars[$key] = $this->_variables[$key];
-			else
-				$vars[$key] = $value;
-		}
+			$vars[$key] = $this->_originals[$key];
+
+		foreach($this->_variables as $key=>$value)
+			$vars[$key] = $this->_variables[$key];
 
 		return $vars;
 	}
