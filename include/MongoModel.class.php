@@ -6,6 +6,9 @@ class MongoModel extends Model
 		if(array_key_exists('_id', $this->_originals))
 			$this->_originals['_id'] = new MongoId($this->_originals['_id']);
 
+		if(array_key_exists('_id', $this->_variables))
+			$this->_variables['_id'] = new MongoId($this->_variables['_id']);
+
 		//Type casting
 		$this->_typeCastValues();
 	}
@@ -36,7 +39,7 @@ class MongoModel extends Model
 		//Find entry
 		$ret = $mongo->$db->$table->findOne($condition);
 
-		return new $class($ret);
+		return (($ret!=NULL)? new $class($ret) : $ret);
 	}
 
 	public function remove($condition = array())
@@ -70,16 +73,7 @@ class MongoModel extends Model
 	public function save()
 	{
 		$mongo = MongoFactory::getInstance();
-		$save = array();
-
-		foreach($this->_originals as $key => $value)
-		{
-			//Use _variables array since it updates the _originals array
-			if(isset($this->_variables[$key]))
-				$save[$key] = $this->_variables[$key];
-			else
-				$save[$key] = $value;
-		}
+		$save  = $this->toArray();
 
 		//save the entity
 		$db    = $this->_db;
@@ -113,7 +107,7 @@ class MongoModel extends Model
 			//recursive
 			$this->_getDotNotationValues($notation, $val, $values);
 		}
-		else
+		elseif(isset($subject[$key]))
 			$values[] = &$subject[$key];
 	}
 
@@ -124,10 +118,16 @@ class MongoModel extends Model
 		{
 			foreach($properties as $property)
 			{
-				$vals = array();
-				$this->_getDotNotationValues($property, $this->_originals, $vals);
+				//Check if the variable is even set
+				$orig_vals = array();
+				$mod_vals  = array();
+				$this->_getDotNotationValues($property, $this->_originals, $orig_vals);
+				$this->_getDotNotationValues($property, $this->_variables, $mod_vals);
 
-				foreach($vals as &$val)
+				foreach($orig_vals as &$val)
+					$val = $this->_typeCastValue($cast, $val);
+
+				foreach($mod_vals as &$val)
 					$val = $this->_typeCastValue($cast, $val);
 			}
 		}
@@ -165,6 +165,8 @@ class MongoModel extends Model
 			case "mongodate":
 				if(!is_object($value) && is_numeric($value))
 					return new MongoDate($value);
+				elseif(is_string($value))        //Date formatted string
+					return new MongoDate(strtotime($value));
 				elseif($value === "")
 					return new MongoDate(0);
 
