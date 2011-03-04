@@ -1,6 +1,8 @@
 <?
 class Application 
 {
+	public $pageTitle;
+
 	protected $_get;
 	protected $_post;
 	protected $_cookie;
@@ -33,6 +35,8 @@ class Application
 
 		$this->_modules    = array();
 		$this->_components = array();
+		
+		$this->pageTitle = "";
 	}
 
 	static function includeJavascriptFile($file)
