@@ -109,10 +109,9 @@ abstract class Model
 		return ($this->$name !== NULL);
 	}
 
-	/*protected function _updateEntry($key, &$data)
+	/*public function __unset($name)
 	{
-		if(array_key_exists($key, $this->_variables))
-			$data[$k] = $this->$key;
+		unset($this->_variables[$name]);
 	}*/
 }
 ?>

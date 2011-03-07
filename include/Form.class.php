@@ -120,7 +120,12 @@ Class Form extends HTMLComponent
 		{
 			$value = $this->_values;
 			for($i=0; $i<count($key); $i++)
-				$value = $value[$key[$i]];
+			{
+				if(isset($value[$key[$i]]))
+					$value = $value[$key[$i]];
+				else
+					$value = NULL;
+			}
 		}
 		else
 			$value = $this->_values[$key[0]];
