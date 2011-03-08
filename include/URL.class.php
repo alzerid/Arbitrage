@@ -25,12 +25,18 @@ class URL
 		if(is_array($url))
 		{
 			$newurl = $url[0];
-			if(strstr($newurl, '/'))
+			if(strstr($newurl, '/'))  //Root level
 			{
 				$ret = explode('/', $newurl);
 				$this->_controller_name = $ret[0];
 				$this->_action_name     = $ret[1];
 				$this->_url = "/$newurl";
+			}
+			else                      //Non root level
+			{
+				$this->_controller_name = '';
+				$this->_action_name     = $url[0];
+				$this->_url = $url[0];
 			}
 
 			//Add params
