@@ -82,7 +82,7 @@ class Application
 		//Application::initializeModules();
 	}
 
-	public function getModule($name)
+	public function getModule($name, $opts=array())
 	{
 		global $_conf;
 
@@ -98,6 +98,9 @@ class Application
 			$this->_modules[$name]->_controller_name = $this->_controller_name;
 			$this->_modules[$name]->_action_name     = $this->_action_name;
 		}
+
+		//Set options for the module
+		$this->_modules[$name]->setOptions($opts);
 
 		return $this->_modules[$name];
 	}

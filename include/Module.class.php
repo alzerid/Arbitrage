@@ -2,6 +2,7 @@
 abstract class Module extends Application
 {
 	protected $_module_name;
+	protected $_options;
 
 	public function __construct($name)
 	{
@@ -10,7 +11,24 @@ abstract class Module extends Application
 
 	abstract function process();
 
-	public function render($_var=NULL)
+	public function renderPartial($view, $_vars=NULL)
+	{
+		global $_conf;
+
+		//Check if view is set
+		$view_path = $_conf['approotpath'] . "modules/{$this->_module_name}/views/{$view}.php";
+
+		if(isset($_vars) && is_array($_vars))
+			extract($_vars);
+
+		ob_start();
+		require_once($view_path);
+		$content = ob_get_clean();
+
+		return $content;
+	}
+
+	public function render($_vars=NULL)
 	{
 		global $_conf;
 
@@ -25,6 +43,11 @@ abstract class Module extends Application
 		$content = ob_get_clean();
 
 		return $content;
+	}
+
+	public function setOptions($options)
+	{
+		$this->_options = $options;
 	}
 
 	public function includeJavascript($file)

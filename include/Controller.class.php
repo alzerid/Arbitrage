@@ -30,9 +30,9 @@ class Controller extends Component
 		$this->_handleReturn($ret);
 	}
 
-	public function renderModule($module)
+	public function renderModule($module, $opts=array())
 	{
-		$module = $this->getModule($module);
+		$module = $this->getModule($module, $opts);
 		return $module->render();
 	}
 
