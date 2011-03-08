@@ -112,7 +112,6 @@ class MongoModel extends Model
 			$notation = explode(".", $notation);
 
 		$key = $notation[0];
-		//var_dump($subject);
 		if($key == "$") //Pivot array inidcator
 		{
 			$val   = &$subject;
@@ -126,7 +125,6 @@ class MongoModel extends Model
 		{
 			//Current key
 			$val = &$subject[$key];
-			var_dump($val);
 			array_shift($notation);
 
 			//recursive
