@@ -1,6 +1,11 @@
 <?
 class MongoModel extends Model
 {
+	public function getID()
+	{
+		return $this->_id;
+	}
+
 	public function normalize()
 	{
 		if(array_key_exists('_id', $this->_originals))
@@ -83,12 +88,31 @@ class MongoModel extends Model
 		$mongo->$db->$table->save($save);
 	}
 
+	public function getDotNotationValue($property)
+	{
+		$ret   = '';
+		$origs = array();
+		$vars  = array();
+
+		$this->_getDotNotationValues($property, $this->_originals, $origs);
+		$this->_getDotNotationValues($property, $this->_variables, $vars);
+
+		if(count($origs))
+			$ret = $origs[0];
+
+		if(count($vars))
+			$ret = $vars[0];
+
+		return $ret;
+	}
+
 	protected function _getDotNotationValues($notation, &$subject, &$values)
 	{
 		if(!is_array($notation))
 			$notation = explode(".", $notation);
 
 		$key = $notation[0];
+		//var_dump($subject);
 		if($key == "$") //Pivot array inidcator
 		{
 			$val   = &$subject;
@@ -98,10 +122,11 @@ class MongoModel extends Model
 			for($i=0; $i<$count; $i++)
 				$this->_getDotNotationValues($notation, $val[$i], $values);
 		}
-		elseif(count($notation) > 1)   //Keep going
+		elseif(isset($subject[$key]) && count($notation) > 1)   //Keep going
 		{
 			//Current key
 			$val = &$subject[$key];
+			var_dump($val);
 			array_shift($notation);
 
 			//recursive
@@ -183,6 +208,11 @@ class MongoModel extends Model
 	}
 
 	protected function _typeCasting()
+	{
+		return array();
+	}
+
+	public function getLabels()
 	{
 		return array();
 	}
