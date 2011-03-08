@@ -128,7 +128,12 @@ Class Form extends HTMLComponent
 			}
 		}
 		else
-			$value = $this->_values[$key[0]];
+		{
+			if(isset($this->_values[$key[0]]))
+				$value = $this->_values[$key[0]];
+			else
+				$value = NULL;
+		}
 
 		return $value;
 	}
