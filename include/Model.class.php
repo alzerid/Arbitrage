@@ -65,6 +65,7 @@ abstract class Model
 
 	abstract public function save();
 	abstract public function update();
+	abstract public function getID();
 
 	//Bulk/Single operations
 	abstract public function findAll($condition = array());
