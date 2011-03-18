@@ -18,6 +18,19 @@ class MongoModel extends Model
 		$this->_typeCastValues();
 	}
 
+	public function count($condition = array())
+	{
+		$mongo = MongoFactory::getInstance();
+		$db    = $this->_db;
+		$table = $this->_table;
+		$class = $this->_class;
+
+		//Get count
+		$cnt = $mongo->$db->$table->count($condition);
+
+		return $cnt;
+	}
+
 	public function findAll($condition = array(), $sort = array())
 	{
 		$mongo = MongoFactory::getInstance();
