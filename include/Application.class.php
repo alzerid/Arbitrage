@@ -118,6 +118,8 @@ class Application
 
 			$component = $name . "Component";
 			$component = new $component;
+			$component->_controller_name = $this->_controller_name;
+			$component->_action_name     = $this->_action_name;
 			$this->_components[$name] = $component;
 		}
 
