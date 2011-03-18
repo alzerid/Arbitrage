@@ -18,7 +18,7 @@ class MongoModel extends Model
 		$this->_typeCastValues();
 	}
 
-	public function findAll($condition = array())
+	public function findAll($condition = array(), $sort = array())
 	{
 		$mongo = MongoFactory::getInstance();
 		$db    = $this->_db;
@@ -27,6 +27,11 @@ class MongoModel extends Model
 
 		//Find entry
 		$rows = $mongo->$db->$table->find($condition);
+
+		//Sort if array is empty
+		if(!empty($rows) && count($sort))
+			$rows = $rows->sort($sort);
+
 		$ret  = array();
 		foreach($rows as $row)
 			$ret[] = new $class($row);
@@ -67,7 +72,7 @@ class MongoModel extends Model
 		$class = $this->_class;	
 
 		//Get variables
-		$vars = $this->_toDotNotation($this->_variables);
+		$vars = $this->_toDotNotation($this->toArray());
 		$cond = array('_id' => $vars['_id']);
 		unset($vars['_id']);
 
@@ -172,7 +177,6 @@ class MongoModel extends Model
 
 			case "boolean":
 			case "bool":
-
 				if(isset($value))
 				{
 					if(is_string($value) && ((strtolower($value) === "true" || strtolower($value) === "on")))
