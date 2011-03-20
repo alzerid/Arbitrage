@@ -4,10 +4,25 @@ class Router
 	static public function getController()
 	{
 		global $_conf;
-		$route  = $_GET['_route'];
+
+		if(trim($_GET['_route']) == '')
+		{
+			if(isset($_conf['routing']['default']))
+			{
+				header("Location: {$_conf['routing']['default']}");
+				die();
+			}
+			else
+			{
+				echo "Default route not set. Please set it in the routing.yaml file.";
+				die();
+			}
+		}
+
+		$route = $_GET['_route'];
 
 		//Parse out the controller and view
-		$route = explode("/", $route);
+		$route      = explode("/", $route);
 		$controller = strtolower($route[0]);
 		$view       = $route[1];
 
@@ -29,6 +44,5 @@ class Router
 
 		return $controller;
 	}
-	
 }
 ?>
