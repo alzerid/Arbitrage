@@ -93,10 +93,8 @@ class Application
 			require_once($_conf['approotpath'] . "modules/{$name}/$name.php");
 
 			$module = $name . "Module";
-			$module = new $module($name, $this->_controller_name, $this->_action_name);
+			$module = new $module($this, $opts);
 			$this->_modules[$name] = $module;
-			$this->_modules[$name]->_controller_name = $this->_controller_name;
-			$this->_modules[$name]->_action_name     = $this->_action_name;
 		}
 
 		//Set options for the module

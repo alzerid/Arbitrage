@@ -4,9 +4,18 @@ abstract class Module extends Application
 	protected $_module_name;
 	protected $_options;
 
-	public function __construct($name)
+	public function __construct($name, $application, $options)
 	{
 		$this->_module_name = $name;
+		
+		//Set all application level entries
+		$this->_controller_name = $application->_controller_name;
+		$this->_action_name     = $application->_action_name;
+		$this->_get             = $application->_get;
+		$this->_post            = $application->_post;
+
+		//Set options
+		$this->_options = $options;
 	}
 
 	abstract function process();
@@ -47,7 +56,10 @@ abstract class Module extends Application
 
 	public function setOptions($options)
 	{
-		$this->_options = $options;
+		if(!empty($this->_options))
+			$this->_options = array_merge($this->_options, $options);
+		else
+			$this->_options = $options;
 	}
 
 	public function includeJavascript($file)

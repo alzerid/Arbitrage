@@ -87,7 +87,7 @@ class Controller extends Component
 
 	public function includeStylesheet($file)
 	{
-		Application::includeStylesheetFile("/stylesheet/$file");
+		Application::includeStylesheetFile("/stylesheets/$file");
 	}
 
 	protected function filters()
