@@ -11,6 +11,25 @@ class Controller extends Component
 		parent::__construct();
 	}
 
+	//Magic functions
+	public function __get($name)
+	{
+		return $this->_get;
+		var_dump($name);
+		die();
+	}
+
+	/* Function gets items from form POST or GET */
+	public function form($key)
+	{
+		if(isset($this->_post[$key]))
+			return $this->_post[$key];
+		elseif(isset($this->_get[$key]))
+			return $this->_get[$key];
+
+		return NULL;
+	}
+
 	public function execute()
 	{
 		//Get filters
@@ -70,6 +89,11 @@ class Controller extends Component
 	public function isPost()
 	{
 		return isset($this->_post['_form']);
+	}
+
+	public function isFormPost()
+	{
+		return (isset($this->_post['_form']) || isset($this->_get['_form']));
 	}
 
 	public function includeControllerJavascript($controller=NULL)
