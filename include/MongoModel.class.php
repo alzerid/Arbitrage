@@ -65,6 +65,19 @@ class MongoModel extends Model
 		return (($ret!=NULL)? new $class($ret) : $ret);
 	}
 
+	public function group($keys, $initial, $function, $opts=array())
+	{
+		$mongo = MongoFactory::getInstance();
+		$db    = $this->_db;
+		$table = $this->_table;
+		$class = $this->_class;	
+
+		//Run group by
+		$ret = $mongo->$db->$table->group($keys, $initial, $function, $opts);
+
+		return $ret;
+	}
+
 	public function remove($condition = array())
 	{
 		$mongo = MongoFactory::getInstance();
