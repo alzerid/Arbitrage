@@ -78,6 +78,19 @@ class MongoModel extends Model
 		return $ret;
 	}
 
+	public function distinct($key, $query=array())
+	{
+		$mongo = MongoFactory::getInstance();
+		$db    = $this->_db;
+		$table = $this->_table;
+		$class = $this->_class;	
+
+		//Distinct
+		$ret = $mongo->$db->command(array('distinct' => $table, 'key' => $key));
+
+		return $ret;
+	}
+
 	public function remove($condition = array())
 	{
 		$mongo = MongoFactory::getInstance();
