@@ -72,17 +72,16 @@ class Controller extends Component
 		return $content;
 	}
 
-	public function render($view, $vars=NULL)
+	public function render($view, $layout="layout", $vars=NULL)
 	{
 		global $_conf;
-		
 		$content = $this->renderPartial($view, $vars);
 
 		if(isset($vars) && is_array($vars))
 			extract($vars);
 
 		//Get layout and render
-		$layout_path = $_conf['approotpath'] . "app/views/layout/layout.php";
+		$layout_path = $_conf['approotpath'] . "app/views/layout/$layout.php";
 		require_once($layout_path);
 	}
 
@@ -101,6 +100,8 @@ class Controller extends Component
 		if($controller == NULL)
 			$controller = $this->_controller_name;
 
+		//Add inline js for controller creation
+		//Application::$_inlinejs .= "";
 		Application::includeJavascriptFile("/cjavascript/$controller.js");
 	}
 
@@ -140,6 +141,7 @@ class Controller extends Component
 			//Get view
 			$view = ((isset($ret['render']))? $ret['render'] : $this->_controller_name . "/" . $this->_action_name);
 			$vars = ((isset($ret['variables']))? $ret['variables'] : NULL);
+			$lay  = ((isset($ret['layout']))? $ret['layout'] : "layout");
 
 			//if view is fales then return
 			if($view === false)
@@ -150,7 +152,7 @@ class Controller extends Component
 				$view = $view . "/index";
 			
 			//require the file
-			$this->render($view, $vars);
+			$this->render($view, $lay, $vars);
 		}
 	}
 
