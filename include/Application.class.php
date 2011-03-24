@@ -14,6 +14,7 @@ class Application
 
 	static private $_javascripts = array();
 	static private $_stylesheets = array();
+	static protected $_inlinejs  = '';
 
 	private $_modules;
 	private $_components;
@@ -122,6 +123,12 @@ class Application
 		}
 
 		return $this->_components[$name];
+	}
+
+	static public function requireLibrary($name)
+	{
+		global $_conf;
+		require_once($_conf['fwrootpath'] . "lib/$name");
 	}
 }
 ?>
