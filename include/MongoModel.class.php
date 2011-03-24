@@ -87,6 +87,7 @@ class MongoModel extends Model
 
 		//Distinct
 		$ret = $mongo->$db->command(array('distinct' => $table, 'key' => $key));
+		$ret = $ret['values'];
 
 		return $ret;
 	}
