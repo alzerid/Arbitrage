@@ -115,6 +115,11 @@ class Controller extends Component
 		Application::includeStylesheetFile("/stylesheets/$file");
 	}
 
+	public function includeExternalStylesheet($url)
+	{
+		Application::includeStylesheetFile($url);
+	}
+
 	protected function filters()
 	{
 		return array();
