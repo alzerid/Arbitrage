@@ -75,7 +75,13 @@ class Controller extends Component
 	public function render($view, $layout="layout", $vars=NULL)
 	{
 		global $_conf;
-		$content = $this->renderPartial($view, $vars);
+
+		//Check for errors in the system
+		$err = Application::getBackTrace();
+		if(!empty($err))
+			$content = $err;
+		else
+			$content = $this->renderPartial($view, $vars);
 
 		if(isset($vars) && is_array($vars))
 			extract($vars);

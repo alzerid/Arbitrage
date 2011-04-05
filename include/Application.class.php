@@ -15,6 +15,7 @@ class Application
 	static private $_javascripts = array();
 	static private $_stylesheets = array();
 	static protected $_inlinejs  = '';
+	static private $_backtrace   = '';  //Backtrace text for error displaying
 
 	private $_modules;
 	private $_components;
@@ -129,6 +130,16 @@ class Application
 	{
 		global $_conf;
 		require_once($_conf['fwrootpath'] . "lib/$name");
+	}
+
+	static public function setBackTrace($txt)
+	{
+		self::$_backtrace = $txt;
+	}
+
+	static public function getBackTrace()
+	{
+		return self::$_backtrace;
 	}
 }
 ?>
