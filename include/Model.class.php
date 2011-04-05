@@ -37,8 +37,10 @@ abstract class Model
 				}
 				else
 					$key = $k;
-
-				$vars[$key] = $v;
+				
+				//Ignore submit button
+				if($key != "submit")
+					$vars[$key] = $v;
 			}
 
 			if($pre == '')
