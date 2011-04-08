@@ -65,6 +65,22 @@ class MongoModel extends Model
 		return (($ret!=NULL)? new $class($ret) : $ret);
 	}
 
+	public function findDBRef($ref, $class)
+	{
+		$mongo = MongoFactory::getInstance();
+		$db    = $this->_db;
+		$table = $this->_table;
+		$class = $this->_class;
+
+		//Find entry
+		$ret = $mongo->$db->getDBRef($ref);
+
+		//Create new class via the $ref
+
+		//return (($ret != NULL)?
+		return $ret;
+	}
+
 	public function group($keys, $initial, $function, $opts=array())
 	{
 		$mongo = MongoFactory::getInstance();
