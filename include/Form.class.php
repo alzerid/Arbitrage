@@ -12,7 +12,7 @@ Class Form extends HTMLComponent
 		
 		$this->_populateObjectVariables($properties);
 		$this->_values = $values;
-		echo "<form id=\"{$this->id}\" name=\"{$this->id}\" method=\"{$this->method}\" action=\"{$this->action}\">\n";
+		echo "<form id=\"{$this->id}\" name=\"{$this->id}\" method=\"{$this->method}\" action=\"{$this->action}\" enctype=\"{$this->enctype}\">\n";
 	}
 
 	public function __get($name)
@@ -110,6 +110,9 @@ Class Form extends HTMLComponent
 		
 		if($this->action == NULL)
 			$this->_properties['action'] = '';
+
+		if($this->enctype == NULL)
+			$this->_properties['enctype'] = 'application/x-www-form-urlencoded';
 	}
 
 	private function _getValue($id)
