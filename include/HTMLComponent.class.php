@@ -133,6 +133,40 @@ class HTMLComponent extends Component
 		return $href;
 	}
 
+	public static function arrayToInput($type, $name, $arr)
+	{
+		$html = "";
+
+		//Generate 
+		$arr  = array($name => $arr);
+		$ret  = self::toArrayNotationString($arr);
+		$func = "input$type";
+
+		foreach($ret as $key=>$value)
+			$html .= self::$func($key, $value);
+
+		return $html;
+	}
+
+	public static function toArrayNotationString($vars, $pre="")
+	{
+		$query = array();
+		foreach($vars as $key=>$value)
+		{
+			if($pre != "")
+				$key = "$pre" . "[" . $key . "]";
+
+			if(is_array($value) && count($value))
+				$query = array_merge($query, self::toArrayNotationString($value, $key));
+			elseif(is_array($value))  //empty array
+				$query = array_merge($query, array($key => array()));
+			else
+				$query = array_merge($query, array($key => $value));
+		}
+
+		return $query;
+
+	}
 
 	private static function _generateAttribs($attribs)
 	{
