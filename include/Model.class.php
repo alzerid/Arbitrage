@@ -112,9 +112,10 @@ abstract class Model
 		return ($this->$name !== NULL);
 	}
 
-	/*public function __unset($name)
+	public function __unset($name)
 	{
+		unset($this->_originals[$name]);
 		unset($this->_variables[$name]);
-	}*/
+	}
 }
 ?>
