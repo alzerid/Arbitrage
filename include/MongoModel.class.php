@@ -183,6 +183,13 @@ class MongoModel extends Model
 			for($i=0; $i<$count; $i++)
 				$this->_getDotNotationValues($notation, $val[$i], $values);
 		}
+		elseif($key == "*")
+		{
+			$val = &$subject;
+			array_shift($notation);
+			foreach($val as $k=>&$v)
+				$this->_getDotNotationValues($notation, $v, $values);
+		}
 		elseif(isset($subject[$key]) && count($notation) > 1)   //Keep going
 		{
 			//Current key
