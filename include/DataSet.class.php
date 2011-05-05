@@ -9,6 +9,7 @@ class DataSet
 	{
 		$this->_variables = array();
 		$this->_originals = array();
+		$this->_id        = $id;
 
 		$this->_originals = $data;
 	}
