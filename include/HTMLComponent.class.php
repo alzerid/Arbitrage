@@ -78,6 +78,14 @@ class HTMLComponent extends Component
 		return $html;
 	}
 
+	public static function inputRadio($id, $attribs=array())
+	{
+		$attribs = HTMLComponent::_generateAttribs($attribs);
+		$html    = "<input type=\"radio\" id=\"$id\" name=\"$id\" $attribs />\n";
+
+		return $html;
+	}
+
 	public static function submitButton($id, $value, $attribs=array())
 	{
 		$attribs = HTMLComponent::_generateAttribs($attribs);
