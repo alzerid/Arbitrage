@@ -119,9 +119,9 @@ class ReturnMedium
 	/**************/
 
 	/** ACCESSORS **/
-	public function getStatus()
+	public function getErrorNo()
 	{
-		return $this->status;
+		return $this->errorno;
 	}
 	
 	public function getMessage($message)
