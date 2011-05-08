@@ -93,6 +93,14 @@ class HTMLComponent extends Component
 
 		return $html;	
 	}
+        
+	public static function imageSubmitButton($id, $value, $src, $attribs=array())
+        {
+                $attribs = HTMLComponent::_generateAttribs($attribs);
+                $html    = "<input type=\"image\" id=\"$id\" name=\"$id\" value=\"$value\" src=\"$src\" alt=\"\" $attribs />\n";
+
+                return $html;
+        }
 
 	public static function inputButton($id, $value, $attribs=array())
 	{
@@ -125,6 +133,14 @@ class HTMLComponent extends Component
 
 		return $html;
 	}
+
+	public static function image($id,$src,$attribs=array())
+        {
+                $attribs = HTMLComponent::_generateAttribs($attribs);
+                $html    = "<img name=\"$id\" id=\"$id\" src=\"$src\" $attribs />\n";
+
+                return $html;
+        }
 
 	public static function generateLink($tag, $url, $attribs = NULL)
 	{

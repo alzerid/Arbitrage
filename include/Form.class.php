@@ -81,6 +81,11 @@ Class Form extends HTMLComponent
 	{
 		return HTMLComponent::submitButton("{$this->id}_$id", $value, $attribs);
 	}
+	
+	public function imageSubmit($id, $valid, $src, $attribs=array())
+	{
+		return HTMLComponent::imageSubmitButton("{$this->id}_$id", $value, $src, $attribs);
+	}
 
 	public function hidden($id, $value=NULL, $attribs=array())
 	{
