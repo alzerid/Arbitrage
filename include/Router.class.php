@@ -7,9 +7,15 @@ class Router
 
 		if(trim($_GET['_route']) == '')
 		{
+			//Attach get string
+			$get = '';
+			unset($_GET['_route']);
+			if(isset($_GET) && count($_GET))
+				$get = '?' . http_build_query($_GET);
+
 			if(isset($_conf['routing']['default']))
 			{
-				header("Location: {$_conf['routing']['default']}");
+				header("Location: {$_conf['routing']['default']}$get");
 				die();
 			}
 			else
