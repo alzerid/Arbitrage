@@ -2,11 +2,13 @@
 class Controller extends Component
 {
 	private $_filters;
+	private $_view_vars;
 
 	public function __construct($controller, $action)
 	{
 		$this->_controller_name = $controller;
 		$this->_action_name     = $action;
+		$this->_view_vars       = array();
 
 		parent::__construct();
 	}
@@ -72,19 +74,25 @@ class Controller extends Component
 		return $content;
 	}
 
-	public function render($view, $layout="layout", $vars=NULL)
+	public function render($view, $layout="layout", $_vars=NULL)
 	{
 		global $_conf;
+
+		//merge _view_vars
+		if($_vars != NULL)
+			$_vars = array_merge($this->_view_vars, $_vars);
+		elseif(count($this->_view_vars))
+			$_vars = $this->_view_vars;
 
 		//Check for errors in the system
 		$err = Application::getBackTrace();
 		if(!empty($err))
 			$content = $err;
 		else
-			$content = $this->renderPartial($view, $vars);
+			$content = $this->renderPartial($view, $_vars);
 
-		if(isset($vars) && is_array($vars))
-			extract($vars);
+		if(isset($_vars) && is_array($_vars) && count($_vars))
+			extract($_vars);
 
 		//Get layout and render
 		$layout_path = $_conf['approotpath'] . "app/views/layout/$layout.php";
@@ -129,6 +137,11 @@ class Controller extends Component
 	public function includeExternalStylesheet($url)
 	{
 		Application::includeStylesheetFile($url);
+	}
+
+	public function addViewVariables($vars)
+	{
+		$this->_view_vars = array_merge($this->_view_vars, $vars);
 	}
 
 	protected function filters()
