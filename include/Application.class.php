@@ -141,5 +141,10 @@ class Application
 	{
 		return self::$_backtrace;
 	}
+
+	static public function resetSession()
+	{
+		session_destroy();
+	}
 }
 ?>
