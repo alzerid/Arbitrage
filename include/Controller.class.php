@@ -116,6 +116,11 @@ class Controller extends Component
 		Application::includeJavascriptFile("/javascript/$link");
 	}
 
+	public function includeExternalJavascript($url)
+	{
+		Application::includeJavascriptFile($url);
+	}
+
 	public function includeStylesheet($file)
 	{
 		Application::includeStylesheetFile("/stylesheets/$file");
