@@ -168,6 +168,14 @@ class MongoModel extends Model
 		return $ret;
 	}
 
+	static public function getMongoIDTime($timestamp)
+	{
+		$date = new DateTime($timestamp);
+		$date = str_pad(dechex($date->getTimestamp()), 24, "0", STR_PAD_RIGHT);
+
+		return new MongoId($date);
+	}
+
 	protected function _getDotNotationValues($notation, &$subject, &$values)
 	{
 		if(!is_array($notation))
