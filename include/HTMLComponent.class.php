@@ -134,13 +134,13 @@ class HTMLComponent extends Component
 		return $html;
 	}
 
-	public static function image($id,$src,$attribs=array())
-        {
-                $attribs = HTMLComponent::_generateAttribs($attribs);
-                $html    = "<img name=\"$id\" id=\"$id\" src=\"$src\" $attribs />\n";
+	public static function image($id, $src, $attribs=array())
+	{
+		$attribs = HTMLComponent::_generateAttribs($attribs);
+		$html    = "<img name=\"$id\" id=\"$id\" src=\"$src\" $attribs />\n";
 
-                return $html;
-        }
+		return $html;
+	}
 
 	public static function generateLink($tag, $url, $attribs = NULL)
 	{
