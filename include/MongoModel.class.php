@@ -196,7 +196,12 @@ class MongoModel extends Model
 			$val = &$subject;
 			array_shift($notation);
 			foreach($val as $k=>&$v)
-				$this->_getDotNotationValues($notation, $v, $values);
+			{
+				if(is_array($v))
+					$this->_getDotNotationValues($notation, $v, $values);
+				else
+					$values[] = &$subject[$k];
+			}
 		}
 		elseif(isset($subject[$key]) && count($notation) > 1)   //Keep going
 		{
@@ -247,6 +252,9 @@ class MongoModel extends Model
 			case "string":
 				return ((string) $value);
 
+			case "utf8":
+				return utf8_encode($value);
+
 			case "boolean":
 			case "bool":
 				if(isset($value))
@@ -276,6 +284,10 @@ class MongoModel extends Model
 					return new MongoId($value);
 
 				return $value;
+
+			case "mongobindata":
+				if(!is_object($value))
+					return new MongoBinData($value);
 		}
 		
 		return $value;
