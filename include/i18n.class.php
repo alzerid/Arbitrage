@@ -1,9 +1,36 @@
 <?
 class Language
 {
-	protected $i18n;
-	public $phoneFields;
-	public $name;
+	protected $_i18n;
+	protected $_language;
+	protected $_locale;
+
+	public function __construct($file)
+	{
+		global $_conf;
+
+		$lang            = explode('_', $file);
+		$this->_language = strtolower($lang[0]);
+		$this->_locale   = strtolower($lang[1]);
+		$this->_i18n     = array();
+
+		//Load up the file
+		$i18n = &$this->_i18n;
+		require_once($_conf['approotpath'] . "app/i18n/$file.i18n.php");
+	}
+
+	public function __get($var)
+	{
+		if(isset($this->_i18n) && isset($this->_i18n[$var]))
+			return $this->_i18n[$var];
+
+		return NULL;
+	}
+
+	public function getContent()
+	{
+		return $this->_i18n;
+	}
 
 	public function _($l)
 	{
@@ -12,47 +39,20 @@ class Language
 
 	public function get($l)
 	{
-		if(array_key_exists($l, $this->i18n))
-			return $this->i18n[$l];
+		if(array_key_exists($l, $this->_i18n))
+			return $this->_i18n[$l];
 
 		return null;
 	}
-}
 
-class LanguageFactory
-{
-	static function getLanguage($module, $lang=null)
+	public function getLocale()
 	{
-		global $_conf;
+		return $this->_locale;
+	}
 
-		if($lang == null)
-		{
-			//Set default locale
-			$locale   = "en";
-			$language = "en";
-			$country  = "us";
-		}
-		else
-		{
-			$ex = explode("_", $lang);
-			$locale   = $ex[0];
-			$language = $ex[0];
-			$country  = $ex[1];
-		}	
-
-		//Get object
-		$full_path = "{$_conf['fsrootpath']}/modules/$module/i18n/$lang.php";
-		if(file_exists($full_path))
-			require_once($full_path);
-		else
-		{
-			trigger_error("Unable to grab language '$lang'.", E_USER_ERROR);
-			die();
-		}
-
-		$lang = new PathLanguage();
-
-		return $lang;
+	public function getLanguage()
+	{
+		return $this->_language;
 	}
 }
 ?>
