@@ -3,7 +3,7 @@ class Router
 {
 	static public function getController()
 	{
-		global $_conf;
+		$conf = Application::getConfig();
 
 		if(trim($_GET['_route']) == '')
 		{
@@ -13,9 +13,9 @@ class Router
 			if(isset($_GET) && count($_GET))
 				$get = '?' . http_build_query($_GET);
 
-			if(isset($_conf['routing']['default']))
+			if(isset($conf->routing['default']))
 			{
-				header("Location: {$_conf['routing']['default']}$get");
+				header("Location: {$conf->routing['default']}$get");
 				die();
 			}
 			else
@@ -33,14 +33,17 @@ class Router
 		$view       = $route[1];
 
 		//Require once the controller
-		$controller_path = $_conf['approotpath'] . "app/controllers/$controller.php";
+		$controller_path = $conf->approotpath . "app/controllers/$controller.php";
+		if(!file_exists($controller_path))
+			throw new CocaineException('Unable to load route ' . implode('/', $route) . '.');
+
 		require_once($controller_path);
 
 		//check to see if we are calling ajax
 		if(isset($_GET['_ajax']))
 		{
 			//require the base controller
-			$controller_path = $_conf['approotpath'] . "app/ajax/$controller.php";
+			$controller_path = $conf->approotpath . "app/ajax/$controller.php";
 			require_once($controller_path);
 			$controller     .= "Ajax";
 		}

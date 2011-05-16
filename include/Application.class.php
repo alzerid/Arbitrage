@@ -75,13 +75,9 @@ class Application
 		return $ret;
 	}
 
-	static public function initialize()
+	static public function getConfig()
 	{
-		//Initialize Components
-		//Application::initializeComponenets();
-
-		//Initialize Modules
-		//Application::initializeModules();
+		return CocaineConfig::getInstance();
 	}
 
 	public function getModule($name, $opts=array())
