@@ -161,8 +161,7 @@ class Application
 		if(preg_match('/Model/', $class_name))
 		{
 			$class = strtolower(str_replace("Model", "", $class_name));
-			$file  = "{$conf->approotpath}model/$class.php";
-			var_dump($file);
+			$file  = "{$conf->approotpath}app/models/$class.php";
 			if(!file_exists($file))
 				throw new CocaineException("Unable to load model '$class_name'.");
 
