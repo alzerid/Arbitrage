@@ -29,6 +29,11 @@ class CocaineConfig
 		$this->_variables['approotpath'] = realpath("$root/../") . "/";
 	}
 
+	public function getVariables()
+	{
+		return $this->_variables;
+	}
+
 	public function load($filename)
 	{
 		//Determine if it is a YAML file or PHP file
@@ -43,7 +48,6 @@ class CocaineConfig
 				$this->_loadYAML($filename);
 				break;
 		}
-
 	}
 
 	public function __get($name)
