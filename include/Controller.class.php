@@ -80,6 +80,8 @@ class Controller extends Component
 
 	public function render($view, $layout="layout", $_vars=NULL)
 	{
+		$conf = Application::getConfig();
+
 		//merge _view_vars
 		if($_vars != NULL)
 			$_vars = array_merge($this->_view_vars, $_vars);
@@ -173,16 +175,16 @@ class Controller extends Component
 
 			//Get default return type
 			$render = ((isset($conf->render['default']))? $conf->render['default'] : 'View');
-			switch($render)
+			switch(strtolower($render))
 			{
-				case "ReturnMedium":
+				case "returnmedium":
 					$rm = new ReturnMedium;
 					$rm->setMessage('');
 					$ret['render'] = $rm;
 
 					break;
 
-				case "View":
+				case "view":
 					$ret['render'] = $this->_controller_name . "/" . $this->_action_name;
 					break;
 			}
@@ -191,7 +193,7 @@ class Controller extends Component
 		//Render based on type
 		if($ret['render'] === false)
 			return;
-		elseif(get_class($ret['render']) == "ReturnMedium")
+		elseif(is_object($ret['render']) && get_class($ret['render']) == "ReturnMedium")
 			echo $ret['render']->render();
 		elseif(is_string($ret['render']))
 		{
