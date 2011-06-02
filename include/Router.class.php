@@ -13,9 +13,9 @@ class Router
 			if(isset($_GET) && count($_GET))
 				$get = '?' . http_build_query($_GET);
 
-			if(isset($conf->routing['default']))
+			if(isset($conf->routing['_default']))
 			{
-				header("Location: {$conf->routing['default']}$get");
+				header("Location: {$conf->routing['_default']}$get");
 				die();
 			}
 			else
@@ -39,6 +39,20 @@ class Router
 
 		require_once($controller_path);
 
+		//Do some advanced routing logic
+		$routing = $conf->routing;
+		if(isset($routing[$controller]))
+		{
+			foreach($routing[$controller] as $match => $val)
+			{
+				if(preg_match($match, $view))
+				{
+					$view = $val;
+					break;
+				}
+			}
+		}
+
 		//check to see if we are calling ajax
 		if(isset($_GET['_ajax']))
 		{
@@ -48,6 +62,7 @@ class Router
 			$controller     .= "Ajax";
 		}
 
+		//Get controller and view
 		$controller_name = ucfirst($controller) . "Controller";
 		$controller = new $controller_name($controller, $view);
 
