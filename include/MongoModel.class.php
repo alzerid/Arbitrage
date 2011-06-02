@@ -31,7 +31,7 @@ class MongoModel extends Model
 		return $cnt;
 	}
 
-	public function findAll($condition = array(), $sort = array())
+	public function findAll($condition = array(), $sort = array(), $limit=-1)
 	{
 		$mongo = MongoFactory::getInstance();
 		$db    = $this->_db;
@@ -44,6 +44,10 @@ class MongoModel extends Model
 		//Sort if array is empty
 		if(!empty($rows) && count($sort))
 			$rows = $rows->sort($sort);
+
+		//Limit
+		if(!empty($rows) && $limit > 0)
+			$rows = $rows->limit($limit);
 
 		$ret  = array();
 		foreach($rows as $row)
@@ -166,6 +170,14 @@ class MongoModel extends Model
 			$ret = $vars[0];
 
 		return $ret;
+	}
+
+	public function getMongoIDTimestamp()
+	{
+		$id = $this->_id;
+		$ts = hexdec(substr($id, 0, 8));
+		
+		return $ts;
 	}
 
 	static public function getMongoIDTime($timestamp)
