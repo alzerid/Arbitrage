@@ -1,32 +1,42 @@
 <?php
+session_start();
 
-require_once('{COCAINE_DIRECTORY}/bootstrap.php');
-require_once($_conf['fsfwpath'] . 'include/API.class.php');
-require_once($_conf['fsfwpath'] . 'include/XMLDomConstruct.class.php');
-require_once($_conf['fsfwpath'] . 'include/Router.class.php');
-require_once($_conf['fsfwpath'] . 'include/FastLog.class.php');
-require_once($_conf['fsfwpath'] . 'lib/common/HelperFunctions.php');
-require_once($_conf['fsfwpath'] . 'include/Error.class.php');
-require_once($_conf['fsfwpath'] . 'include/ReturnMedium.class.php');
-require_once($_conf['fsfwpath'] . 'lib/distributed_cache/Cache.class.php');
-require_once($_conf['fsfwpath'] . 'lib/database/MongoFactory.class.php');
-require_once($_conf['fsfwpath'] . 'lib/database/DB.class.php');
-require_once($_conf['fsfwpath'] . 'include/dao.php');
-require_once($_conf['fsfwpath'] . 'include/Model.php');
-require_once($_conf['fsfwpath'] . 'include/Business.class.php');
-
-//Get API class from Router
-$api = Router::getAPI();
-
-if($api == NULL)
+try
 {
-  //Log the error
-  FastLog::logit("core", __FILE__, "Unable to get API class.");
+	require_once('bootstrap.php');
 
-  //TODO: Die with an error json return
-  die();
+	//Get API class from Router
+	$controller = Router::getController();
+	if($controller == NULL)
+	{
+		//Log the error
+		FastLog::logit("core", __FILE__, "Unable to get Controller class.");
+
+		//TODO: Die with an error json return
+		die();
+	}
+		
+	//Execute the api
+	$controller->execute();
 }
-	
-//Execute the api
-$api->execute();
+catch(Exception $ex)
+{
+	//Check how we will be displaying this error
+	$conf = Application::getConfig();
+	$type = $conf->cocaine['exception_handler']['type'];
+	switch($type)
+	{
+		case "ReturnMedium":
+			$rm = new ReturnMedium;
+			$rm->setErrorNo($ex->getCode());
+			$rm->setMessage($ex->getMessage());
+
+			echo $rm->render();
+			die();
+			break;
+	}
+	//Handle exception
+	echo "HANDLE EXCEPTION<br/>";
+	echo $ex->getMessage();
+}
 ?>
