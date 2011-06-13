@@ -19,7 +19,7 @@ class ReturnMedium
 	{
 		$this->skipheader = false;
     $this->errorno    = 0;
-    $this->message    = "";
+    $this->message    = "Success.";
     $this->user       = NULL;
 
     $this->setType($type);

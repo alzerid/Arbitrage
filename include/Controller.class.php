@@ -45,6 +45,10 @@ class Controller extends Component
 		$this->_runFilter($before_filter);
 
 		//TODO: Pass params if there are any 
+		if(!method_exists($this, $action))
+			throw new CocaineException("No action by '{$this->_action_name}' is available.");
+
+		//Call the action
 		$ret = $this->$action();
 
 		//Handle return
@@ -59,10 +63,10 @@ class Controller extends Component
 
 	public function renderPartial($view, $_vars=NULL)
 	{
-		global $_conf;
+		$conf = Application::getConfig();
 
 		//Check if view is set
-		$view_path = $_conf['approotpath'] . "app/views/$view.php";
+		$view_path = $conf->approotpath . "app/views/$view.php";
 
 		if(isset($_vars) && is_array($_vars))
 			extract($_vars);
@@ -76,7 +80,7 @@ class Controller extends Component
 
 	public function render($view, $layout="layout", $_vars=NULL)
 	{
-		global $_conf;
+		$conf = Application::getConfig();
 
 		//merge _view_vars
 		if($_vars != NULL)
@@ -95,7 +99,7 @@ class Controller extends Component
 			extract($_vars);
 
 		//Get layout and render
-		$layout_path = $_conf['approotpath'] . "app/views/layout/$layout.php";
+		$layout_path = $conf->approotpath . "app/views/layout/$layout.php";
 		require_once($layout_path);
 	}
 
@@ -161,20 +165,42 @@ class Controller extends Component
 
 	private function _handleReturn($ret)
 	{
-		global $_conf;
+		$conf = Application::getConfig();
 
-		if(isset($ret['render']) && get_class($ret['render']) == "ReturnMedium")
+		//Check if ret is set
+		if(!isset($ret) || !isset($ret['render']))
+		{
+			if(!isset($ret))
+				$ret = array();
+
+			//Get default return type
+			$render = ((isset($conf->render['default']))? $conf->render['default'] : 'View');
+			switch(strtolower($render))
+			{
+				case "returnmedium":
+					$rm = new ReturnMedium;
+					$rm->setMessage('');
+					$ret['render'] = $rm;
+
+					break;
+
+				case "view":
+					$ret['render'] = $this->_controller_name . "/" . $this->_action_name;
+					break;
+			}
+		}
+
+		//Render based on type
+		if($ret['render'] === false)
+			return;
+		elseif(is_object($ret['render']) && get_class($ret['render']) == "ReturnMedium")
 			echo $ret['render']->render();
-		else
+		elseif(is_string($ret['render']))
 		{
 			//Get view
-			$view = ((isset($ret['render']))? $ret['render'] : $this->_controller_name . "/" . $this->_action_name);
+			$view = $ret['render'];
 			$vars = ((isset($ret['variables']))? $ret['variables'] : NULL);
 			$lay  = ((isset($ret['layout']))? $ret['layout'] : "layout");
-
-			//if view is fales then return
-			if($view === false)
-				return;
 
 			//No view specified use index  
 			if(!strstr($view, "/"))

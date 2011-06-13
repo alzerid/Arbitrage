@@ -39,6 +39,8 @@ class Application
 		$this->_components = array();
 		
 		$this->pageTitle = "";
+
+		spl_autoload_register('Application::autoload', true, true);
 	}
 
 	static function includeJavascriptFile($file)
@@ -75,13 +77,9 @@ class Application
 		return $ret;
 	}
 
-	static public function initialize()
+	static public function getConfig()
 	{
-		//Initialize Components
-		//Application::initializeComponenets();
-
-		//Initialize Modules
-		//Application::initializeModules();
+		return CocaineConfig::getInstance();
 	}
 
 	public function getModule($name, $opts=array())
@@ -145,6 +143,30 @@ class Application
 	static public function resetSession()
 	{
 		session_destroy();
+	}
+	
+	static public function requireController($filename)
+	{
+		$config = Application::getConfig();
+		$file   = "{$config->approotpath}/app/controllers/$filename";
+		if(!file_exists($file))
+			throw new CocaineException("Unable to include controller '$filename'.");
+
+		require_once($file);
+	}
+
+	static public function autoload($class_name)
+	{
+		$conf = Application::getConfig();
+		if(preg_match('/Model/', $class_name))
+		{
+			$class = strtolower(str_replace("Model", "", $class_name));
+			$file  = "{$conf->approotpath}app/models/$class.php";
+			if(!file_exists($file))
+				throw new CocaineException("Unable to load model '$class_name'.");
+
+			require_once($file);
+		}
 	}
 }
 ?>
