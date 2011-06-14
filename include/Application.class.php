@@ -168,5 +168,18 @@ class Application
 			require_once($file);
 		}
 	}
+
+	static public function getDefaultLogger()
+	{
+		$conf = Application::getConfig();
+		$log  = $conf->logger;
+
+		if(!isset($log))
+			throw new CocaineException("Unable to get default logger. Please set it up correctly in the config file.");
+
+		$logger = LogFacilityFactory::getLogger($log['type'], $log['properties']);
+
+		return $logger;
+	}
 }
 ?>
