@@ -34,6 +34,11 @@ class CocaineConfig
 		return $this->_variables;
 	}
 
+	public function setVariable($key, $value)
+	{
+		$this->_variables[$key] = $value;
+	}
+
 	public function load($filename)
 	{
 		//Determine if it is a YAML file or PHP file

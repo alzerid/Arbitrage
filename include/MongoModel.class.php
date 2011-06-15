@@ -86,6 +86,11 @@ class MongoModel extends Model
 		return $ret;
 	}
 
+	public function createDBRef()
+	{
+		return MongoDBRef::create($this->_table, $this->_id, $this->_db);
+	}
+
 	public function group($keys, $initial, $function, $opts=array())
 	{
 		$mongo = MongoFactory::getInstance();
