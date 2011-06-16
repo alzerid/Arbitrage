@@ -5,7 +5,7 @@ abstract class ScriptApplication extends Application
 	{
 		global $argv;
 
-		$_GET  = $argv;
+		$_GET  = array_slice($argv, 2);
 		$_POST = $_GET;
 
 		parent::__construct();
