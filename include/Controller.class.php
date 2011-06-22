@@ -168,7 +168,7 @@ class Controller extends Component
 		$conf = Application::getConfig();
 
 		//Check if ret is set
-		if(!isset($ret) || !isset($ret['render']))
+		if(!isset($ret) || (is_array($ret) && !isset($ret['render'])))
 		{
 			if(!isset($ret))
 				$ret = array();

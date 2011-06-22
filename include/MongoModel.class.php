@@ -130,7 +130,7 @@ class MongoModel extends Model
 	}
 
 	//Function only updates the entry
-	public function update()
+	public function update($opts=array())
 	{
 		$mongo = MongoFactory::getInstance();
 		$db    = $this->_db;
@@ -143,7 +143,7 @@ class MongoModel extends Model
 		unset($vars['_id']);
 
 		$set = array('$set' => $vars);
-		$mongo->$db->$table->update($cond, $set);
+		$mongo->$db->$table->update($cond, $set, $opts);
 	}
 
 	public function save()
