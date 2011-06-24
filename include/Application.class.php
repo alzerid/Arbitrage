@@ -43,6 +43,11 @@ class Application
 		spl_autoload_register('Application::autoload', true, true);
 	}
 
+	static function generateJavascriptLink($file)
+	{
+		return "<script language='JavaScript' src='$file'></script>\n";
+	}
+
 	static function includeJavascriptFile($file)
 	{
 		self::$_javascripts[] = $file;
