@@ -29,6 +29,11 @@ class CocaineConfig
 		$this->_variables['approotpath'] = realpath("$root/../") . "/";
 	}
 
+	public function getEnvironment()
+	{
+		return $this->_env;
+	}
+
 	public function getVariables()
 	{
 		return $this->_variables;
