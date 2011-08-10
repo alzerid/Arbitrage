@@ -45,7 +45,7 @@ class Application
 
 	static function generateJavascriptLink($file)
 	{
-		return "<script language='JavaScript' src='$file'></script>\n";
+		return "<script type=\"text/javascript\" language=\"JavaScript\" src=\"$file\"></script>\n";
 	}
 
 	static function includeJavascriptFile($file)
@@ -64,7 +64,7 @@ class Application
 		if(count(self::$_javascripts))
 		{
 			foreach(self::$_javascripts as $js)
-				$ret .= "<script language='JavaScript' src='$js'></script>\n";
+				$ret .= "<script type=\"text/javascript\" language=\"JavaScript\" src=\"$js\"></script>\n";
 		}
 
 		return $ret;
