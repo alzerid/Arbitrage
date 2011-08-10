@@ -51,6 +51,10 @@ class Controller extends Component
 		//Call the action
 		$ret = $this->$action();
 
+		//Run after filter
+		$after_filter = ((isset($filters['after_filter']))? $filters['after_filter'] : NULL);
+		$this->_runFilter($after_filter);
+
 		//Handle return
 		$this->_handleReturn($ret);
 	}
