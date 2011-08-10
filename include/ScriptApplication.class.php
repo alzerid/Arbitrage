@@ -1,6 +1,9 @@
 <?
 abstract class ScriptApplication extends Application
 {
+	static private $_LOADING = array("|", "/", "-", "\\");
+	static private $_LIDX    = 0;
+
 	public function __construct()
 	{
 		global $argv;
@@ -32,8 +35,16 @@ abstract class ScriptApplication extends Application
 		require_once($file);
 	}
 
+	static public function loadingPrint($message)
+	{
+		echo $message . self::$_LOADING[self::$_LIDX] . "\r";
+		self::$_LIDX = (++self::$_LIDX % count(self::$_LOADING));
+	}
+
 	abstract public function run();
 	abstract public function help();
+
+
 
 	//Parse arguments
 
