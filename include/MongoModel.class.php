@@ -187,10 +187,10 @@ class MongoModel extends Model
 		return $ts;
 	}
 
-	static public function getMongoIDTime($timestamp)
+	static public function getMongoIDTime($timestamp, $padding="0")
 	{
 		$date = new DateTime($timestamp);
-		$date = str_pad(dechex($date->getTimestamp()), 24, "0", STR_PAD_RIGHT);
+		$date = str_pad(dechex($date->getTimestamp()), 24, $padding, STR_PAD_RIGHT);
 
 		return new MongoId($date);
 	}
