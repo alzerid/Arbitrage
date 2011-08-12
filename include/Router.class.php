@@ -54,17 +54,20 @@ class Router
 		}
 
 		//check to see if we are calling ajax
+		$ajax = false;
 		if(isset($_GET['_ajax']))
 		{
 			//require the base controller
 			$controller_path = $conf->approotpath . "app/ajax/$controller.php";
 			require_once($controller_path);
 			$controller     .= "Ajax";
+			$ajax            = true;
 		}
 
 		//Get controller and view
 		$controller_name = ucfirst($controller) . "Controller";
 		$controller = new $controller_name($controller, $view);
+		$controller->setAjax($ajax);
 
 		return $controller;
 	}

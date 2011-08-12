@@ -3,12 +3,14 @@ class Controller extends Component
 {
 	private $_filters;
 	private $_view_vars;
+	private $_ajax;
 
 	public function __construct($controller, $action)
 	{
 		$this->_controller_name = $controller;
 		$this->_action_name     = $action;
 		$this->_view_vars       = array();
+		$this->_ajax            = false;
 
 		parent::__construct();
 	}
@@ -19,6 +21,16 @@ class Controller extends Component
 		return $this->_get;
 		var_dump($name);
 		die();
+	}
+
+	public function setAjax($bool)
+	{
+		$this->_ajax = $bool;
+	}
+
+	public function isAjax()
+	{
+		return $this->_ajax;
 	}
 
 	/* Function gets items from form POST or GET */
