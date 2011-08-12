@@ -41,8 +41,7 @@ class Controller extends Component
 		$action = $this->_action_name . "action";
 
 		//Run before filter
-		$before_filter = ((isset($filters['before_filter']))? $filters['before_filter'] : NULL);
-		$this->_runFilter($before_filter);
+		$this->_runFilter('before_filter');
 
 		//TODO: Pass params if there are any 
 		if(!method_exists($this, $action))
@@ -52,8 +51,7 @@ class Controller extends Component
 		$ret = $this->$action();
 
 		//Run after filter
-		$after_filter = ((isset($filters['after_filter']))? $filters['after_filter'] : NULL);
-		$this->_runFilter($after_filter);
+		$this->_runFilter('after_filter');
 
 		//Handle return
 		$this->_handleReturn($ret);
@@ -102,9 +100,22 @@ class Controller extends Component
 		if(isset($_vars) && is_array($_vars) && count($_vars))
 			extract($_vars);
 
-		//Get layout and render
+		//Get layout
 		$layout_path = $conf->approotpath . "app/views/layout/$layout.php";
+		ob_start();
 		require_once($layout_path);
+		$content = ob_get_clean();
+
+		//Check if there are post processing filters
+		//$stime = microtime();
+		$ret = $this->_runFilter('post_process', array('html' => $content));
+		//$etime = microtime();
+
+		if(isset($ret))
+			$content = $ret;
+
+		//Render layout
+		echo $content;
 	}
 
 	public function isPost()
@@ -215,24 +226,28 @@ class Controller extends Component
 		}
 	}
 
-	private function _runFilter($filters)
+	private function _runFilter($filter, $params=array())
 	{
-		if($filters == NULL)
+		$filters = $this->filters();
+		if(!array_key_exists($filter, $filters))
 			return;
+
+		//Get filters
+		$filters = $filters[$filter];
 
 		//Run through array
 		foreach($filters as $filter)
 		{
 			if(is_string($filter))
-				$this->$filter();
+				return $this->$filter($params);
 			elseif(is_object($filter) && get_parent_class($filter) == "Filter")
-				$filter->execute();
+				return $filter->execute($params);
 			elseif(is_array($filter))
 			{
 				$component = $filter['component'];
 				$method    = $filter['method'];
 
-				$component->$method();
+				return $component->$method($params);
 			}
 		}
 	}
