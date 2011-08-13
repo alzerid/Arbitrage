@@ -86,7 +86,7 @@ class Controller extends Component
 			extract($_vars);
 
 		ob_start();
-		require_once($view_path);
+		require($view_path);
 		$content = ob_get_clean();
 
 		return $content;
