@@ -1,5 +1,5 @@
 <?
-class CocaineConfig
+class ArbitrageConfig
 {
 	static private $_instance = NULL;
 	protected $_variables;
@@ -14,7 +14,7 @@ class CocaineConfig
 	static public function getInstance()
 	{
 		if(self::$_instance == NULL)
-			self::$_instance = new CocaineConfig;
+			self::$_instance = new ArbitrageConfig;
 
 		return self::$_instance;
 	}
@@ -25,7 +25,7 @@ class CocaineConfig
 		$this->_env  = $env;
 
 		//Setup paths
-		$this->_variables['fwrootpath']  = COCAINE_FW_PATH;
+		$this->_variables['fwrootpath']  = ARBITRAGE_FW_PATH;
 		$this->_variables['approotpath'] = realpath("$root/../") . "/";
 	}
 

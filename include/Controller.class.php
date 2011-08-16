@@ -57,7 +57,7 @@ class Controller extends Component
 
 		//TODO: Pass params if there are any 
 		if(!method_exists($this, $action))
-			throw new CocaineException("No action by '{$this->_action_name}' is available.");
+			throw new ArbitrageException("No action by '{$this->_action_name}' is available.");
 
 		//Call the action
 		$ret = $this->$action();

@@ -1,0 +1,5 @@
+<?
+class ArbitrageException extends Exception
+{
+}
+?>

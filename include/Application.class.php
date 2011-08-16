@@ -84,7 +84,7 @@ class Application
 
 	static public function getConfig()
 	{
-		return CocaineConfig::getInstance();
+		return ArbitrageConfig::getInstance();
 	}
 
 	public function getModule($name, $opts=array())
@@ -155,7 +155,7 @@ class Application
 		$config = Application::getConfig();
 		$file   = "{$config->approotpath}/app/controllers/$filename";
 		if(!file_exists($file))
-			throw new CocaineException("Unable to include controller '$filename'.");
+			throw new ArbitrageException("Unable to include controller '$filename'.");
 
 		require_once($file);
 	}
@@ -168,7 +168,7 @@ class Application
 			$class = strtolower(str_replace("Model", "", $class_name));
 			$file  = "{$conf->approotpath}app/models/$class.php";
 			if(!file_exists($file))
-				throw new CocaineException("Unable to load model '$class_name'.");
+				throw new ArbitrageException("Unable to load model '$class_name'.");
 
 			require_once($file);
 		}
@@ -180,7 +180,7 @@ class Application
 		$log  = $conf->logger;
 
 		if(!isset($log))
-			throw new CocaineException("Unable to get default logger. Please set it up correctly in the config file.");
+			throw new ArbitrageException("Unable to get default logger. Please set it up correctly in the config file.");
 
 		$logger = LogFacilityFactory::getLogger($log['type'], $log['properties']);
 

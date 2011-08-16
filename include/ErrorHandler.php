@@ -1,6 +1,6 @@
 <?
 
-function cocaine_error_handler($errno, $errstr, $errfile, $errline)
+function arbitrage_error_handler($errno, $errstr, $errfile, $errline)
 {
 	$summary = <<<HTML
 	<span style="font-size: 20px; color: red;">AN ERROR OCCURRED</span>
@@ -71,5 +71,5 @@ HTML;
 }
 
 
-set_error_handler('cocaine_error_handler');
+set_error_handler('arbitrage_error_handler');
 ?>

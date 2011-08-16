@@ -35,7 +35,7 @@ class Router
 		//Require once the controller
 		$controller_path = $conf->approotpath . "app/controllers/$controller.php";
 		if(!file_exists($controller_path))
-			throw new CocaineException('Unable to load route ' . implode('/', $route) . '.');
+			throw new ArbitrageException('Unable to load route ' . implode('/', $route) . '.');
 
 		require_once($controller_path);
 

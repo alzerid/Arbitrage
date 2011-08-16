@@ -30,7 +30,7 @@ abstract class ScriptApplication extends Application
 		$config = Application::getConfig();
 		$file   = "{$config->scriptrootpath}/$filename";
 		if(!file_exists($file))
-			throw new CocaineException("Unable to include controller '$filename'.");
+			throw new ArbitrageException("Unable to include controller '$filename'.");
 
 		require_once($file);
 	}

@@ -1,5 +1,0 @@
-<?
-class CocaineException extends Exception
-{
-}
-?>
