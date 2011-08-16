@@ -1,11 +1,11 @@
 <?
-define("COCAINE_FW_PATH", "/domain/cocaine/");
+define("ARBITRAGE_FW_PATH", "/domain/arbitrage/");
 
 //Pre boot files that are needed before application boot
-require_once(COCAINE_FW_PATH . 'include/CocaineException.class.php');
-require_once(COCAINE_FW_PATH . 'include/Application.class.php');
-require_once(COCAINE_FW_PATH . 'include/CocaineConfig.class.php');
-require_once(COCAINE_FW_PATH . 'lib/local_cache/LocalCacheFactory.class.php');
+require_once(ARBITRAGE_FW_PATH . 'include/ArbitrageException.class.php');
+require_once(ARBITRAGE_FW_PATH . 'include/Application.class.php');
+require_once(ARBITRAGE_FW_PATH . 'include/ArbitrageConfig.class.php');
+require_once(ARBITRAGE_FW_PATH . 'lib/local_cache/LocalCacheFactory.class.php');
 require_once("config/config.php");
 
 //Get configuration

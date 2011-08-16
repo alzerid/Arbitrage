@@ -23,7 +23,7 @@ catch(Exception $ex)
 {
 	//Check how we will be displaying this error
 	$conf = Application::getConfig();
-	$type = $conf->cocaine['exception_handler']['type'];
+	$type = $conf->arbitrage['exception_handler']['type'];
 	switch($type)
 	{
 		case "ReturnMedium":
