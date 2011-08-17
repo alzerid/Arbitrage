@@ -87,6 +87,17 @@ class Application
 		return ArbitrageConfig::getInstance();
 	}
 
+	static public function getPublicHtmlFile($file)
+	{
+		global $_conf;
+
+		$path = $_conf['approotpath'] . "public/html/$file";
+		if(!file_exists($path))
+			return '';
+
+		return file_get_contents($path);
+	}
+
 	public function getModule($name, $opts=array())
 	{
 		global $_conf;

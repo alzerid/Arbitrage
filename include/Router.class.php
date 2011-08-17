@@ -30,7 +30,7 @@ class Router
 		//Parse out the controller and view
 		$route      = explode("/", $route);
 		$controller = strtolower($route[0]);
-		$view       = $route[1];
+		$view       = ((count($route) >=2)? $route[1] : '');
 
 		//Require once the controller
 		$controller_path = $conf->approotpath . "app/controllers/$controller.php";
