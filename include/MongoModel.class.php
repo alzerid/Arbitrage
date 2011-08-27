@@ -69,6 +69,41 @@ class MongoModel extends Model
 		return (($ret!=NULL)? new $class($ret) : $ret);
 	}
 
+	public function runCommand($cmd, $opts)
+	{
+		$mongo = MongoFactory::getInstance();
+		$db    = $this->_db;
+		$table = $this->_table;
+		$class = $this->_class;
+
+		//Run the command
+		$cmd = array("$cmd" => $table);
+		$cmd = array_merge($cmd, $opts);
+		$res = $mongo->$db->command($cmd);
+
+		//Translate results
+		$ret = array();
+		if(isset($res['results']))
+		{
+			foreach($res['results'] as $res)
+			{
+				$obj = new $class($res['obj']);
+				unset($res['obj']);
+
+				//Append command results to the object
+				$variables = array();
+				if(count($res))
+					$variables = $res;
+
+				$obj->_resultVariables = $variables;
+				
+				$ret[] = $obj;
+			}
+		}
+
+		return ((count($ret) == 0)? NULL : $ret);
+	}
+
 	public function findDBRef($ref, $class_o=NULL)
 	{
 		$mongo = MongoFactory::getInstance();

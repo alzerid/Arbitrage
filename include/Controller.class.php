@@ -63,7 +63,7 @@ class Controller extends Component
 		$ret = $this->$action();
 
 		//Run after filter
-		$this->_runFilter('after_filter');
+		$this->_runFilter('after_filter', array('variables' => &$ret['variables']));
 
 		//Handle return
 		$this->_handleReturn($ret);
@@ -246,21 +246,25 @@ class Controller extends Component
 
 		//Get filters
 		$filters = $filters[$filter];
+		$ret     = "";
 
 		//Run through array
 		foreach($filters as $filter)
 		{
 			if(is_string($filter))
-				return $this->$filter($params);
+				$ret = $this->$filter($params);
 			elseif(is_object($filter) && get_parent_class($filter) == "Filter")
-				return $filter->execute($params);
+				$ret = $filter->execute($params);
 			elseif(is_array($filter))
 			{
 				$component = $filter['component'];
 				$method    = $filter['method'];
 
-				return $component->$method($params);
+				$ret = $component->$method($params);
 			}
+
+			if($filter == "post_process")
+				return $ret;
 		}
 	}
 }
