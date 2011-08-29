@@ -140,6 +140,12 @@ class Application
 		return $this->_components[$name];
 	}
 
+	public function startSession()
+	{
+		session_start();
+		$this->_session =& $_SESSION;
+	}
+
 	static public function requireLibrary($name)
 	{
 		global $_conf;

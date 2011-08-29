@@ -55,7 +55,7 @@ class Router
 
 		//check to see if we are calling ajax
 		$ajax = false;
-		if(isset($_GET['_ajax']))
+		if(isset($_GET['_ajax']) || isset($_POST['_ajax']))
 		{
 			//require the base controller
 			$controller_path = $conf->approotpath . "app/ajax/$controller.php";
