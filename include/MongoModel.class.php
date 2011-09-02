@@ -69,6 +69,22 @@ class MongoModel extends Model
 		return (($ret!=NULL)? new $class($ret) : $ret);
 	}
 
+	public function findRandom($condition = array())
+	{
+		$mongo = MongoFactory::getInstance();
+		$db    = $this->_db;
+		$table = $this->_table;
+		$class = $this->_class;
+
+		//Get count
+		$cnt  = $mongo->$db->$table->find($condition)->count();
+		$rand = mt_rand(0, $cnt-1);
+		$ret  = $mongo->$db->$table->find($condition)->skip($rand)->limit(1);
+		$ret  = iterator_to_array($ret, false);
+
+		return ((count($ret))? new $class($ret[0]): NULL);
+	}
+
 	public function runCommand($cmd, $opts)
 	{
 		$mongo = MongoFactory::getInstance();
