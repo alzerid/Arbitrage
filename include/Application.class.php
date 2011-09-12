@@ -194,7 +194,7 @@ class Application
 	static public function getDefaultLogger()
 	{
 		$conf = Application::getConfig();
-		$log  = $conf->logger;
+		$log  = $conf->arbitrage['logger'];
 
 		if(!isset($log))
 			throw new ArbitrageException("Unable to get default logger. Please set it up correctly in the config file.");

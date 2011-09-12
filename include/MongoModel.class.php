@@ -212,6 +212,19 @@ class MongoModel extends Model
 		$mongo->$db->$table->save($save);
 	}
 
+	public function bulkInsert($models)
+	{
+		$mongo = MongoFactory::getInstance();
+		$db    = $this->_db;
+		$table = $this->_table;
+
+		$bulk  = array();
+		foreach($models as $m)
+			$bulk[] = $m->toArray();
+
+		$mongo->$db->$table->batchInsert($bulk);
+	}
+
 	public function getDotNotationValue($property)
 	{
 		$ret   = '';
@@ -236,6 +249,16 @@ class MongoModel extends Model
 		$ts = hexdec(substr($id, 0, 8));
 		
 		return $ts;
+	}
+
+	public function getDatabase()
+	{
+		return $this->_db;
+	}
+
+	public function getCollection()
+	{
+		return $this->_table;
 	}
 
 	static public function getMongoIDTime($timestamp, $padding="0")
