@@ -85,7 +85,7 @@ class MongoModel extends Model
 		return ((count($ret))? new $class($ret[0]): NULL);
 	}
 
-	public function runCommand($cmd, $opts)
+	public function runCommand($cmd, $opts, $raw=false)
 	{
 		$mongo = MongoFactory::getInstance();
 		$db    = $this->_db;
@@ -103,16 +103,21 @@ class MongoModel extends Model
 		{
 			foreach($res['results'] as $res)
 			{
-				$obj = new $class($res['obj']);
-				unset($res['obj']);
+				if(!$raw)
+				{
+					$obj = new $class($res['obj']);
+					unset($res['obj']);
 
-				//Append command results to the object
-				$variables = array();
-				if(count($res))
-					$variables = $res;
+					//Append command results to the object
+					$variables = array();
+					if(count($res))
+						$variables = $res;
 
-				$obj->_resultVariables = $variables;
-				
+					$obj->_resultVariables = $variables;
+				}
+				else
+					$obj = $res;
+					
 				$ret[] = $obj;
 			}
 		}
