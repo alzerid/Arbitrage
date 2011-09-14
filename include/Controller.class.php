@@ -238,14 +238,14 @@ class Controller extends Component
 		}
 	}
 
-	private function _runFilter($filter, $params=array())
+	private function _runFilter($filter_key, $params=array())
 	{
 		$filters = $this->filters();
-		if(!array_key_exists($filter, $filters))
+		if(!array_key_exists($filter_key, $filters))
 			return;
 
 		//Get filters
-		$filters = $filters[$filter];
+		$filters = $filters[$filter_key];
 		$ret     = "";
 
 		//Run through array
@@ -263,7 +263,7 @@ class Controller extends Component
 				$ret = $component->$method($params);
 			}
 
-			if($filter == "post_process")
+			if($filter_key == "post_process")
 				return $ret;
 		}
 	}
