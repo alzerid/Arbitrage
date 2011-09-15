@@ -18,9 +18,25 @@ class Controller extends Component
 	//Magic functions
 	public function __get($name)
 	{
-		return $this->_get;
-		var_dump($name);
-		die();
+		if(isset($this->$name))
+			return $this->$name;
+
+		return NULL;
+	}
+
+	public function getControllerName()
+	{
+		return $this->_controller_name;
+	}
+
+	public function getActionName()
+	{
+		return $this->_action_name;
+	}
+
+	public function isControllerAction($controller, $action)
+	{
+		return ($this->_controller_name == $controller && $this->_action_name == $action);
 	}
 
 	public function setAjax($bool)
