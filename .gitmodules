@@ -1,0 +1,3 @@
+[submodule "lib"]
+	path = lib
+	url = ssh://git@wyrm.ericjanik.com:4022/home/git/sneaky/php-lib.git
