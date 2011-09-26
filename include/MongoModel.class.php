@@ -266,6 +266,18 @@ class MongoModel extends Model
 		return $this->_table;
 	}
 
+	static public function loadMapReduceFile($file, &$map, &$reduce)
+	{
+		$mr = file_get_contents($file);
+
+		//Find MAP: to :END
+		preg_match('/MAP:(.*):END/Umis', $mr, $match);
+		$map = trim($match[1]);
+
+		preg_match('/REDUCE:(.*):END/Umis', $mr, $match);
+		$reduce = trim($match[1]);
+	}
+
 	static public function getMongoIDTime($timestamp, $padding="0")
 	{
 		$date = new DateTime($timestamp);
