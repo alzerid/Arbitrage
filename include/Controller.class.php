@@ -186,6 +186,11 @@ class Controller extends Component
 		Application::includeStylesheetFile($url);
 	}
 
+	public function getViewVariable($key)
+	{
+		return ((isset($this->_view_vars[$key]))? $this->_view_vars[$key] : NULL);
+	}
+
 	public function addViewVariables($vars)
 	{
 		$this->_view_vars = array_merge($this->_view_vars, $vars);

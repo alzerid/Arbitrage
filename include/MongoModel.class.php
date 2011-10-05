@@ -1,6 +1,8 @@
 <?
 class MongoModel extends Model
 {
+	static private $_cmd_result = NULL;
+
 	public function getID()
 	{
 		return $this->_id;
@@ -122,7 +124,14 @@ class MongoModel extends Model
 			}
 		}
 
+		self::$_cmd_result = $res;
+
 		return ((count($ret) == 0)? NULL : $ret);
+	}
+
+	static public function getCommandResult()
+	{
+		return self::$_cmd_result;
 	}
 
 	public function findDBRef($ref, $class_o=NULL)
@@ -266,16 +275,32 @@ class MongoModel extends Model
 		return $this->_table;
 	}
 
-	static public function loadMapReduceFile($file, &$map, &$reduce)
+	static public function loadMapReduceFile($file)
 	{
-		$mr = file_get_contents($file);
+		$arr = array('out', 'query');
+		$ret = array();
+		$mr  = file_get_contents($file);
 
-		//Find MAP: to :END
-		preg_match('/MAP:(.*):END/Umis', $mr, $match);
-		$map = trim($match[1]);
+		//Search for all XXXX: tags
+		preg_match_all('/^[A-Z]+:/m', $mr, $matches);
+		foreach($matches[0] as $match)
+		{
+			preg_match('/' . $match . '(.*):END/Umis', $mr, $m);
+			$key = $match;
+			$key = preg_replace('/:/', '', strtolower($key));
+			$ret[$key] = $m[1];
+		}
 
-		preg_match('/REDUCE:(.*):END/Umis', $mr, $match);
-		$reduce = trim($match[1]);
+		foreach($arr as $a)
+		{
+			if(array_key_exists($a, $ret))
+			{
+				$ret[$a] = trim($ret[$a]);
+				$ret[$a] = json_decode($ret[$a], true);
+			}
+		}
+
+		return $ret;
 	}
 
 	static public function getMongoIDTime($timestamp, $padding="0")
