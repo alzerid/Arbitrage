@@ -44,6 +44,16 @@ abstract class ScriptApplication extends Application
 	abstract public function run();
 	abstract public function help();
 
+	protected function _traverseArray(&$arr, $cb)
+	{
+		foreach($arr as $key=>&$val)
+		{
+			if(is_array($val))
+				$this->_traverseArray($arr[$key], $cb);
+			else
+				$cb($key, $val);
+		}
+	}
 
 
 	//Parse arguments
