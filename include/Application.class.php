@@ -203,5 +203,44 @@ class Application
 
 		return $logger;
 	}
+
+	static protected function _selectArrayValue($path, $data, &$vals=array(), $pivot=NULL)
+	{
+		if($pivot != NULL)
+		{
+			$pivot  = explode('.', $pivot);
+			$cpivot = $pivot[0];
+			$pivot  = implode('.', array_slice($pivot, 1));
+		}
+
+		$path  = explode('.', $path);
+		$cpath = $path[0];
+		$path  = implode('.', array_slice($path, 1));
+
+		//Pivot point
+		if($cpath == "$")
+		{
+			foreach($data as $key=>$value)
+			{
+				if($pivot !== NULL && $pivot === "")
+				{
+					if(!isset($vals[$key]))
+						$vals[$key] = array();
+
+					$val = &$vals[$key];
+				}
+				else
+					$val = &$vals;
+
+				self::_selectArrayValue($path, $value, $val, $pivot);
+			}
+		}
+		elseif(strlen($path) > 0)
+		{
+			die("IN _selectArrayValue");
+		}
+		else
+			$vals[] = $data[$cpath];
+	}
 }
 ?>

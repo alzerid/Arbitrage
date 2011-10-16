@@ -54,9 +54,5 @@ abstract class ScriptApplication extends Application
 				$cb($key, $val);
 		}
 	}
-
-
-	//Parse arguments
-
 }
 ?>

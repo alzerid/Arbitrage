@@ -277,7 +277,7 @@ class MongoModel extends Model
 
 	static public function loadMapReduceFile($file)
 	{
-		$arr = array('out', 'query');
+		$arr = array('out', 'query', 'scope');
 		$ret = array();
 		$mr  = file_get_contents($file);
 
