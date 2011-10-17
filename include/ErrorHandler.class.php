@@ -86,7 +86,7 @@ function arbitrage_error_handler_text($errno, $errstr, $errfile, $errline, $vars
 		E_STRICT             => 'Runtime Notice',
 		E_RECOVERABLE_ERROR  => 'Catchable Fatal Error');
 	
-	if(error_reporting() == 0)
+	if(error_reporting() == 0 || !(error_reporting() & $errno))
 		return 0;
 	
 	$errtrace = array(E_ERROR, E_WARNING, E_PARSE, E_NOTICE);
