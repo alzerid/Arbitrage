@@ -204,43 +204,42 @@ class Application
 		return $logger;
 	}
 
-	static protected function _selectArrayValue($path, $data, &$vals=array(), $pivot=NULL)
+	static protected function _selectArrayValue($path, $data)
 	{
-		if($pivot != NULL)
-		{
-			$pivot  = explode('.', $pivot);
-			$cpivot = $pivot[0];
-			$pivot  = implode('.', array_slice($pivot, 1));
-		}
-
 		$path  = explode('.', $path);
 		$cpath = $path[0];
 		$path  = implode('.', array_slice($path, 1));
+		$ret   = array();
 
-		//Pivot point
-		if($cpath == "$")
+		if($cpath == "*")
+		{
+			foreach($data as $key=>$value)
+				$ret[] = self::_selectArrayValue($path, $value);
+		}
+		elseif($cpath[0] == "$")
 		{
 			foreach($data as $key=>$value)
 			{
-				if($pivot !== NULL && $pivot === "")
-				{
-					if(!isset($vals[$key]))
-						$vals[$key] = array();
+				if(!isset($ret[$key]))
+					$ret[$key] = array();
 
-					$val = &$vals[$key];
-				}
-				else
-					$val = &$vals;
+				$ret[$key] = self::_selectArrayValue($path, $value);
+			}
 
-				self::_selectArrayValue($path, $value, $val, $pivot);
+			//Check for special operation
+			if(strtolower($cpath) == '$sum')
+			{
+				foreach($ret as $key => $val)
+					$ret[$key] = array_sum($ret[$key]);
 			}
 		}
-		elseif(strlen($path) > 0)
-		{
-			die("IN _selectArrayValue");
-		}
+		elseif($path != "")
+			return self::_selectArrayValue($path, $data[$cpath]);
 		else
-			$vals[] = $data[$cpath];
+			return $data[$cpath];
+
+
+		return $ret;
 	}
 }
 ?>
