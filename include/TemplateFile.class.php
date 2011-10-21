@@ -19,7 +19,10 @@ class TemplateFile
 	static public function replace($input, $replacements)
 	{
 		foreach($replacements as $key=>$value)
-			$input = preg_replace('/{{' . preg_quote($key) . '}}/', $value, $input);
+		{
+			$key   = preg_quote((string) $key);
+			$input = preg_replace('/\{\{' . $key . '\}\}/U', $value, $input);
+		}
 
 		return $input;
 	}
