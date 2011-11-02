@@ -80,9 +80,14 @@ class MongoModel extends Model
 
 		//Get count
 		$cnt  = $mongo->$db->$table->find($condition)->count();
-		$rand = mt_rand(0, $cnt-1);
-		$ret  = $mongo->$db->$table->find($condition)->skip($rand)->limit(1);
-		$ret  = iterator_to_array($ret, false);
+		if($cnt > 0)
+		{
+			$rand = mt_rand(0, $cnt-1);
+			$ret  = $mongo->$db->$table->find($condition)->skip($rand)->limit(1);
+			$ret  = iterator_to_array($ret, false);
+		}
+		else
+			$ret = array();
 
 		return ((count($ret))? new $class($ret[0]): NULL);
 	}
