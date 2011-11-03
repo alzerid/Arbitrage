@@ -128,6 +128,11 @@ class MongoModel extends Model
 				$ret[] = $obj;
 			}
 		}
+		else if(isset($res['values']) && isset($cmd['distinct']) && $raw)
+		{
+			self::$_cmd_result = $res;
+			return $res;
+		}
 
 		self::$_cmd_result = $res;
 
