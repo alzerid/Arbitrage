@@ -204,26 +204,35 @@ class Application
 		return $logger;
 	}
 
-	static protected function _selectArrayValue($path, $data)
+	static protected function _selectArrayValue($path, $data, $cb=NULL)
 	{
 		$path  = explode('.', $path);
 		$cpath = $path[0];
 		$path  = implode('.', array_slice($path, 1));
 		$ret   = array();
 
-		if($cpath == "*")
+		if($cpath != "" && $cpath[0] == "*")
 		{
 			foreach($data as $key=>$value)
-				$ret[] = self::_selectArrayValue($path, $value);
+			{
+				$matches = array();
+				if(preg_match('/:cb:(.*)$/', $cpath, $matches))
+				{
+					$func = $cb[$matches[1]];
+					$func($key, $value);
+				}
+
+				$ret[] = self::_selectArrayValue($path, $value, $cb);
+			}
 		}
-		elseif($cpath[0] == "$")
+		elseif($cpath != "" && $cpath[0] == "$")
 		{
 			foreach($data as $key=>$value)
 			{
 				if(!isset($ret[$key]))
 					$ret[$key] = array();
 
-				$ret[$key] = self::_selectArrayValue($path, $value);
+				$ret[$key] = self::_selectArrayValue($path, $value, $cb);
 			}
 
 			//Check for special operation
@@ -234,10 +243,9 @@ class Application
 			}
 		}
 		elseif($path != "")
-			return self::_selectArrayValue($path, $data[$cpath]);
+			return self::_selectArrayValue($path, $data[$cpath], $cb);
 		else
 			return $data[$cpath];
-
 
 		return $ret;
 	}
