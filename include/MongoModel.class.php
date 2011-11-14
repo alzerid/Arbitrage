@@ -287,9 +287,10 @@ class MongoModel extends Model
 
 	static public function loadMapReduceFile($file)
 	{
-		$arr = array('out', 'query', 'scope');
-		$ret = array();
-		$mr  = file_get_contents($file);
+		$trim = array('db', 'table');
+		$arr  = array('out', 'query', 'scope');
+		$ret  = array();
+		$mr   = file_get_contents($file);
 
 		//Search for all XXXX: tags
 		preg_match_all('/^[A-Z]+:/m', $mr, $matches);
@@ -308,6 +309,13 @@ class MongoModel extends Model
 				$ret[$a] = trim($ret[$a]);
 				$ret[$a] = json_decode($ret[$a], true);
 			}
+		}
+
+		//Trim
+		foreach($trim as $t)
+		{
+			if(isset($ret[$t]))
+				$ret[$t] = trim($ret[$t]);
 		}
 
 		return $ret;
