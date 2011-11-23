@@ -3,8 +3,9 @@ Class Form extends HTMLComponent
 {
 	private $_properties;
 	private $_values;
+	private $_prepend_id;   //Determines if we should prepend the form id to our elements
 
-	public function __construct($properties, $values = NULL)
+	public function __construct($properties, $prepend_id, $values = NULL)
 	{
 		//check if $values is a model
 		if(gettype($values) == "object" && is_subclass_of($values, 'Model'))
@@ -29,10 +30,10 @@ Class Form extends HTMLComponent
 		$value   = ((isset($value))? $value: '');
 		$attribs = array_merge($attribs, array('value' => $value));
 		$id      = $this->_normalizeName($id);
-		return HTMLComponent::inputText("{$this->id}_$id", $attribs);
+		return HTMLComponent::inputText($this->_prependFormID($id), $attribs);
 	}
 
-	public function select($id, $values, $default=array(), $attribs=array())
+	public function select($id, $values, $attribs=array(), $default=array())
 	{
 		$d = $this->_getValue($id);
 		if(!is_array($d))
@@ -40,10 +41,10 @@ Class Form extends HTMLComponent
 
 		$default = array_merge($default, $d);
 		$id      = $this->_normalizeName($id);
-		return HTMLComponent::inputSelect("{$this->id}_$id", $values, $default, $attribs);
+		return HTMLComponent::inputSelect($this->_prependFormID($id), $values, $attribs, $default);
 	}
 
-	public function multiSelect($id, $values, $default=array(), $attribs=array())
+	public function multiSelect($id, $values, $attribs=array(), $default=array())
 	{
 		$d = $this->_getValue($id);
 		if(!is_array($d))
@@ -51,20 +52,26 @@ Class Form extends HTMLComponent
 
 		$default = array_merge($default, $d);
 		$id      = $this->_normalizeName($id);
-		return HTMLComponent::inputMultiSelect("{$this->id}_$id", $values, $default, $attribs);
+		return HTMLComponent::inputMultiSelect($this->_prependFormID($id), $values, $default, $attribs);
+	}
+
+	public function selectState($id, $attribs=array(), $default=array())
+	{
+		$id = $this->_normalizeName($id);
+		return HTMLComponent::inputStateSelector($id, $attribs, $default);
 	}
 
 	public function textArea($id, $value=NULL, $attribs=array())
 	{
 		$value   = (($value === NULL)? $this->_getValue($id) : $value);
 		$id      = $this->_normalizeName($id);
-		return HTMLComponent::inputTextArea("{$this->id}_$id", $value, $attribs);
+		return HTMLComponent::inputTextArea($this->_prependFormID($id), $value, $attribs);
 	}
 
 	public function file($id, $attribs=array())
 	{
 		$id = $this->_normalizeName($id);
-		return HTMLComponent::inputFile("{$this->id}_$id", $attribs);
+		return HTMLComponent::inputFile($this->_prependFormID($id), $attribs);
 	}
 
 	public function checkbox($id, $attribs=array())
@@ -74,17 +81,17 @@ Class Form extends HTMLComponent
 			$attribs = array_merge($attribs, array('checked' => 'checked'));
 
 		$id      = $this->_normalizeName($id);
-		return HTMLComponent::inputCheckbox("{$this->id}_$id", $attribs);
+		return HTMLComponent::inputCheckbox($this->_prependFormID($id), $attribs);
 	}
 
 	public function submit($id, $value, $attribs=array())
 	{
-		return HTMLComponent::submitButton("{$this->id}_$id", $value, $attribs);
+		return HTMLComponent::submitButton($this->_prependFormID($id), $value, $attribs);
 	}
 	
 	public function imageSubmit($id, $valid, $src, $attribs=array())
 	{
-		return HTMLComponent::imageSubmitButton("{$this->id}_$id", $value, $src, $attribs);
+		return HTMLComponent::imageSubmitButton($this->_prependFormID($id), $value, $src, $attribs);
 	}
 
 	public function hidden($id, $value=NULL, $attribs=array())
@@ -92,8 +99,8 @@ Class Form extends HTMLComponent
 		if($value == NULL)
 			$value = $this->_getValue($id);
 
-		$id      = $this->_normalizeName($id);
-		return parent::inputHidden("{$this->id}_$id", $value, $attribs);
+		$id = $this->_normalizeName($id);
+		return parent::inputHidden($this->_prependFormID($id), $value, $attribs);
 	}
 
 	public function end()
@@ -160,6 +167,11 @@ Class Form extends HTMLComponent
 			$value = $name;
 
 		return $value;
+	}
+
+	private function _prependFormID($id)
+	{
+		return (($this->_prepend_name)? "{$this->id}_$id" : $id);
 	}
 }
 ?>

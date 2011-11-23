@@ -30,7 +30,7 @@ class HTMLComponent extends Component
 		return $html;
 	}
 
-	public static function inputSelect($id, $values, $selected=array(), $attribs=array())
+	public static function inputSelect($id, $values, $attribs=array(), $selected=array())
 	{
 		$attribs = HTMLComponent::_generateAttribs($attribs);
 		$html  = "<select name=\"$id\" id=\"$id\" $attribs>\n";
@@ -51,7 +51,7 @@ class HTMLComponent extends Component
 		return $html;
 	}
 
-	public static function inputMultiSelect($id, $values, $selected=array(), $attribs=array())
+	public static function inputMultiSelect($id, $values, $attribs=array(), $selected=array())
 	{
 		$attribs = HTMLComponent::_generateAttribs($attribs);
 		$html  = "<select name=\"$id" . "[]\" id=\"$id\" multiple $attribs>\n";
@@ -68,6 +68,19 @@ class HTMLComponent extends Component
 		$html .= "</select>\n";
 		
 		return $html;
+	}
+
+	public static function inputStateSelector($id, $attribs=array(), $selected=array())
+	{
+		$states  = States::getNames();
+		$abbr    = States::getAbbreviations();
+		foreach($states as &$s)
+			$s = ucwords($s);
+
+		$states = array_combine($abbr, $states);
+		$states = array_merge(array('-' => "Select a State"), $states);
+
+		return self::inputSelect($id, $states, $attribs, $selected);
 	}
 
 	public static function inputCheckbox($id, $attribs=array())
