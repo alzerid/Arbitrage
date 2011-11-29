@@ -57,6 +57,7 @@ Class Form extends HTMLComponent
 
 	public function selectState($id, $attribs=array(), $default=array())
 	{
+		$default = ((count($default) == 0)? $this->_getValue($id) : $default);
 		$id = $this->_normalizeName($id);
 		return HTMLComponent::inputStateSelector($id, $attribs, $default);
 	}
@@ -80,7 +81,7 @@ Class Form extends HTMLComponent
 		if($checked == true)
 			$attribs = array_merge($attribs, array('checked' => 'checked'));
 
-		$id      = $this->_normalizeName($id);
+		$id = $this->_normalizeName($id);
 		return HTMLComponent::inputCheckbox($this->_prependFormID($id), $attribs);
 	}
 
