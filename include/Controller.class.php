@@ -117,6 +117,11 @@ class Controller extends Component
 			$_vars = array_merge($this->_view_vars, $_vars);
 		elseif(count($this->_view_vars))
 			$_vars = $this->_view_vars;
+			
+		//Pre process filter
+		$ret = $this->_runFilter('pre_process', $_vars);
+		if(isset($ret))
+			$_vars = $ret;
 
 		//Check for errors in the system
 		$err = Application::getBackTrace();
@@ -189,6 +194,11 @@ class Controller extends Component
 	public function getViewVariable($key)
 	{
 		return ((isset($this->_view_vars[$key]))? $this->_view_vars[$key] : NULL);
+	}
+
+	public function getViewVariables()
+	{
+		return $this->_view_vars;
 	}
 
 	public function addViewVariables($vars)
@@ -284,7 +294,7 @@ class Controller extends Component
 				$ret = $component->$method($params);
 			}
 
-			if($filter_key == "post_process")
+			if(in_array($filter_key, array("pre_process", "post_process")))
 				return $ret;
 		}
 	}
