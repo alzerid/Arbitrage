@@ -204,6 +204,15 @@ class Application
 		return $logger;
 	}
 
+	static public function recursiveGlob($pattern, $flags=0)
+	{
+		$files = glob($pattern, $flags);
+		foreach(glob(dirname($pattern) . '/*', GLOB_ONLYDIR | GLOB_NOSORT) as $dir)
+			$files = array_merge($files, self::recursiveGlob($dir . '/' . basename($pattern), $flags));
+
+		return $files;
+	}
+
 	static protected function _selectArrayValue($path, $data, $cb=NULL)
 	{
 		$path  = explode('.', $path);
