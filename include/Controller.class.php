@@ -167,7 +167,6 @@ class Controller extends Component
 			$controller = $this->_controller_name;
 
 		//Add inline js for controller creation
-		//Application::$_inlinejs .= "";
 		Application::includeJavascriptFile("/cjavascript/$controller.js");
 	}
 
