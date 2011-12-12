@@ -139,6 +139,15 @@ class MongoModel extends Model
 		return ((count($ret) == 0)? NULL : $ret);
 	}
 
+	public function execute($code, $vars=array())
+	{
+		$mongo = MongoFactory::getInstance();
+		$db    = $this->_db;
+
+		$res  = $mongo->$db->execute($code, $vars);
+		return ((isset($res['retval']))? $res['retval'] : NULL);
+	}
+
 	static public function getCommandResult()
 	{
 		return self::$_cmd_result;
@@ -283,6 +292,12 @@ class MongoModel extends Model
 	public function getCollection()
 	{
 		return $this->_table;
+	}
+
+	static public function loadExecutionFile($file)
+	{
+		$contents = file_get_contents($file);
+		return $contents;
 	}
 
 	static public function loadMapReduceFile($file)
