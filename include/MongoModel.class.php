@@ -223,12 +223,12 @@ class MongoModel extends Model
 		$table = $this->_table;
 		$class = $this->_class;	
 
-		//Get variables
-		$vars = $this->_toDotNotation($this->toArray());
-		$cond = array('_id' => $vars['_id']);
-		unset($vars['_id']);
+		//Go through original keys
+		$update = $this->_variableDiff();
 
-		$set = array('$set' => $vars);
+		//Get variables
+		$cond = array('_id' => $this->_id);
+		$set  = array('$set' => $update);
 		$mongo->$db->$table->update($cond, $set, $opts);
 	}
 
@@ -342,6 +342,23 @@ class MongoModel extends Model
 		$date = str_pad(dechex($date->getTimestamp()), 24, $padding, STR_PAD_RIGHT);
 
 		return new MongoId($date);
+	}
+
+	protected function _increment($key, $amount=1)
+	{
+		$mongo = MongoFactory::getInstance();
+		$db    = $this->_db;
+		$table = $this->_table;
+		
+		//Increment
+		$mongo->$db->$table->update(array('_id' => $this->_id), array('$inc' => array($key => 1)));
+		
+		//Get variable and increment
+		$val = $this->_getValueByNotation($key);
+		$val++;
+
+		//Set value
+		$this->_setValueByNotation($key, $val);
 	}
 
 	protected function _getDotNotationValues($notation, &$subject, &$values)
@@ -488,6 +505,49 @@ class MongoModel extends Model
 		}
 
 		return $query;
+	}
+
+	protected function _setValueByNotation($key, $val)
+	{
+		$notation = explode(".", $key);
+		if(count($notation) > 1)
+		{
+			$arr = $this->{$notation[0]};
+			$key = implode('.', array_slice($notation, 1));
+
+			//Grab array manipulator
+			$walk = new ArrayManipulator($arr);
+			$walk->setValue($key, $val);
+			$this->{$notation[0]} = $walk->getData();
+		}
+		else
+			$this->{$key} = $val;
+	}
+
+	protected function _getValueByNotation($key)
+	{
+		$walk = explode(".", $key);
+		$val  = $this->{$walk[0]};
+
+		if(count($walk) > 1)
+		{
+			$arr  = $this->{$walk[0]};
+			$key  = implode('.', array_slice($walk, 1));
+
+			//Grab array manipulator
+			$walk = new ArrayManipulator($arr);
+			$val  = $walk->getValue($key);
+		}
+
+		return $val;
+	}
+
+	protected function _variableDiff()
+	{
+		$walk = new ArrayManipulator($this->_originals);
+		$walk->arrayDiff($this->_variables);
+
+		return $walk->toDotNotation();
 	}
 }
 ?>
