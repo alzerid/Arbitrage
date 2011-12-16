@@ -70,8 +70,10 @@ class ArrayManipulator
 		foreach($values as $key => $val)
 		{
 			$ret[$val] = $this->getValue($key);
-			if($ret[$val] === NULL)
+			if($ret[$val] === NULL && $default !== NULL)
 				$ret[$val] = $default;
+			elseif($ret[$val] === NULL && $default === NULL)
+				unset($ret[$val]);
 		}
 
 		return $ret;
