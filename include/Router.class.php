@@ -41,9 +41,12 @@ class Router
 		return $url;
 	}
 
-	static public function getController($route)
+	static public function getController($route=NULL)
 	{
 		$conf = Application::getConfig();
+
+		if($route == NULL)
+			$route = $_GET['_route'];
 
 		//Parse out the controller and view
 		$route      = explode("/", $route);
