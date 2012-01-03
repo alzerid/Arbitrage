@@ -1,31 +1,49 @@
 <?
 class Router
 {
-	static public function getController()
+	static public function route($url)
 	{
-		$conf = Application::getConfig();
-
-		if(trim($_GET['_route']) == '')
+		//Remove Query strings
+		$url = preg_replace('/\?.*$/', '', $url);
+		
+		$conf  = Application::getConfig();
+		$route = $conf->routing;
+		if(isset($route) && isset($route['rules']))
 		{
-			//Attach get string
-			$get = '';
-			unset($_GET['_route']);
-			if(isset($_GET) && count($_GET))
-				$get = '?' . http_build_query($_GET);
+			$routes = $conf->routing['rules'];
+			foreach($routes as $key=>$route)
+			{
+				$matches = array();
+				if(preg_match($key, $url, $matches))
+				{
+					//String replace
+					if(count($matches) > 1)
+					{
+						$replace = array_slice($matches, 1);
+						foreach($replace as $pos => $val)
+						{
+							$idx    = ($pos+1);
+							$search = '/(\\\|\$)' . $idx . '/';
+							$route = preg_replace($search, $val, $route);
+						}
+					}
 
-			if(isset($conf->routing['_default']))
-			{
-				header("Location: {$conf->routing['_default']}$get");
-				die();
-			}
-			else
-			{
-				echo "Default route not set. Please set it in the routing.yaml file.";
-				die();
+					//Break from main loop cause we found our url
+					$url = $route;
+					break;
+				}
 			}
 		}
 
-		$route = $_GET['_route'];
+		//Remove leading /
+		$url = preg_replace('/^\//', '', $url);
+
+		return $url;
+	}
+
+	static public function getController($route)
+	{
+		$conf = Application::getConfig();
 
 		//Parse out the controller and view
 		$route      = explode("/", $route);
