@@ -148,6 +148,14 @@ class MongoModel extends Model
 		return ((isset($res['retval']))? $res['retval'] : NULL);
 	}
 
+	public function getLastError()
+	{
+		$mongo = MongoFactory::getInstance();
+		$db    = $this->_db;
+
+		return $mongo->$db->lastError();
+	}
+
 	static public function getCommandResult()
 	{
 		return self::$_cmd_result;
