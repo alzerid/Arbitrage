@@ -54,19 +54,36 @@ class HTMLComponent extends Component
 	public static function inputMultiSelect($id, $values, $attribs=array(), $selected=array())
 	{
 		$attribs = HTMLComponent::_generateAttribs($attribs);
-		$html  = "<select name=\"$id" . "[]\" id=\"$id\" multiple $attribs>\n";
+		$html  = "<select name=\"$id" . "[]\" id=\"$id\" multiple=\"multiple\" $attribs>\n";
 
-
-		foreach($values as $k=>$v)
+		foreach($values as $key=>$value)
 		{
-			$s = '';
-			if(in_array($k, $selected))
-				$s = "selected";
-			$html .= "<option value=\"$k\" $s>$v</option>\n";
+			//Check if avalue is array, if so it is in an optgroup
+			if(is_array($value))
+			{
+				$html .= "<optgroup label=\"$key\">\n";
+				foreach($value as $k=>$v)
+				{
+					$s = '';
+					if(in_array((string) $k, $selected, true))
+						$s = "selected=\"selected\"";
+
+					$html .= "<option value=\"$k\" $s>$v</option>\n";
+				}
+
+				$html .= "</optgroup>\n";
+			}
+			else
+			{
+				$s = '';
+				if(in_array((string) $key, $selected, true))
+					$s = "selected=\"selected\"";
+
+				$html .= "<option value=\"$key\" $s>$value</option>\n";
+			}
 		}
 
 		$html .= "</select>\n";
-		
 		return $html;
 	}
 
