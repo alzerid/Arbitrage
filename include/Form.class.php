@@ -46,13 +46,19 @@ Class Form extends HTMLComponent
 
 	public function multiSelect($id, $values, $attribs=array(), $default=array())
 	{
-		$d = $this->_getValue($id);
-		if(!is_array($d))
-			$d = array($d);
+		$s = $this->_getValue($id);
+		if(isset($s))
+		{
+			if(!is_array($s))
+				$s = array($s);
 
-		$default = array_merge($default, $d);
+			$selected = $s;
+		}
+		else
+			$selected = $default;
+
 		$id      = $this->_normalizeName($id);
-		return HTMLComponent::inputMultiSelect($this->_prependFormID($id), $values, $default, $attribs);
+		return HTMLComponent::inputMultiSelect($this->_prependFormID($id), $values, $attribs, $selected);
 	}
 
 	public function selectState($id, $attribs=array(), $default=array())
