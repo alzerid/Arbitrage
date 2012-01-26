@@ -1,0 +1,45 @@
+arbitrage:
+  error_handler: 'text'
+
+  exception_handler:
+    type: "View"
+
+  logger:
+    type: "mongo"
+    properties:
+      host: 10.64.5.170
+      port: 27017
+      database: "tradestars"
+      collection: "logs"
+
+  routing:
+    _default: /home/index
+
+  render:
+    default: 'View' #Correct values are ReturnMedium (usually for API apps, json XML responses), View
+
+  remote_cache:
+    memcache:
+      host: 127.0.0.1
+      port: 11211
+
+    redis:
+      host: 10.64.5.170
+      port: 6379
+
+  local_cache:
+    type: apc
+
+  databases:
+    mongodb:
+      _default:
+         host: 10.64.5.170
+         port: 27017
+
+application:
+  database: 'babel'
+  cache_model: true
+  url: 'http://dev.tradestars.com/'
+  use_minification: true
+  jquery_source: 'remote'   #remote - pulls for google, local - pulls locally
+  js_error_email: 'feedback@dualclutchmedia.com'

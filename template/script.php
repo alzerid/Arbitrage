@@ -1,3 +1,4 @@
+#!/bin/env /usr/bin/php
 <?
 if(php_sapi_name() != 'cli')
 	return;
@@ -13,23 +14,26 @@ if($argc <= 1)
 	die();
 }
 
-//Load script
-$script = Application::getConfig()->approotpath . "app/scripts/{$argv[1]}/{$argv[1]}.php";
-if(!file_exists($script))
+if(!isset($script))
 {
-	echo "Unable to find application script {$argv[1]}.\n";
-	die();
+	//Load script
+	$script = Application::getConfig()->approotpath . "app/scripts/{$argv[1]}/{$argv[1]}.php";
+	if(!file_exists($script))
+	{
+		echo "Unable to find application script {$argv[1]}.\n";
+		die();
+	}
+
+	//Add config property
+	Application::getConfig()->setVariable('scriptrootpath', dirname($script) . "/");
+
+	//Require it
+	require_once($script);
+
+	//Create an instance and run the script
+	$class  = ScriptApplication::getClassName($argv[1]);
+	$script = new $class(array_slice($argv, 2));
 }
-
-//Add config property
-Application::getConfig()->setVariable('scriptrootpath', dirname($script) . "/");
-
-//Require it
-require_once($script);
-
-//Create an instance and run the script
-$class  = ScriptApplication::getClassName($argv[1]);
-$script = new $class(array_slice($argv, 2));
 
 //Run the script
 $script->run();

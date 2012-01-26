@@ -1,0 +1,3 @@
+routing:
+  rules:
+    '/^\/$/i':            'home/index'      #root

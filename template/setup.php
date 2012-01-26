@@ -30,7 +30,6 @@ abstract class SetupCommand
 			self::$_CONFIG[dirname($file)] = yaml_parse_file($file);
 	}
 
-
 	public function help()
 	{
 		printf("Help Menu - %s SubCommands\n", $this->_name);
@@ -202,7 +201,8 @@ class MinifyCommand extends SetupCommand
 		$this->_config = array();
 		$this->_cmds   = array('all'        => 'Minify all stylesheet and javascript files.',
 		                       'stylesheet' => 'Minify all stylesheet files.',
-		                       'javascript' => 'Minify all javascript files.');
+		                       'javascript' => 'Minify all javascript files.',
+		                       'clean'      => 'Cleanup minified files.');
 
 		parent::__construct('minify', "Command to minify stylesheets and javascript files. Searches for .setup files in directories for more contextual information.");
 	}
@@ -235,6 +235,52 @@ class MinifyCommand extends SetupCommand
 		$this->_minify('stylesheet');
 	}
 
+	public function cleanCommand($args)
+	{
+		$extensions = array('javascript' => 'js', 'stylesheet' => 'css');
+		$configs    = self::_getConfig();
+
+		foreach($extensions as $type=>$ext)
+		{
+			//Search all javascript files
+			$file   = Application::getConfig()->approotpath . "*." . $ext;
+			$files  = Application::recursiveGlob($file);
+
+			//Grab grouped files
+			$dirs = $this->_groupFiles($files);
+
+			//Iterate through grouped files
+			foreach($dirs as $key => $vals)
+			{
+				//Check if we have a config
+				$config = ((isset($configs[$key]['minify'][$type]))? $configs[$key]['minify'][$type] : self::$_DCONFIG[$type]);
+				$out    = ((isset($config['out']))? $config['out'] : NULL);
+
+				if($out == NULL)
+					continue;
+
+				//Get out and remove
+				$cwd  = getcwd();
+				chdir($key);
+
+				$match = array();
+				if(preg_match('/\$:(.*)$/', $out, $match))
+				{
+					$minext = $match[1];
+					foreach($vals as $f)
+					{
+						if(preg_match('/' . $minext . '/', $f))
+							unlink($f);
+					}
+				}
+				elseif(file_exists($out))
+					unlink($out);
+
+				chdir($cwd);
+			}
+		}
+	}
+
 	protected function _checkForCompressor()
 	{
 	}
@@ -250,16 +296,8 @@ class MinifyCommand extends SetupCommand
 		return false;
 	}
 
-	private function _minify($type)
+	private function _groupFiles($files)
 	{
-
-		$ext     = array('javascript' => 'js', 'stylesheet' => 'css');
-		$configs = self::_getConfig();
-
-		//Search all javascript files
-		$file  = Application::getConfig()->approotpath . "*." . $ext[$type];
-		$files = Application::recursiveGlob($file);
-
 		$dirs = array();
 		foreach($files as $file)
 		{
@@ -269,6 +307,21 @@ class MinifyCommand extends SetupCommand
 
 			$dirs[$dir][] = basename($file);
 		}
+
+		return $dirs;
+	}
+
+	private function _minify($type)
+	{
+		$ext     = array('javascript' => 'js', 'stylesheet' => 'css');
+		$configs = self::_getConfig();
+
+		//Search all javascript files
+		$file  = Application::getConfig()->approotpath . "*." . $ext[$type];
+		$files = Application::recursiveGlob($file);
+
+		//Grab grouped files
+		$dirs = $this->_groupFiles($files);
 
 		//Iterate through each directory and apply minify
 		foreach($dirs as $key => $vals)
@@ -284,11 +337,11 @@ class MinifyCommand extends SetupCommand
 			foreach($vals as $file)
 			{
 				//Make sure we include files
-				if(!$this->_match($config['include'], $file))
+				if(isset($config['include']) && !$this->_match($config['include'], $file))
 					continue;
 
 				//Make sure we don't ignore
-				if($this->_match($config['ignore'], $file))
+				if(isset($config['ignore']) && $this->_match($config['ignore'], $file))
 					continue;
 
 				//Add to input list
@@ -297,39 +350,43 @@ class MinifyCommand extends SetupCommand
 
 			//Setup parameter list
 			$cnt   = count($input);
-			$out   = $config['out'];
+			$out   = ((isset($config['out']))? $config['out'] : '');
 			$ctype = $ext[$type];
 
-			//Call the javascript minifier
-			$cwd = getcwd();
-			chdir($key);
-
-			$cmd = "java -jar " . self::$_COMPRESSOR . " --type=$ctype ";
-			if($config['combine'])
+			if($cnt > 0)
 			{
-				//Remove out file
-				if(file_exists($out))
-					unlink($out);
+				//Call the javascript minifier
+				$cwd = getcwd();
+				chdir($key);
 
-				//Run each time
-				foreach($input as $i)
+				$cmd = "java -jar " . self::$_COMPRESSOR . " --type=$ctype ";
+				if($config['combine'])
 				{
-					$run = $cmd . "$i >> $out";
-					$ret = `$run`;
+					//Remove out file
+					if(file_exists($out))
+						unlink($out);
+
+					//Run each time
+					foreach($input as $i)
+					{
+						$run = $cmd . "$i >> $out";
+						$ret = `$run`;
+					}
 				}
-			}
-			else
-			{
-				$input = implode(" ", $input);
-				$cmd   = "java -jar " . self::$_COMPRESSOR . " --type=$ctype -o $out $input";
-				$ret   = `$cmd`;
-			}
+				else
+				{
+					$input = implode(" ", $input);
+					$cmd   = "java -jar " . self::$_COMPRESSOR . " --type=$ctype -o $out $input";
+					$ret   = `$cmd`;
+				}
 
-			chdir($cwd);
+				chdir($cwd);
 
-			echo " - Processing '$key'... $cnt files processed and " . (count($vals) - $cnt) . " files ignored.\n\n";
+				echo " - Processing '$key'... $cnt files processed and " . (count($vals) - $cnt) . " files ignored.\n\n";
+			}
+			else 
+				echo " - Processing '$key'... IGNORED.\n\n";
 		}
-
 	}
 }
 
