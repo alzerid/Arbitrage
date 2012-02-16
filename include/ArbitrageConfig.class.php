@@ -39,10 +39,10 @@ class ArbitrageConfig
 		return $this->_variables;
 	}
 
-	public function setVariable($key, $value)
+	/*public function setVariable($key, $value)
 	{
 		$this->_variables[$key] = $value;
-	}
+	}*/
 
 	public function load($filename)
 	{
@@ -62,13 +62,50 @@ class ArbitrageConfig
 
 	public function __get($name)
 	{
-		return ((isset($this->_variables[$name]))? $this->_variables[$name] : NULL);
+		$prop = new ArbitrageConfigProperty($this->_variables);
+		return $prop->$name;
+	}
+
+	public function __set($name, $val)
+	{
+		$this->_config[$name] = $val;
 	}
 
 	private function _loadYAML($file)
 	{
 		$conf = yaml_parse_file("{$this->_root}/$file");
 		$this->_variables = array_merge($this->_variables, $conf);
+	}
+}
+
+class ArbitrageConfigProperty
+{
+	private $_config;
+
+	public function __construct(&$config)
+	{
+		$this->_config = &$config;
+	}
+
+	public function __get($name)
+	{
+		if(!array_key_exists($name, $this->_config))
+			return NULL;
+
+		if(is_array($this->_config[$name]) && $this->_isAssoc($this->_config[$name]))
+			return new ArbitrageConfigProperty($this->_config[$name]);
+
+		return $this->_config[$name];
+	}
+
+	public function __set($name, $val)
+	{
+		$this->_config[$name] = $val;
+	}
+
+	private function _isAssoc($arr)
+	{
+		return array_keys($arr) !== range(0, count($arr) - 1);
 	}
 }
 ?>

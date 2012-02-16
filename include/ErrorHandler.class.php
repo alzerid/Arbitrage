@@ -132,7 +132,8 @@ function arbitrage_error_handler_text($errno, $errstr, $errfile, $errline, $vars
 }
 
 $config  = Application::getConfig();
-$handler = ((isset($config->arbitrage['error_handler']))? $config->arbitrage['error_handler'] : "");
+$handler = $config->arbitrage->error_handler;
+$handler = (($handler !== NULL)? $handler : "text");
 
 switch($handler)
 {

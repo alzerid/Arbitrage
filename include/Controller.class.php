@@ -60,6 +60,16 @@ class Controller extends Component
 		return NULL;
 	}
 
+	public function setRenderType($type)
+	{
+		Application::getConfig()->arbitrage->render = $type;
+	}
+	
+	public function setExceptionHandler($type)
+	{
+		Application::getConfig()->arbitrage->exception_handler = $type;
+	}
+
 	public function execute()
 	{
 		//Get filters
