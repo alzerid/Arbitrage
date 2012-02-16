@@ -2,15 +2,14 @@
 	function toggleCode(idx)
 	{
 		var html = this.innerHTML;
-		console.debug(this.innerHTML);
-		if(html === "[ - ]")
+		if(html === "[ + ]")
 		{
-			this.innerHTML = "[ + ]";
+			this.innerHTML = "[ - ]";
 			document.getElementById('code_' + idx).style.display = "block";
 		}
 		else
 		{
-			this.innerHTML = "[ - ]";
+			this.innerHTML = "[ + ]";
 			document.getElementById('code_' + idx).style.display = "none";
 		}
 	}
@@ -60,7 +59,7 @@
 		{
 			?>
 			<div class="entry">
-				<div class="expand" onclick="return toggleCode.call(this, <?=$idx?>);">[ - ]</div>
+				<div class="expand" onclick="return toggleCode.call(this, <?=$idx?>);">[ + ]</div>
 				<div class="summary"><span style="color: red; font-weight: bold"><?=$entry['summary']?></span> <span style="color: #999999; font-weight: bold">(<?=$entry['file']?>:<?=$entry['line']?>)</span></div>
 				<div class="clear"></div>
 				<div class="code_wrapper" id="code_<?=$idx?>">

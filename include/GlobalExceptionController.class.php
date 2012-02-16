@@ -31,13 +31,17 @@ class GlobalExceptionController extends Controller
 			//Grab only 10 lines, with error in center and bolded
 			if(count($code) > 0)
 			{
-				$start = (($t['line'] <= 6)? 0 : $t['line']-5);
+				$start = (($t['line'] < 5)? 0 : $t['line']-5);
 				$nline = $t['line'] - $start;
 				$code  = array_slice($code, $start, 10); //10 lines of code
 
 				$ret = array();
 				foreach($code as $key => $c)
-					$ret[] = array('line' => ($t['line'] + $key) - 6, 'code' => $c, 'selected' => ($key === $nline-1));
+				{
+					$content = htmlentities((($c == "")? ' ' : $c));
+					$content = str_replace("\t", '&nbsp;&nbsp;&nbsp;&nbsp;', $content);
+					$ret[] = array('line' => ($t['line'] + $key) - ($nline-1), 'code' => $content, 'selected' => ($key === $nline-1));
+				}
 				
 				$entry['code'] = $ret;
 			}
