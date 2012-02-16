@@ -1,35 +1,40 @@
 <?
-define('RM_XML', 0);
-define('RM_JSON', 1);
-define('RM_USER', 2);
-
 /**
   * Status responses must be: Success, Failure, TryAgain.
 	*/
 
 class ReturnMedium
 {
-	private $skipheader;
-	private $errorno;
-	private $message;
-	private $user;
-  private $type;
+	static public $RM_XML  = 0;
+	static public $RM_JSON = 1;
+	static public $RM_USER = 3;
 
-	public function __construct($type=RM_JSON)
+	private $_skipheader;
+	private $_scope;
+	private $_errorno;
+	private $_message;
+	private $_user;
+  private $_type;
+
+	public function __construct($type=-1)
 	{
-		$this->skipheader = false;
-    $this->errorno    = 0;
-    $this->message    = "Success.";
-    $this->user       = NULL;
+		if($type == -1)
+			$type = self::$RM_JSON;
+
+		$this->_skipheader = false;
+    $this->_errorno    = 0;
+    $this->_message    = "Success.";
+    $this->_user       = NULL;
+		$this->_scope      = "unknown";
 
     $this->setType($type);
 	}
 
 	public function parse($parse)
 	{
-		$this->errorno = $parse[0];
-		$this->message = $parse[1];
-		$this->user    = (isset($parse[2])? $parse[2] : NULL);
+		$this->_errorno = $parse[0];
+		$this->_message = $parse[1];
+		$this->_user    = (isset($parse[2])? $parse[2] : NULL);
 	}
 
   public function setType($type)
@@ -40,21 +45,21 @@ class ReturnMedium
       switch($type)
       {
         case 'json':
-          $type = RM_JSON;
+          $type = self::$RM_JSON;
           break;
 
         case 'xml':
-          $type = RM_XML;
+          $type = self::$RM_XML;
           break;
 
         case 'user':
-          $type = RM_USER;
+          $type = self::$RM_USER;
           break;
       }
     }
 
     //Set type
-    $this->type = $type;
+    $this->_type = $type;
   }
 
   public function display()
@@ -66,26 +71,27 @@ class ReturnMedium
 	{
 		$result = array();
 
-    $result['header'] = array('errorno' => $this->errorno, 'message' => $this->message);
+    $result['header'] = array('scope' => $this->_scope, 'errorno' => $this->_errorno, 'message' => $this->_message);
 
-		if ($this->user) $result['user']  = $this->user;
+		if($this->_user)
+			$result['user'] = $this->_user;
 		
-		switch($this->type)
+		switch($this->_type)
 		{
-			case RM_XML:
+			case self::$RM_USER:
 				//Encapsulate in APP_XML_NAME
 				$arr = array(APP_XML_NAME => $result);
 				$xml = new XMLDomConstruct('1.0', 'utf-8');
 
-				if(!$this->skipheader)
+				if(!$this->_skipheader)
 					header('Content-Type: text/xml');
 
 				$xml->fromMixed($arr);
 				$result = $xml->saveXML();
 				break;
 
-			case RM_JSON:
-				if(!$this->skipheader)
+			case self::$RM_JSON:
+				if(!$this->_skipheader)
 					header('Content-Type: application/json');
 
 				$result = json_encode($result);
@@ -98,45 +104,54 @@ class ReturnMedium
 	/** MODIFIERS **/
 	public function setErrorNo($err)
 	{
-		$this->errorno = $err;
+		$this->_errorno = $err;
 	}
 	
 	public function setMessage($message)
 	{
-		$this->message = $message;
+		$this->_message = $message;
 	}
 	
 	public function setUser($user)
 	{
-		$this->user = $user;
+		$this->_user = $user;
 	}
 
 	public function setSkipHeader($bool)
 	{
-		$this->skipheader = $bool;
+		$this->_skipheader = $bool;
 	}
 
+	public function setScope($scope)
+	{
+		$this->_scope = $scope;
+	}
 	/**************/
 
 	/** ACCESSORS **/
 	public function getErrorNo()
 	{
-		return $this->errorno;
+		return $this->_errorno;
 	}
 	
-	public function getMessage($message)
+	public function getMessage()
 	{
-		return $this->message;
+		return $this->_message;
 	}
 	
-	public function getUser($user)
+	public function getUser()
 	{
-		return $this->user;
+		return $this->_user;
+	}
+
+	public function getScope()
+	{
+		return $this->_scope;
 	}
 
 	public function getType()
 	{
-		return $this->type;
+		return $this->_type;
 	}
 	/***************/
 }
