@@ -6,11 +6,9 @@ class Router
 		//Remove Query strings
 		$url = preg_replace('/\?.*$/', '', $url);
 		
-		$conf  = Application::getConfig();
-		$route = $conf->routing;
-		if(isset($route) && isset($route->rules))
+		$routes = Application::getConfig()->routing->toArray();
+		if(isset($routes))
 		{
-			$routes = $conf->routing->rules;
 			foreach($routes as $key=>$route)
 			{
 				$matches = array();
