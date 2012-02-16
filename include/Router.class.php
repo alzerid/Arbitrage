@@ -8,9 +8,9 @@ class Router
 		
 		$conf  = Application::getConfig();
 		$route = $conf->routing;
-		if(isset($route) && isset($route['rules']))
+		if(isset($route) && isset($route->rules))
 		{
-			$routes = $conf->routing['rules'];
+			$routes = $conf->routing->rules;
 			foreach($routes as $key=>$route)
 			{
 				$matches = array();
@@ -59,20 +59,6 @@ class Router
 			throw new ArbitrageException('Unable to load route ' . implode('/', $route) . '.');
 
 		require_once($controller_path);
-
-		//Do some advanced routing logic
-		$routing = $conf->routing;
-		if(isset($routing[$controller]))
-		{
-			foreach($routing[$controller] as $match => $val)
-			{
-				if(preg_match($match, $view))
-				{
-					$view = $val;
-					break;
-				}
-			}
-		}
 
 		//check to see if we are calling ajax
 		$ajax = false;
