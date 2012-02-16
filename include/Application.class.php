@@ -43,6 +43,48 @@ class Application
 		spl_autoload_register('Application::autoload', true, true);
 	}
 
+	static public function runApplication()
+	{
+		try
+		{
+			//Parse URL and grab correct route
+			$route = Router::route($_SERVER['REQUEST_URI']);
+
+			//Get API class from Router
+			$controller = Router::getController($route);
+			if($controller == NULL)
+			{
+				//Log the error
+				FastLog::logit("core", __FILE__, "Unable to get Controller class.");
+
+				//TODO: Die with an error json return
+				die();
+			}
+				
+			//Execute the api
+			$controller->execute();
+		}
+		catch(ArbitrageException $ex)
+		{
+			//Render
+			$ex->render();
+		}
+		catch(Exception $ex)
+		{
+			//Show 404
+			header("Status: 404 Not Found");
+			$html = Application::getPublicHtmlFile('404.html');
+			echo $html;
+			echo "<!-- $ex -->";
+
+			//Add to tmp file
+			$body = "START(" . date("Y/m/d H:i:s") . "):\n$ex\n:END\n";
+			file_put_contents("/tmp/af_404.txt", $body, FILE_APPEND);
+			die();
+			break;
+		}
+	}
+
 	static function generateJavascriptLink($file)
 	{
 		return "<script type=\"text/javascript\" language=\"JavaScript\" src=\"$file\"></script>\n";
