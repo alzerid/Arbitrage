@@ -146,6 +146,15 @@ class Application
 		$this->_session =& $_SESSION;
 	}
 
+	static public function requireApplicationLibrary($path)
+	{
+		$path = Application::getConfig()->approotpath . "app/lib/$path";
+		if(!file_exists($path))
+			throw new ArbitrageException("Unable to include application library '$path'!");
+
+		require_once($path);
+	}
+
 	static public function requireLibrary($name)
 	{
 		global $_conf;
