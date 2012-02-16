@@ -1,24 +1,49 @@
 <?
 class ArbitrageException extends Exception
 {
-	static public $UNKNOWN = -1;
+	protected $_scope;
+
+	public function __construct($message="", $code=0, $previous=NULL)
+	{
+		parent::__construct($message, $code, $previous);
+		$this->_scope = "Arbitrage Framework";
+	}
 
 	public function getScope()
 	{
-		return "Arbitrage Framework";
+		return $this->_scope;
 	}
 
-	protected function _mapMessage($err, $vars=NULL)
+	public function render()
 	{
-		return "Unknown error occurred.";
-	}
+		$type = Application::getConfig()->arbitrage->render;
+		switch($type)
+		{
+			case "ReturnMedium":
+				$rm = new ReturnMedium;
+				$rm->setErrorNo($ex->getCode());
+				$rm->setScope($ex->getScope());
+				$rm->setMessage($ex->getMessage());
 
-	protected function _replaceFormattedString($str, $vars)
-	{
-		foreach($vars as $key=>$val)
-			$str = preg_replace('/{{' . $key . '}}/', $val, $str);
+				echo $rm->render;
+				die();
+				break;
 
-		return $str;
+			default:
+			case "View":
+				$path = Application::getConfig()->fwrootpath . 'include/GlobalExceptionController.class.php';
+				if(Application::getConfig()->errorHandlerClass != NULL)
+					$path = Application::getConfig()->approotpath . "app/controllers/" . strtolower(Application::getConfig()->errorHandlerClass) . ".php";
+
+				if(!file_exists($path))
+					die("CRITICAL ERROR: UNABLE TO THROW EXCEPTION CORRECTLY");
+
+				require_once($path);
+				$controller = new GlobalExceptionController('globalerror', 'error');
+				$controller->setException($this);
+				$controller->execute();
+				break;
+		}
 	}
 }
 ?>
