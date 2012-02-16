@@ -39,6 +39,16 @@ class Controller extends Component
 		return ($this->_controller_name == $controller && $this->_action_name == $action);
 	}
 
+	public function setViewPath($path)
+	{
+		Application::getConfig()->viewpath = $path;
+	}
+
+	public function getViewPath()
+	{
+		return Application::getConfig()->viewpath;
+	}
+
 	public function setAjax($bool)
 	{
 		$this->_ajax = $bool;
@@ -60,16 +70,11 @@ class Controller extends Component
 		return NULL;
 	}
 
-	public function setRenderType($type)
+	public function setRenderMode($type)
 	{
-		Application::getConfig()->arbitrage->render = $type;
+		Application::getConfig()->arbitrage->renderMode = $type;
 	}
 	
-	public function setExceptionHandler($type)
-	{
-		Application::getConfig()->arbitrage->exception_handler = $type;
-	}
-
 	public function execute()
 	{
 		//Get filters
@@ -103,25 +108,22 @@ class Controller extends Component
 
 	public function renderPartial($view, $_vars=NULL)
 	{
-		$conf = Application::getConfig();
-
 		//Check if view is set
-		$view_path = $conf->approotpath . "app/views/$view.php";
+		$view_path = Application::getConfig()->viewpath . "$view.php";
+		if(!file_exists($view_path))
+			throw new ArbitrageException("View '$view_path' does not exist.");
 
 		if(isset($_vars) && is_array($_vars))
 			extract($_vars);
 
 		ob_start();
 		require($view_path);
-		$content = ob_get_clean();
 
-		return $content;
+		return ob_get_clean();;
 	}
 
 	public function render($view, $layout="layout", $_vars=NULL)
 	{
-		$conf = Application::getConfig();
-
 		//merge _view_vars
 		if($_vars != NULL)
 			$_vars = array_merge($this->_view_vars, $_vars);
@@ -144,15 +146,16 @@ class Controller extends Component
 			extract($_vars);
 
 		//Get layout
-		$layout_path = $conf->approotpath . "app/views/layout/$layout.php";
+		$layout_path = Application::getConfig()->viewpath . "layout/$layout.php";
+		
+		//Check if layout exists
+		if(!file_exists($layout_path))
+			throw new ArbitrageException("Layout at '$layout_path' does not exist.");
+
 		ob_start();
 		require_once($layout_path);
 		$content = ob_get_clean();
-
-		//Check if there are post processing filters
-		//$stime = microtime();
-		$ret = $this->_runFilter('post_process', array('html' => $content));
-		//$etime = microtime();
+		$ret     = $this->_runFilter('post_process', array('html' => $content));
 
 		if(isset($ret))
 			$content = $ret;
@@ -232,8 +235,6 @@ class Controller extends Component
 
 	private function _handleReturn($ret)
 	{
-		$conf = Application::getConfig();
-
 		//Check if ret is set
 		if(!isset($ret) || (is_array($ret) && !isset($ret['render'])))
 		{
@@ -241,7 +242,8 @@ class Controller extends Component
 				$ret = array();
 
 			//Get default return type
-			$render = ((isset($conf->render['default']))? $conf->render['default'] : 'View');
+			$render = Application::getConfig()->arbitrage->renderMode;
+			$render = (($render == NULL)? "View" : $render);
 			switch(strtolower($render))
 			{
 				case "returnmedium":
