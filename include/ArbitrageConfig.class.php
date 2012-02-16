@@ -27,6 +27,9 @@ class ArbitrageConfig
 		//Setup paths
 		$this->_variables['fwrootpath']  = ARBITRAGE_FW_PATH;
 		$this->_variables['approotpath'] = realpath("$root/../") . "/";
+
+		//Setup viewpath
+		$this->_variables['viewpath'] = $this->_variables['approotpath'] . "app/views/";
 	}
 
 	public function getEnvironment()
@@ -34,15 +37,15 @@ class ArbitrageConfig
 		return $this->_env;
 	}
 
-	public function getVariables()
+	public function toArray()
 	{
 		return $this->_variables;
 	}
 
-	/*public function setVariable($key, $value)
+	public function getVariables()
 	{
-		$this->_variables[$key] = $value;
-	}*/
+		return $this->toArray();
+	}
 
 	public function load($filename)
 	{
@@ -68,7 +71,7 @@ class ArbitrageConfig
 
 	public function __set($name, $val)
 	{
-		$this->_config[$name] = $val;
+		$this->_variables[$name] = $val;
 	}
 
 	private function _loadYAML($file)
@@ -96,6 +99,11 @@ class ArbitrageConfigProperty
 			return new ArbitrageConfigProperty($this->_config[$name]);
 
 		return $this->_config[$name];
+	}
+
+	public function toArray()
+	{
+		return $this->_config;
 	}
 
 	public function __set($name, $val)
