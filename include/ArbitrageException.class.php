@@ -31,7 +31,7 @@ class ArbitrageException extends Exception
 
 			default:
 			case "view":
-				$path = Application::getConfig()->fwrootpath . 'include/GlobalExceptionController.class.php';
+				$path = Application::getConfig()->fwrootpath . 'include/ExceptionHandler.class.php';
 				if(Application::getConfig()->errorHandlerClass != NULL)
 					$path = Application::getConfig()->approotpath . "app/controllers/" . strtolower(Application::getConfig()->errorHandlerClass) . ".php";
 
@@ -39,7 +39,7 @@ class ArbitrageException extends Exception
 					die("CRITICAL ERROR: UNABLE TO THROW EXCEPTION CORRECTLY");
 
 				require_once($path);
-				$controller = new GlobalExceptionController('globalerror', 'error');
+				$controller = new ExceptionHandler('globalerror', 'error');
 				$controller->setException($this);
 				$controller->execute();
 				break;
