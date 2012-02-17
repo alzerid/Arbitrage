@@ -131,9 +131,30 @@ function arbitrage_error_handler_text($errno, $errstr, $errfile, $errline, $vars
 	}
 }
 
+class ArbitrageErrorHandler
+{
+	static $_exception = NULL;
+
+	static public function handleByException($errno, $errstr, $errfile, $errline, $vars)
+	{
+		//Check for previous
+		$prev = ((isset(self::$_exception))? self::$_exception : NULL);
+		self::$_exception = new PHPException($errstr, $errno, $errfile, $errno, $prev);
+	}
+
+	static public function finish()
+	{
+		ob_end_clean();
+
+		//Call render on exception
+		if(self::$_exception !== NULL)
+			self::$_exception->render();
+	}
+}
+
 $config  = Application::getConfig();
 $handler = $config->arbitrage->errorHandler;
-$handler = (($handler !== NULL)? $handler : "text");
+$handler = (($handler !== NULL)? strtolower($handler) : "text");
 
 switch($handler)
 {
@@ -143,6 +164,11 @@ switch($handler)
 	
 	case 'text':
 		set_error_handler('arbitrage_error_handler_text');
+		break;
+	
+	case 'exception':
+		set_error_handler(array('ArbitrageErrorHandler', 'handleByException'));
+		register_shutdown_function(array('ArbitrageErrorHandler', 'finish'));
 		break;
 }
 ?>

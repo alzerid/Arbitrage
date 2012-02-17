@@ -16,21 +16,21 @@ class ArbitrageException extends Exception
 
 	public function render()
 	{
-		$type = Application::getConfig()->arbitrage->render;
+		$type = strtolower(Application::getConfig()->arbitrage->renderMode);
 		switch($type)
 		{
-			case "ReturnMedium":
+			case "returnmedium":
 				$rm = new ReturnMedium;
-				$rm->setErrorNo($ex->getCode());
-				$rm->setScope($ex->getScope());
-				$rm->setMessage($ex->getMessage());
+				$rm->setErrorNo($this->getCode());
+				$rm->setScope($this->getScope());
+				$rm->setMessage($this->getMessage());
 
-				echo $rm->render;
+				echo $rm->render();
 				die();
 				break;
 
 			default:
-			case "View":
+			case "view":
 				$path = Application::getConfig()->fwrootpath . 'include/GlobalExceptionController.class.php';
 				if(Application::getConfig()->errorHandlerClass != NULL)
 					$path = Application::getConfig()->approotpath . "app/controllers/" . strtolower(Application::getConfig()->errorHandlerClass) . ".php";
@@ -44,6 +44,17 @@ class ArbitrageException extends Exception
 				$controller->execute();
 				break;
 		}
+	}
+}
+
+class PHPException extends ArbitrageException
+{
+	public function __construct($message, $code, $file, $line, $previous=NULL)
+	{
+		parent::__construct($message, $code, $previous);
+		$this->file   = $file;
+		$this->line   = $line;
+		$this->_scope = "PHP Error";
 	}
 }
 ?>

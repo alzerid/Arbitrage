@@ -12,9 +12,22 @@ class GlobalExceptionController extends Controller
 		//Set view path
 		$this->setViewPath(Application::getConfig()->fwrootpath . 'template/views/');
 
-		//Setup 
+		return array('render' => '_global/error', 'layout' => 'error', 'variables' => array('exceptions' => $this->_walkExceptions($this->_ex)));
+	}
+
+	public function setException($ex)
+	{
+		$this->_ex = $ex;
+	}
+
+	private function _walkExceptions($ex)
+	{
+		$prev = array();
+		if($ex->getPrevious() != NULL)
+			$prev = $this->_walkExceptions($ex->getPrevious());
+
+		//Get trace
 		$trace = array();
-		$ex    = $this->_ex;
 		foreach($ex->getTrace() as $t)
 		{
 			$entry = array();
@@ -49,12 +62,9 @@ class GlobalExceptionController extends Controller
 			$trace[] = $entry;
 		}
 
-		return array('render' => '_global/error', 'layout' => 'error', 'variables' => array('scope' => $ex->getScope(), 'message' => $ex->getMessage(), 'file' => $ex->getFile(), 'line' => $ex->getLine(), 'trace' => $trace));
-	}
+		$exception = array('scope' => $ex->getScope(), 'message' => $ex->getMessage(), 'file' => $ex->getFile(), 'line' => $ex->getLine(), 'trace' => $trace);
 
-	public function setException($ex)
-	{
-		$this->_ex = $ex;
+		return array_merge($prev, array($exception));
 	}
 }
 ?>
