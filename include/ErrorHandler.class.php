@@ -144,11 +144,12 @@ class ArbitrageErrorHandler
 
 	static public function finish()
 	{
-		ob_end_clean();
-
 		//Call render on exception
 		if(self::$_exception !== NULL)
+		{
+			ob_end_clean();
 			self::$_exception->render();
+		}
 	}
 }
 

@@ -25,6 +25,9 @@ class ArbitrageException extends Exception
 				$rm->setScope($this->getScope());
 				$rm->setMessage($this->getMessage());
 
+				//Set user for file and line number
+				$rm->setUser(array('file' => $this->getFile(), 'line' => $this->getLine()));
+
 				echo $rm->render();
 				die();
 				break;
