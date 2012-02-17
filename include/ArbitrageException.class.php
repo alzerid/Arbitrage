@@ -16,7 +16,10 @@ class ArbitrageException extends Exception
 
 	public function render()
 	{
-		$type = strtolower(Application::getConfig()->arbitrage->renderMode);
+		//Use errorHandlerRenderMode if set
+		$type = Application::getConfig()->arbitrage->errorHandlerRenderMode;
+		$type = (($type==NULL)? Application::getConfig()->arbitrage->renderMode : $type);
+		$type = strtolower($type);
 		switch($type)
 		{
 			case "returnmedium":
