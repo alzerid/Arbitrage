@@ -1,4 +1,10 @@
 <?
+/**
+ * Controller Arbitrage Class
+ * @author Eric M. Janik
+ * @version 2.0
+ */
+
 class Controller extends Component
 {
 	private $_filters;
@@ -41,7 +47,7 @@ class Controller extends Component
 		return ($this->_controller_name == $controller && $this->_action_name == $action);
 	}
 
-	public function setViewPath($path)
+	public function setViewPath(string $path)
 	{
 		Application::getConfig()->viewpath = $path;
 	}
@@ -51,9 +57,38 @@ class Controller extends Component
 		return Application::getConfig()->viewpath;
 	}
 
+	/**
+	  * returns if the view exists or not.
+		* @param $view The view to check for existence.
+		* @return Returns true if the view exists, else false.
+		*/
+	public function doesViewExist(string $view)
+	{
+		return file_exists(Application::getConfig()->viewpath . $view . ".php");
+	}
+	
+	/**
+	 * sets the layout path.
+	 * @param $path The path to set internal layout variable.
+	 */
+	public function setLayoutPath(string $path)
+	{
+		Application::getConfig()->layoutpath = $path;
+	}
+
 	public function setLayout($layout)
 	{
 		$this->_layout = $layout;
+	}
+
+	/**
+	 * returns if the layout exists.
+	 * @param $layout The view layout to check for existence.
+	 * @return Returns true if the view layout exists, else false.
+	 */
+	public function doesLayoutExist(string $layout)
+	{
+		return file_exists(Application::getConfig()->layoutpath . $layout . ".php");
 	}
 
 	public function setAjax($bool)
@@ -153,7 +188,7 @@ class Controller extends Component
 			extract($_vars);
 
 		//Get layout
-		$layout_path = Application::getConfig()->viewpath . "layout/$layout.php";
+		$layout_path = Application::getConfig()->layoutpath . "$layout.php";
 		
 		//Check if layout exists
 		if(!file_exists($layout_path))
