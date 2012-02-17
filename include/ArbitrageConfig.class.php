@@ -28,8 +28,9 @@ class ArbitrageConfig
 		$this->_variables['fwrootpath']  = ARBITRAGE_FW_PATH;
 		$this->_variables['approotpath'] = realpath("$root/../") . "/";
 
-		//Setup viewpath
-		$this->_variables['viewpath'] = $this->_variables['approotpath'] . "app/views/";
+		//Setup view and layout path
+		$this->_variables['viewpath']   = $this->_variables['approotpath'] . "app/views/";
+		$this->_variables['layoutpath'] = $this->_variables['approotpath'] . "app/views/layout/";
 	}
 
 	public function getEnvironment()
