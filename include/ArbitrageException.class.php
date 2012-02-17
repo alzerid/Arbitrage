@@ -20,33 +20,41 @@ class ArbitrageException extends Exception
 		switch($type)
 		{
 			case "returnmedium":
-				$rm = new ReturnMedium;
-				$rm->setErrorNo($this->getCode());
-				$rm->setScope($this->getScope());
-				$rm->setMessage($this->getMessage());
-
-				//Set user for file and line number
-				$rm->setUser(array('file' => $this->getFile(), 'line' => $this->getLine()));
-
+				$rm = $this->_renderReturnMedium();
 				echo $rm->render();
 				die();
 				break;
 
 			default:
 			case "view":
-				$path = Application::getConfig()->fwrootpath . 'include/ExceptionHandler.class.php';
-				if(Application::getConfig()->errorHandlerClass != NULL)
-					$path = Application::getConfig()->approotpath . "app/controllers/" . strtolower(Application::getConfig()->errorHandlerClass) . ".php";
-
-				if(!file_exists($path))
-					die("CRITICAL ERROR: UNABLE TO THROW EXCEPTION CORRECTLY");
-
-				require_once($path);
-				$controller = new ExceptionHandler('globalerror', 'error');
-				$controller->setException($this);
-				$controller->execute();
+				$this->_renderView();
 				break;
 		}
+	}
+
+	protected function _renderReturnMedium()
+	{
+		$rm = new ReturnMedium;
+		$rm->setErrorNo($this->getCode());
+		$rm->setScope($this->getScope());
+		$rm->setMessage($this->getMessage());
+
+		return $rm;
+	}
+
+	protected function _renderView()
+	{
+		$path = Application::getConfig()->fwrootpath . 'include/ExceptionHandler.class.php';
+		if(Application::getConfig()->errorHandlerClass != NULL)
+			$path = Application::getConfig()->approotpath . "app/controllers/" . strtolower(Application::getConfig()->errorHandlerClass) . ".php";
+
+		if(!file_exists($path))
+			die("CRITICAL ERROR: UNABLE TO THROW EXCEPTION CORRECTLY");
+
+		require_once($path);
+		$controller = new ExceptionHandler('globalerror', 'error');
+		$controller->setException($this);
+		$controller->execute();
 	}
 }
 
@@ -58,6 +66,14 @@ class PHPException extends ArbitrageException
 		$this->file   = $file;
 		$this->line   = $line;
 		$this->_scope = "PHP Error";
+	}
+
+	protected function _renderReturnMedium()
+	{
+		$rm = parent::_renderReturnMedium();
+		$rm->setUser(array('file' => $this->getFile(), 'line' => $this->getLine()));
+
+		return $rm;
 	}
 }
 ?>
