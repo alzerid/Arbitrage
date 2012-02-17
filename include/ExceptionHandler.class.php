@@ -1,5 +1,5 @@
 <?
-class GlobalExceptionController extends Controller
+class ExceptionHandler extends Controller
 {
 	protected $_view;
 	protected $_ex;
@@ -9,10 +9,15 @@ class GlobalExceptionController extends Controller
 		//Clean out buffer
 		ob_end_clean();
 
-		//Set view path
-		$this->setViewPath(Application::getConfig()->fwrootpath . 'template/views/');
+		//Check if view exists in application land
+		if(!$this->doesViewExist('_arbitrage/_error_handler'))
+			$this->setViewPath(Application::getConfig()->fwrootpath . 'template/app/views/');
 
-		return array('render' => '_global/error', 'layout' => 'error', 'variables' => array('exceptions' => $this->_walkExceptions($this->_ex)));
+		//Check if layout exists
+		if(!$this->doesLayoutExist('_error_handler'))
+			$this->setLayoutPath(Application::getConfig()->fwrootpath . 'template/app/layout/');
+
+		return array('render' => '_arbitrage/_error_handler', 'layout' => '_error_handler', 'variables' => array('exceptions' => $this->_walkExceptions($this->_ex)));
 	}
 
 	public function setException($ex)
