@@ -139,7 +139,7 @@ class ArbitrageErrorHandler
 	{
 		//Check for previous
 		$prev = ((isset(self::$_exception))? self::$_exception : NULL);
-		self::$_exception = new PHPException($errstr, $errno, $errfile, $errno, $prev);
+		self::$_exception = new PHPException($errstr, $errno, $errfile, $errline, $prev);
 	}
 
 	static public function finish()
