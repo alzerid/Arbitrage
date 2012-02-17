@@ -4,12 +4,14 @@ class Controller extends Component
 	private $_filters;
 	private $_view_vars;
 	private $_ajax;
+	private $_layout;
 
 	public function __construct($controller, $action)
 	{
 		$this->_controller_name = $controller;
 		$this->_action_name     = $action;
 		$this->_view_vars       = array();
+		$this->_layout          = "layout";  //default layout
 		$this->_ajax            = false;
 
 		parent::__construct();
@@ -37,6 +39,11 @@ class Controller extends Component
 	public function isControllerAction($controller, $action)
 	{
 		return ($this->_controller_name == $controller && $this->_action_name == $action);
+	}
+
+	public function setLayout($layout)
+	{
+		$this->_layout = $layout;
 	}
 
 	public function setAjax($bool)
@@ -108,7 +115,7 @@ class Controller extends Component
 		return $content;
 	}
 
-	public function render($view, $layout="layout", $_vars=NULL)
+	public function render($view, $layout, $_vars=NULL)
 	{
 		$conf = Application::getConfig();
 
@@ -257,7 +264,7 @@ class Controller extends Component
 			//Get view
 			$view = $ret['render'];
 			$vars = ((isset($ret['variables']))? $ret['variables'] : NULL);
-			$lay  = ((isset($ret['layout']))? $ret['layout'] : "layout");
+			$lay  = ((isset($ret['layout']))? $ret['layout'] : $this->_layout);
 
 			//No view specified use index  
 			if(!strstr($view, "/"))
