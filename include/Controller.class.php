@@ -5,16 +5,41 @@
  * @version 2.0
  */
 
-class Controller extends Component
+class Controller
 {
+
+	//PHP Variables attatched to the session
+	private $_get;
+	private $_post;
+	private $_cookie;
+	private $_session;
+	private $_files;
+
+	//Controller specifics
 	private $_filters;
 	private $_view_vars;
 	private $_ajax;
 	private $_layout;
 
-	public function __construct($controller, $action)
+	public function __construct()
 	{
-		$this->_controller_name = $controller;
+		//PHP variables
+		$this->_get = $_GET;
+		unset($this->_get['_route']);
+
+		$this->_post     = $_POST;
+		$this->_cookie   = $_COOKIE; 
+		
+		if(isset($_SESSION))
+			$this->_session =& $_SESSION;
+		else
+			$this->_session = NULL;
+
+		$this->_files = ((isset($_FILES))? $_FILES : array());
+
+
+		//Internal variables
+		$this->_controller_name = get_class($this);
 		$this->_action_name     = $action;
 		$this->_view_vars       = array();
 		$this->_layout          = "layout";  //default layout
@@ -91,6 +116,13 @@ class Controller extends Component
 		return file_exists(Application::getConfig()->layoutpath . $layout . ".php");
 	}
 
+	public function redirect($redirect)
+	{
+		$url = new URL($redirect);
+		header("Location: " . $url->getURL());
+		die();
+	}
+
 	public function setAjax($bool)
 	{
 		$this->_ajax = $bool;
@@ -161,7 +193,7 @@ class Controller extends Component
 		ob_start();
 		require($view_path);
 
-		return ob_get_clean();;
+		return ob_get_clean();
 	}
 
 	public function render($view, $layout, $_vars=NULL)

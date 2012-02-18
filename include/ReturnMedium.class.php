@@ -7,7 +7,7 @@ class ReturnMedium
 {
 	static public $RM_XML  = 0;
 	static public $RM_JSON = 1;
-	static public $RM_USER = 3;
+	static public $RM_USER = 2;
 
 	private $_skipheader;
 	private $_scope;
@@ -16,11 +16,8 @@ class ReturnMedium
 	private $_user;
   private $_type;
 
-	public function __construct($type=-1)
+	public function __construct($type=1)
 	{
-		if($type == -1)
-			$type = self::$RM_JSON;
-
 		$this->_skipheader = false;
     $this->_errorno    = 0;
     $this->_message    = "Success.";

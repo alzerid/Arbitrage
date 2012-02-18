@@ -3,10 +3,10 @@ class ArbitrageException extends Exception
 {
 	protected $_scope;
 
-	public function __construct($message="", $code=0, $previous=NULL)
+	public function __construct($scope = "Arbitrage Framework", $message="", $code=0, $previous=NULL)
 	{
 		parent::__construct($message, $code, $previous);
-		$this->_scope = "Arbitrage Framework";
+		$this->_scope = $scope;
 	}
 
 	public function getScope()
@@ -14,7 +14,7 @@ class ArbitrageException extends Exception
 		return $this->_scope;
 	}
 
-	public function render()
+	/*public function render()
 	{
 		//Use errorHandlerRenderMode if set
 		$type = Application::getConfig()->arbitrage->errorHandlerRenderMode;
@@ -58,25 +58,43 @@ class ArbitrageException extends Exception
 		$controller = new ExceptionHandler('globalerror', 'error');
 		$controller->setException($this);
 		$controller->execute();
+	}*/
+}
+
+abstract class ArbitrageRenderException extends ArbitrageException
+{
+	abstract public function render();
+}
+
+class ArbitrageReturnMediumException extends ArbitrageRenderException
+{
+	private $_rtype;
+
+	public function __construct($scope, $render_type=NULL, $message="", $errorno=0)
+	{
+		parent::__construct($scope, $message, $errno);
+		$this->_rtype = $render_type;
+	}
+
+	public function render()
+	{
+		$rm = new ReturnMedium;
+		$rm->setErrorNo($this->getCode());
+		$rm->setScope($this->getScope());
+		$rm->setMessage($this->getMessage());
+
+		echo $rm->render();
 	}
 }
 
-class PHPException extends ArbitrageException
+final class PHPException extends ArbitrageException
 {
 	public function __construct($message, $code, $file, $line, $previous=NULL)
 	{
-		parent::__construct($message, $code, $previous);
+		parent::__construct("PHP Error", $message, $code, $previous);
 		$this->file   = $file;
 		$this->line   = $line;
 		$this->_scope = "PHP Error";
-	}
-
-	protected function _renderReturnMedium()
-	{
-		$rm = parent::_renderReturnMedium();
-		$rm->setUser(array('file' => $this->getFile(), 'line' => $this->getLine()));
-
-		return $rm;
 	}
 }
 ?>

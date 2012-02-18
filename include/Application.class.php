@@ -1,24 +1,13 @@
 <?
-class Application 
+//TODO: MOve controller type methods to the controller
+class ArbitrageApplication 
 {
-	public $pageTitle;
-
-	protected $_get;
-	protected $_post;
-	protected $_cookie;
-	protected $_session;
-	protected $_files;
-
-	protected $_controller_name;
-	protected $_action_name;
+	static private $_controller;  //The controller object that was requested
+	static private $_action;      //The action object that was requested
 
 	static private $_javascripts = array();
 	static private $_stylesheets = array();
-	static protected $_inlinejs  = '';
 	static private $_backtrace   = '';  //Backtrace text for error displaying
-
-	private $_modules;
-	private $_components;
 
 	public function __construct()
 	{
@@ -36,15 +25,17 @@ class Application
 		$this->_files = ((isset($_FILES))? $_FILES : array());
 
 		$this->_modules    = array();
-		$this->_components = array();
 		
-		$this->pageTitle = "";
-
 		spl_autoload_register('Application::autoload', true, true);
+	}
+
+	static public function init()
+	{
 	}
 
 	static public function runApplication()
 	{
+		//TODO: Add a primary buffer layer then flush it
 		try
 		{
 			//Parse URL and grab correct route
@@ -52,24 +43,16 @@ class Application
 
 			//Get API class from Router
 			$controller = Router::getController($route);
-			if($controller == NULL)
-			{
-				//Log the error
-				FastLog::logit("core", __FILE__, "Unable to get Controller class.");
-
-				//TODO: Die with an error json return
-				die();
-			}
 				
-			//Execute the api
+			//Execute the action
+			ob_start();
 			$controller->execute();
 		}
-		catch(ArbitrageException $ex)
+		catch(ArbitrageRenderException $ex)
 		{
-			//Render
 			$ex->render();
 		}
-		catch(Exception $ex)
+		/*catch(Exception $ex)
 		{
 			//Show 404
 			header("Status: 404 Not Found");
@@ -82,7 +65,7 @@ class Application
 			file_put_contents("/tmp/af_404.txt", $body, FILE_APPEND);
 			die();
 			break;
-		}
+		}*/
 	}
 
 	static function generateJavascriptLink($file)
@@ -138,48 +121,6 @@ class Application
 			return '';
 
 		return file_get_contents($path);
-	}
-
-	public function getModule($name, $opts=array())
-	{
-		global $_conf;
-
-		$name = strtolower($name);
-		if(!isset($this->_modules[$name]))
-		{
-			//Require the module
-			require_once($_conf['approotpath'] . "modules/{$name}/$name.php");
-
-			$module = $name . "Module";
-			$module = new $module($this, $opts);
-			$this->_modules[$name] = $module;
-		}
-
-		//Set options for the module
-		$this->_modules[$name]->setOptions($opts);
-
-		return $this->_modules[$name];
-	}
-
-	public function getComponent($name)
-	{
-		global $_conf;
-
-		//Check for component
-		$name = strtolower($name);
-		if(!isset($this->_components[$name]))
-		{
-			//Require the component
-			require_once($_conf['approotpath'] . "components/$name.php");
-
-			$component = $name . "Component";
-			$component = new $component;
-			$component->_controller_name = $this->_controller_name;
-			$component->_action_name     = $this->_action_name;
-			$this->_components[$name] = $component;
-		}
-
-		return $this->_components[$name];
 	}
 
 	public function startSession()
