@@ -2,7 +2,7 @@
 define("MODEL_INSERT", 0x00);
 define("MODEL_UPDATE", 0x01);
 
-abstract class CModel implements IModel
+abstract class CModel /*implements IModel*/
 {
 	protected $_variables;
 	protected $_originals;

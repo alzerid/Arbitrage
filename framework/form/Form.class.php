@@ -1,5 +1,5 @@
 <?
-Class Form extends HTMLComponent
+Class Form extends CHTMLComponent
 {
 	private $_properties;
 	private $_values;

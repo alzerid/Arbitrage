@@ -5,23 +5,9 @@
  * @version 2.0
  */
 
-class Controller
+class CController extends CBaseController
 {
-
-	//PHP Variables attatched to the session
-	private $_get;
-	private $_post;
-	private $_cookie;
-	private $_session;
-	private $_files;
-
-	//Controller specifics
-	private $_filters;
-	private $_view_vars;
-	private $_ajax;
-	private $_layout;
-
-	public function __construct()
+	/*public function __construct()
 	{
 		//PHP variables
 		$this->_get = $_GET;
@@ -46,31 +32,18 @@ class Controller
 		$this->_ajax            = false;
 
 		parent::__construct();
-	}
+	}*/
 
 	//Magic functions
-	public function __get($name)
+	/*public function __get($name)
 	{
 		if(isset($this->$name))
 			return $this->$name;
 
 		return NULL;
-	}
+	}*/
 
-	public function getControllerName()
-	{
-		return $this->_controller_name;
-	}
 
-	public function getActionName()
-	{
-		return $this->_action_name;
-	}
-
-	public function isControllerAction($controller, $action)
-	{
-		return ($this->_controller_name == $controller && $this->_action_name == $action);
-	}
 
 	public function setViewPath(string $path)
 	{
@@ -111,7 +84,7 @@ class Controller
 	 * @param $layout The view layout to check for existence.
 	 * @return Returns true if the view layout exists, else false.
 	 */
-	public function doesLayoutExist(string $layout)
+	/*public function doesLayoutExist(string $layout)
 	{
 		return file_exists(Application::getConfig()->layoutpath . $layout . ".php");
 	}
@@ -121,9 +94,9 @@ class Controller
 		$url = new URL($redirect);
 		header("Location: " . $url->getURL());
 		die();
-	}
+	}*/
 
-	public function setAjax($bool)
+	/*public function setAjax($bool)
 	{
 		$this->_ajax = $bool;
 	}
@@ -131,10 +104,10 @@ class Controller
 	public function isAjax()
 	{
 		return $this->_ajax;
-	}
+	}*/
 
 	/* Function gets items from form POST or GET */
-	public function form($key)
+	/*public function form($key)
 	{
 		if(isset($this->_post[$key]))
 			return $this->_post[$key];
@@ -147,9 +120,9 @@ class Controller
 	public function setRenderMode($type)
 	{
 		Application::getConfig()->arbitrage->renderMode = $type;
-	}
+	}*/
 	
-	public function execute()
+	/*public function execute()
 	{
 		//Get filters
 		$filters = $this->filters();
@@ -236,9 +209,9 @@ class Controller
 
 		//Render layout
 		echo $content;
-	}
+	}*/
 
-	public function isPost()
+	/*public function isPost()
 	{
 		return isset($this->_post['_form']);
 	}
@@ -246,7 +219,7 @@ class Controller
 	public function isFormPost()
 	{
 		return (isset($this->_post['_form']) || isset($this->_get['_form']));
-	}
+	}*/
 
 	public function includeControllerJavascript($controller=NULL)
 	{

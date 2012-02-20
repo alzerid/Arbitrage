@@ -1,5 +1,5 @@
 <?
-class HTMLComponent extends Component
+class CHTMLComponent /*extends Component*/
 {
 	public static function label($tag, $attribs=array())
 	{
