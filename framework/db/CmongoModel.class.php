@@ -1,5 +1,5 @@
 <?
-class MongoModel extends Model
+class CMongoModel extends CModel
 {
 	static private $_cmd_result = NULL;
 
