@@ -1,12 +1,12 @@
 <?
-class Router
+class CRouter
 {
 	static public function route($url)
 	{
 		//Remove Query strings
 		$url = preg_replace('/\?.*$/', '', $url);
 		
-		$routes = Application::getConfig()->routing->toArray();
+		$routes = CApplication::getConfig()->routing;
 		if(isset($routes))
 		{
 			foreach($routes as $key=>$route)

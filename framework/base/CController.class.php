@@ -5,252 +5,177 @@
  * @version 2.0
  */
 
-class CController extends CBaseController
+abstract class CController extends CBaseController implements IFileRenderable
 {
-	/*public function __construct()
+	//Render variables
+	private $_layout_path;
+	private $_view_path;
+	private $_default_layout;
+
+	//Tags
+	private $_javascripts;
+	private $_stylesheets;
+
+	public function __construct()
 	{
-		//PHP variables
-		$this->_get = $_GET;
-		unset($this->_get['_route']);
-
-		$this->_post     = $_POST;
-		$this->_cookie   = $_COOKIE; 
-		
-		if(isset($_SESSION))
-			$this->_session =& $_SESSION;
-		else
-			$this->_session = NULL;
-
-		$this->_files = ((isset($_FILES))? $_FILES : array());
-
-
-		//Internal variables
-		$this->_controller_name = get_class($this);
-		$this->_action_name     = $action;
-		$this->_view_vars       = array();
-		$this->_layout          = "layout";  //default layout
-		$this->_ajax            = false;
-
 		parent::__construct();
-	}*/
 
-	//Magic functions
-	/*public function __get($name)
-	{
-		if(isset($this->$name))
-			return $this->$name;
+		//setup view and layout paths
+		$this->setLayoutPath();
+		$this->setViewPath();
+		$this->setDefaultLayout();
 
-		return NULL;
-	}*/
-
-
-
-	public function setViewPath(string $path)
-	{
-		Application::getConfig()->viewpath = $path;
+		$this->_javascripts = array();
+		$this->_stylesheets = array();
 	}
 
-	public function getViewPath()
+	public function setDefaultLayout($layout="default")
 	{
-		return Application::getConfig()->viewpath;
+		$this->_default_layout = $layout;
 	}
 
-	/**
-	  * returns if the view exists or not.
-		* @param $view The view to check for existence.
-		* @return Returns true if the view exists, else false.
-		*/
-	public function doesViewExist(string $view)
+	public function setLayoutPath($path=NULL)
 	{
-		return file_exists(Application::getConfig()->viewpath . $view . ".php");
-	}
-	
-	/**
-	 * sets the layout path.
-	 * @param $path The path to set internal layout variable.
-	 */
-	public function setLayoutPath(string $path)
-	{
-		Application::getConfig()->layoutpath = $path;
+		$this->_layout_path = (($path === NULL)? CApplication::getConfig()->_internals->approotpath . "app/views/layout/" : $path);
 	}
 
-	public function setLayout($layout)
+	public function setViewPath($path=NULL)
 	{
-		$this->_layout = $layout;
+		$this->_view_path = (($path === NULL)? CApplication::getConfig()->_internals->approotpath . "app/views/" : $path);
 	}
 
-	/**
-	 * returns if the layout exists.
-	 * @param $layout The view layout to check for existence.
-	 * @return Returns true if the view layout exists, else false.
-	 */
-	/*public function doesLayoutExist(string $layout)
+	/* IController implementation */
+	public function renderInternal(IRenderer $renderer)
 	{
-		return file_exists(Application::getConfig()->layoutpath . $layout . ".php");
+		return $this->renderFile($renderer->getFile(), $renderer->getLayout(), $renderer->getVariables());
 	}
+	/* END IController implementation */
 
-	public function redirect($redirect)
+	/* Implementation of IFileRenderable */
+	public function renderFile($file, $layout, $variables)
 	{
-		$url = new URL($redirect);
-		header("Location: " . $url->getURL());
-		die();
-	}*/
+		//ob_start();
+		//ob_implicit_flush(false);
 
-	/*public function setAjax($bool)
-	{
-		$this->_ajax = $bool;
-	}
+		//Get content from view
+		$content = $this->renderPartialFile($file, $variables);
 
-	public function isAjax()
-	{
-		return $this->_ajax;
-	}*/
+		//Now render layout
+		$path = $this->_layout_path . $layout . ".php";
+		if(!file_exists($path))
+			throw new EArbitrageException("Layout does not exist '$path'.");
 
-	/* Function gets items from form POST or GET */
-	/*public function form($key)
-	{
-		if(isset($this->_post[$key]))
-			return $this->_post[$key];
-		elseif(isset($this->_get[$key]))
-			return $this->_get[$key];
+		$_vars = $variables;
+		extract($_vars);
 
-		return NULL;
-	}
-
-	public function setRenderMode($type)
-	{
-		Application::getConfig()->arbitrage->renderMode = $type;
-	}*/
-	
-	/*public function execute()
-	{
-		//Get filters
-		$filters = $this->filters();
-
-		//Execute proper action
-		$action = $this->_action_name . "action";
-
-		//Run before filter
-		$this->_runFilter('before_filter');
-
-		//TODO: Pass params if there are any 
-		if(!method_exists($this, $action))
-			throw new ArbitrageException("No action by '{$this->_action_name}' is available.");
-
-		//Call the action
-		$ret = $this->$action();
-
-		//Run after filter
-		$this->_runFilter('after_filter', array('variables' => &$ret['variables']));
-
-		//Handle return
-		$this->_handleReturn($ret);
-	}
-
-	public function renderModule($module, $opts=array())
-	{
-		$module = $this->getModule($module, $opts);
-		return $module->render();
-	}
-
-	public function renderPartial($view, $_vars=NULL)
-	{
-		//Check if view is set
-		$view_path = Application::getConfig()->viewpath . "$view.php";
-		if(!file_exists($view_path))
-			throw new ArbitrageException("View '$view_path' does not exist.");
-
-		if(isset($_vars) && is_array($_vars))
-			extract($_vars);
-
-		ob_start();
-		require($view_path);
+		//Require view
+		require_once($path);
 
 		return ob_get_clean();
 	}
 
-	public function render($view, $layout, $_vars=NULL)
+	public function renderPartialFile($file, $variables=NULL)
 	{
-		//merge _view_vars
-		if($_vars != NULL)
-			$_vars = array_merge($this->_view_vars, $_vars);
-		elseif(count($this->_view_vars))
-			$_vars = $this->_view_vars;
-			
-		//Pre process filter
-		$ret = $this->_runFilter('pre_process', $_vars);
-		if(isset($ret))
-			$_vars = $ret;
-
-		//Check for errors in the system
-		$err = Application::getBackTrace();
-		if(!empty($err))
-			$content = $err;
-		else
-			$content = $this->renderPartial($view, $_vars);
-
-		if(isset($_vars) && is_array($_vars) && count($_vars))
+		$_vars = $variables;
+		if($_vars !== NULL)
 			extract($_vars);
 
-		//Get layout
-		$layout_path = Application::getConfig()->layoutpath . "$layout.php";
+		//Generate file path
+		$path = $this->_view_path . $file . ".php";
 		
-		//Check if layout exists
-		if(!file_exists($layout_path))
-			throw new ArbitrageException("Layout at '$layout_path' does not exist.");
+		if(!file_exists($path))
+			throw new EArbitrageException("View file does not exist '$path'.");
 
 		ob_start();
-		require_once($layout_path);
+		ob_implicit_flush(false);
+		require_once($path);
 		$content = ob_get_clean();
-		$ret     = $this->_runFilter('post_process', array('html' => $content));
 
-		if(isset($ret))
-			$content = $ret;
-
-		//Render layout
-		echo $content;
-	}*/
-
-	/*public function isPost()
-	{
-		return isset($this->_post['_form']);
+		return $content;
 	}
 
-	public function isFormPost()
+	/* renderPartial
+	 * Convinence method that calls CController::renderPartialFile
+	 */
+	public function renderPartial($file, $variables=NULL)
 	{
-		return (isset($this->_post['_form']) || isset($this->_get['_form']));
-	}*/
+		return $this->renderPartialFile($file, $variables);
+	}
+	/* END Implementation of IFileRenderable */
 
-	public function includeControllerJavascript($controller=NULL)
+	/* HTML View Helper Methods */
+	public function includeJavaScriptController()
 	{
-		if($controller == NULL)
-			$controller = $this->_controller_name;
+		$controller = strtolower($this->_controller->getName());
+		$controller = preg_replace('/Controller$/i', '', $controller);
 
-		//Add inline js for controller creation
-		Application::includeJavascriptFile("/cjavascript/$controller.js");
+		//Include controller if available
+		$path = CApplication::getConfig()->_internals->approotpath . "app/cjavascript/$controller.js";
+		if(!file_exists($path))
+			return;
+
+		$this->addJavaScriptTag("/cjavascript/$controller.js");
 	}
 
-	public function includeJavascript($link)
+	public function addJavaScriptTag($link)
 	{
-		Application::includeJavascriptFile("/javascript/$link");
+		$this->_javascripts[] = $link;
 	}
 
-	public function includeExternalJavascript($url)
+	public function generateJavaScriptTag($link)
 	{
-		Application::includeJavascriptFile($url);
+		return '<script type="text/javascript" language="JavaScript" src="' . $link . '"></script>' . "\n";
 	}
 
-	public function includeStylesheet($file)
+	public function populateJavaScriptTags()
 	{
-		Application::includeStylesheetFile("/stylesheets/$file");
+		$ret = "";
+		if(count($this->_javascripts))
+		{
+			foreach($this->_javascripts as $js)
+				$ret .= $this->generateJavaScriptTag($js) . "\n";
+		}
+
+		return $ret;
 	}
 
-	public function includeExternalStylesheet($url)
+	public function addStyleSheetTag($link)
 	{
-		Application::includeStylesheetFile($url);
+		$this->_stylesheets[] = $link;
 	}
 
-	public function getViewVariable($key)
+	public function generateStyleSheetTag($link)
+	{
+		return '<link type="text/css" rel="stylesheet" href="' . $link . '" />' . "\n";
+	}
+
+	public function populateStyleSheetTags()
+	{
+		$ret = "";
+		if(count($this->_stylesheets))
+		{
+			foreach($this->_stylesheets as $st)
+				$ret .= $this->generateStyleSheetTag($st);
+		}
+	
+		return $ret;
+	}
+	/* END HTML View Helper Methods */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	/*public function getViewVariable($key)
 	{
 		return ((isset($this->_view_vars[$key]))? $this->_view_vars[$key] : NULL);
 	}
@@ -263,98 +188,6 @@ class CController extends CBaseController
 	public function addViewVariables($vars)
 	{
 		$this->_view_vars = array_merge($this->_view_vars, $vars);
-	}
-
-	protected function filters()
-	{
-		return array();
-	}
-
-	protected function _cssLink($link)
-	{
-		return "<link rel='stylesheet' type='text/css' href='/stylesheets/$link' />\n";
-	}
-
-	protected function _javascriptLink($link)
-	{
-		return "<script language='JavaScript' src='/javascript/$link'></script>\n";
-	}
-
-	private function _handleReturn($ret)
-	{
-		//Check if ret is set
-		if(!isset($ret) || (is_array($ret) && !isset($ret['render'])))
-		{
-			if(!isset($ret))
-				$ret = array();
-
-			//Get default return type
-			$render = Application::getConfig()->arbitrage->renderMode;
-			$render = (($render == NULL)? "View" : $render);
-			switch(strtolower($render))
-			{
-				case "returnmedium":
-					$rm = new ReturnMedium;
-					$rm->setMessage('');
-					$ret['render'] = $rm;
-
-					break;
-
-				case "view":
-					$ret['render'] = $this->_controller_name . "/" . $this->_action_name;
-					break;
-			}
-		}
-
-		//Render based on type
-		if($ret['render'] === false)
-			return;
-		elseif(is_object($ret['render']) && get_class($ret['render']) == "ReturnMedium")
-			echo $ret['render']->render();
-		elseif(is_string($ret['render']))
-		{
-			//Get view
-			$view = $ret['render'];
-			$vars = ((isset($ret['variables']))? $ret['variables'] : NULL);
-			$lay  = ((isset($ret['layout']))? $ret['layout'] : $this->_layout);
-
-			//No view specified use index  
-			if(!strstr($view, "/"))
-				$view = $view . "/index";
-			
-			//require the file
-			$this->render($view, $lay, $vars);
-		}
-	}
-
-	private function _runFilter($filter_key, $params=array())
-	{
-		$filters = $this->filters();
-		if(!array_key_exists($filter_key, $filters))
-			return;
-
-		//Get filters
-		$filters = $filters[$filter_key];
-		$ret     = "";
-
-		//Run through array
-		foreach($filters as $filter)
-		{
-			if(is_string($filter))
-				$ret = $this->$filter($params);
-			elseif(is_object($filter) && get_parent_class($filter) == "Filter")
-				$ret = $filter->execute($params);
-			elseif(is_array($filter))
-			{
-				$component = $filter['component'];
-				$method    = $filter['method'];
-
-				$ret = $component->$method($params);
-			}
-
-			if(in_array($filter_key, array("pre_process", "post_process")))
-				return $ret;
-		}
-	}
+	}*/
 }
 ?>
