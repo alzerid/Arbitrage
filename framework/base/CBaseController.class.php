@@ -55,6 +55,14 @@ abstract class CBaseController implements IController
 	}
 
 	/**
+	 * Resets the PHP session.
+	 */
+	public function resetSession()
+	{
+		session_destroy();
+	}
+
+	/**
 	 * Returns the current controller name.
 	 * @return string the controller name.
 	 */
