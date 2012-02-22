@@ -1,7 +1,8 @@
 <?
-class ArbitrageErrorHandler extends Controller
+class CErrorHandler implements IObserver, ISingleton
 {
-	static $_PHP_ERROR_TYPE = array(
+	static private $_instance = NULL;
+	static private $_PHP_ERROR_TYPE = array(
 	  E_ERROR              => 'Error',
 	  E_WARNING            => 'Warning',
 	  E_PARSE              => 'Parsing Error',
@@ -16,66 +17,91 @@ class ArbitrageErrorHandler extends Controller
 	  E_STRICT             => 'Runtime Notice',
 	  E_RECOVERABLE_ERROR  => 'Catchable Fatal Error');
 
-	static private $_exception = NULL;
-
-	public function __construct($name="ArbitrageErrorHandler")
+	public function __construct()
 	{
-		
+		$this->_listeners = array();
 	}
 
-	public function showError()
+	static public function getInstance()
 	{
+		if(self::$_instance === NULL)
+			self::$_instance = new CErrorHandler();
+
+		return self::$_instance;
 	}
 
-	static public function addError($errno, $errstr, $errfile, $errline)
+	/* IListener Implementation */
+	public function prependListener(IListener $listener)
 	{
-		$prev = ((isset(self::$_exception))? self::$_exception : NULL);
-		self::$_exception = new PHPException($errstr, $errno, $errfile, $errline, $prev);
+		$this->_listeners = array_merge(array($listener), $this->_listeners);
+		return true;
 	}
 
-	static public function handleView()
+	public function addListener(IListener $listener)
 	{
-		if(self::$_exception === NULL)
-			return;
-
-		ob_end_clean();
-
-		//Get error handler controller
-
-		//Pretty print
-		die("VIEW");
+		$this->_listeners[] = $listener;
+		return true;
 	}
 
-	static public function handleHTMLFile()
+	public function clearListeners()
 	{
-		if(self::$_exception === NULL)
-			return;
-
-		ob_end_clean();
-
-		die("HTMLFILE");
+		$this->_listeners = array();
 	}
 
-	//TODO: Create socket handling
-	static public function handleSocket()
+	public function removeListener(IListener $listener)
 	{
-		if(self::$_exception === NULL)
-			return;
+		$cnt = count($this->_listeners);
+		for($i=0; $i<$cnt; $i++)
+		{
+			if($this->_listeners[$i] == $listener)
+			{
+				unset($this->_listeners[$i]);
+				$this->_listeners = array_values($this->_listeners);
+				return true;
+			}
+		}
 
-		ob_end_clean();
-		die("SOCKET");
+		return false;
+	}
+	/* END IListener Implementation */
+
+	/**
+	 * Static function handles all PHP errors.
+	 * @param $errno The integer value of the PHP error.
+	 * @param $errstr The error string.
+	 * @param $errfile The file the PHP error occurred in.
+	 * @param $errline The line where the PHP error occurred in.
+	 */
+	static public function handleError($errno, $errstr, $errfile, $errline)
+	{
+		//TODO: Check for stop propagation from event
+		$event = new CErrorEvent($errno, self::$_PHP_ERROR_TYPE[$errno], $errstr, $errfile, $errline);
+
+		//Send event to handleError listeners
+		$listeners = CErrorHandler::getInstance()->_listeners;
+		foreach($listeners as $l)
+			$l->handleError($event);
 	}
 
-	static private function _formatExceptions()
+	/**
+	 * Static function handles exceptions that are not caught
+	 * in a try catch block.
+	 * @param $ex The exception that was thrown.
+	 */
+	static public function handleException(Exception $ex)
 	{
-		$exceptions = array();
+		//TODO: Check for stop propagation from event
+
+		$event = new CExceptionEvent($ex);
+
+		//Send event to the listeners
+		$listeners = CErrorHandler::getInstance()->_listeners;
+		foreach($listeners as $l)
+			$l->handleException($event);
 	}
 }
- 
-$mode = Application::getConfig()->arbitrage->errorHandler;
-if($mode !== NULL)
-{
-	set_error_handler(array("ArbitrageErrorHandler", "addError"));
-	register_shutdown_function(array('ArbitrageErrorHandler', "handle$mode"));
-}
+
+//Set global exception handler and php error handler
+set_error_handler(array("CErrorHandler", "handleError"));
+set_exception_handler(array("CErrorHandler", "handleException"));
 ?>
