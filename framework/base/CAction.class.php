@@ -16,7 +16,7 @@ class CAction implements IAction
 
 	public function getName()
 	{
-		return $this->_getName();
+		return strtolower(preg_replace('/Action$/i', '', $this->_name));
 	}
 
 	public function execute()
