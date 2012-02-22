@@ -22,7 +22,7 @@ class CMongoModel extends CModel
 
 	public function count($condition = array())
 	{
-		$mongo = MongoFactory::getInstance();
+		$mongo = CDBFactory::getDataBase('mongo');
 		$db    = $this->_db;
 		$table = $this->_table;
 		$class = $this->_class;
@@ -35,7 +35,7 @@ class CMongoModel extends CModel
 
 	public function findAll($condition = array(), $sort = array(), $limit=-1)
 	{
-		$mongo = MongoFactory::getInstance();
+		$mongo = CDBFactory::getDataBase('mongo');
 		$db    = $this->_db;
 		$table = $this->_table;
 		$class = $this->_class;
@@ -60,7 +60,7 @@ class CMongoModel extends CModel
 
 	public function findOne($condition = array())
 	{
-		$mongo = MongoFactory::getInstance();
+		$mongo = CDBFactory::getDataBase('mongo');
 		$db    = $this->_db;
 		$table = $this->_table;
 		$class = $this->_class;
@@ -73,7 +73,7 @@ class CMongoModel extends CModel
 
 	public function findRandom($condition = array())
 	{
-		$mongo = MongoFactory::getInstance();
+		$mongo = CDBFactory::getDataBase('mongo');
 		$db    = $this->_db;
 		$table = $this->_table;
 		$class = $this->_class;
@@ -94,7 +94,7 @@ class CMongoModel extends CModel
 
 	public function runCommand($cmd, $opts, $raw=false)
 	{
-		$mongo = MongoFactory::getInstance();
+		$mongo = CDBFactory::getDataBase('mongo');
 		$db    = $this->_db;
 		$table = $this->_table;
 		$class = $this->_class;
@@ -141,7 +141,7 @@ class CMongoModel extends CModel
 
 	public function execute($code, $vars=array())
 	{
-		$mongo = MongoFactory::getInstance();
+		$mongo = CDBFactory::getDataBase('mongo');
 		$db    = $this->_db;
 
 		$res  = $mongo->$db->execute($code, $vars);
@@ -150,7 +150,7 @@ class CMongoModel extends CModel
 
 	public function getLastError()
 	{
-		$mongo = MongoFactory::getInstance();
+		$mongo = CDBFactory::getDataBase('mongo');
 		$db    = $this->_db;
 
 		return $mongo->$db->lastError();
@@ -163,7 +163,7 @@ class CMongoModel extends CModel
 
 	public function findDBRef($ref, $class_o=NULL)
 	{
-		$mongo = MongoFactory::getInstance();
+		$mongo = CDBFactory::getDataBase('mongo');
 		$db    = $this->_db;
 		$table = $this->_table;
 		$class = $this->_class;
@@ -187,7 +187,7 @@ class CMongoModel extends CModel
 
 	public function group($keys, $initial, $function, $opts=array())
 	{
-		$mongo = MongoFactory::getInstance();
+		$mongo = CDBFactory::getDataBase('mongo');
 		$db    = $this->_db;
 		$table = $this->_table;
 		$class = $this->_class;	
@@ -200,7 +200,7 @@ class CMongoModel extends CModel
 
 	public function distinct($key, $query=array())
 	{
-		$mongo = MongoFactory::getInstance();
+		$mongo = CDBFactory::getDataBase('mongo');
 		$db    = $this->_db;
 		$table = $this->_table;
 		$class = $this->_class;	
@@ -214,7 +214,7 @@ class CMongoModel extends CModel
 
 	public function remove($condition = array())
 	{
-		$mongo = MongoFactory::getInstance();
+		$mongo = CDBFactory::getDataBase('mongo');
 		$db    = $this->_db;
 		$table = $this->_table;
 		$class = $this->_class;
@@ -226,7 +226,7 @@ class CMongoModel extends CModel
 	//Function only updates the entry
 	public function update($opts=array())
 	{
-		$mongo = MongoFactory::getInstance();
+		$mongo = CDBFactory::getDataBase('mongo');
 		$db    = $this->_db;
 		$table = $this->_table;
 		$class = $this->_class;	
@@ -242,7 +242,7 @@ class CMongoModel extends CModel
 
 	public function save()
 	{
-		$mongo = MongoFactory::getInstance();
+		$mongo = CDBFactory::getDataBase('mongo');
 		$save  = $this->toArray();
 
 		//save the entity
@@ -255,7 +255,7 @@ class CMongoModel extends CModel
 
 	public function bulkInsert($models)
 	{
-		$mongo = MongoFactory::getInstance();
+		$mongo = CDBFactory::getDataBase('mongo');
 		$db    = $this->_db;
 		$table = $this->_table;
 
@@ -354,7 +354,7 @@ class CMongoModel extends CModel
 
 	protected function _increment($key, $amount=1)
 	{
-		$mongo = MongoFactory::getInstance();
+		$mongo = CDBFactory::getDataBase('mongo');
 		$db    = $this->_db;
 		$table = $this->_table;
 		
