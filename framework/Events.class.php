@@ -1,6 +1,35 @@
 <?
+class CEvent
+{
+	private $_propagate = true;
+	protected $_method  = NULL;
 
-class CErrorEvent /*extends CEvent*/
+	public function stopPropagation()
+	{
+		$this->_propagate = false;
+	}
+
+	public function getPropagation()
+	{
+		return $this->_propagate;
+	}
+
+	public function triggerListeners(array $listeners)
+	{
+		if(count($listeners))
+		{
+			$method = $this->_method;
+			foreach($listeners as $l)
+			{
+				$l->$method($this);
+				if($this->_propagate === false)
+					break;
+			}
+		}
+	}
+}
+
+class CErrorEvent extends CEvent
 {
 	public $errno;
 	public $errstr;
@@ -12,6 +41,7 @@ class CErrorEvent /*extends CEvent*/
 
 	public function __construct($errno, $errstr, $message, $file, $line, $trace=NULL)
 	{
+		$this->_method = 'handleError';
 		$this->errno   = $errno;
 		$this->errstr  = $errstr;
 		$this->message = $message;
@@ -74,6 +104,7 @@ class CExceptionEvent extends CErrorEvent
 
 	public function __construct(Exception $ex)
 	{
+		$this->_method   = 'handeException';
 		$this->exception = $ex;
 		$this->errno     = $ex->getCode();
 		$this->errstr    = "";
@@ -81,7 +112,7 @@ class CExceptionEvent extends CErrorEvent
 		$this->file      = $ex->getFile();
 		$this->line      = $ex->getLine();
 		$this->trace     = $ex->getTrace();
-		$this->_cetCode();
+		$this->_getCode();
 	}
 }
 ?>
