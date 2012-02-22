@@ -17,6 +17,8 @@ class CErrorHandler implements IObserver, ISingleton
 	  E_STRICT             => 'Runtime Notice',
 	  E_RECOVERABLE_ERROR  => 'Catchable Fatal Error');
 
+	private $_observer;
+
 	public function __construct()
 	{
 		$this->_listeners = array();
@@ -79,8 +81,7 @@ class CErrorHandler implements IObserver, ISingleton
 
 		//Send event to handleError listeners
 		$listeners = CErrorHandler::getInstance()->_listeners;
-		foreach($listeners as $l)
-			$l->handleError($event);
+		$event->triggerListeners($listeners);
 	}
 
 	/**

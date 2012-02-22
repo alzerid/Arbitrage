@@ -23,7 +23,6 @@ class CApplication implements ISingleton, IErrorHandlerListener
 		return self::$_instance;
 	}
 
-
 	/**
 	 * Loads all the required files for the framework.
 	 */
