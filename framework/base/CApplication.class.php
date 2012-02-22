@@ -41,19 +41,24 @@ class CApplication implements ISingleton, IErrorHandlerListener
 		$this->requireFrameworkFile('base/CAction.class.php');                     //Action class
 		$this->requireFrameworkFile('base/renderers/CRenderer.class.php');         //Base renderer class
 		$this->requireFrameworkFile('base/renderers/CViewFileRenderer.class.php'); //View File renderer class
+		$this->requireFrameworkFile('base/renderers/CJSONRenderer.class.php');     //JSON Renderer
 		$this->requireFrameworkFile('base/CFilterChain.class.php');                //Filter chain for CBaseControllers
 		$this->requireFrameworkFile('base/CRouter.class.php');                     //Router handler
 		$this->requireFrameWorkFile('base/CErrorHandler.class.php');               //Exception handler and PHP error handler
 
+		//Array include
+		$this->requireFrameWorkFile('array/CArrayObject.class.php');               //Array Object
+
 		//Extended framework files
 		$this->requireFrameworkFile('utils/URL.class.php');
-		$this->requireFrameworkFile('config/CArbitrageConfig.class.php');
+		$this->requireFrameworkFile('config/CArbitrageConfig.class.php');          //Arbitrage config class
 
 		//Register exception handler
 		CErrorHandler::getInstance()->addListener($this);
 
 		//Database classes
 		$this->requireFrameworkFile('db/CModel.class.php');
+		$this->requireFrameworkFile('db/CDBFactory.class.php');
 
 		//HTML
 		$this->requireFrameworkFile('base/CHTMLComponent.class.php');
@@ -164,6 +169,8 @@ class CApplication implements ISingleton, IErrorHandlerListener
 		$this->_controller->setAction($this->_action);
 	}
 
+	/* Require File Methods */
+
 	/** 
 	 * Loads the application configuration file.
 	 * @path string The path to the application configuration file.
@@ -210,6 +217,17 @@ class CApplication implements ISingleton, IErrorHandlerListener
 		require_once($path);
 	}
 
+	public function requireApplicationLibrary($lib)
+	{
+		$path = CArbitrageConfig::getInstance()->_internals->approotpath . "app/lib/$lib.php";
+		if(!file_exists($path))
+			throw new EArbitrageException("Unable to include application library '$path'!");
+
+		require_once($path);
+	}
+
+	/* END Require File Methods */
+
 	static public function getConfig()
 	{
 		return CArbitrageConfig::getInstance();
@@ -223,6 +241,7 @@ class CApplication implements ISingleton, IErrorHandlerListener
 			CApplication::getInstance()->requireApplicationModel($class);
 		}
 	}
+
 
 	/* IErrorHandlerListener  Methods */
 	public function handleError(CErrorEvent $event)
@@ -247,13 +266,21 @@ class CApplication implements ISingleton, IErrorHandlerListener
 
 	public function handleException(CExceptionEvent $event)
 	{
-		//TODO: Handle $ex->getPrevious exceptions and show them
-		//TODO: Get error handler controller and post the error
+		$debug = CApplication::getConfig()->arbitrage->debugMode;
+		if($debug === true)
+		{
+			//Flush output buffer
+			ob_end_clean();
 
-		//Grab exception handler
-		var_dump(get_class($ex));
-		var_dump($ex);
-		die("CODE ME: CApplication::handleException");
+			//Render error
+			$this->requireFrameworkFile('base/CFrameworkController.class.php');
+			$controller = new CFrameworkController();
+			$content    = $controller->render('views/exception', array('event' => $event));
+
+			//echo out the content
+			echo $content;
+			die();
+		}
 	}
 	/* End Exception Listner Methods */
 
@@ -312,26 +339,6 @@ class CApplication implements ISingleton, IErrorHandlerListener
 	static public function getConfig()
 	{
 		return CArbitrageConfig::getInstance();
-	}
-
-	static public function getPublicHtmlFile($file)
-	{
-		global $_conf;
-
-		$path = $_conf['approotpath'] . "public/html/$file";
-		if(!file_exists($path))
-			return '';
-
-		return file_get_contents($path);
-	}
-
-	static public function requireApplicationLibrary($path)
-	{
-		$path = Application::getConfig()->approotpath . "app/lib/$path";
-		if(!file_exists($path))
-			throw new EArbitrageException("Unable to include application library '$path'!");
-
-		require_once($path);
 	}
 
 	static public function requireLibrary($name)
