@@ -115,7 +115,7 @@ abstract class CBaseController implements IController
 
 		//TODO: Ensure PHP Exception is on
 		ob_start();
-		$content = $this->_render($ret);
+		$content = $this->render($ret);
 		$content = $chain->runPostProcess($content);
 
 		echo $content;
@@ -124,7 +124,7 @@ abstract class CBaseController implements IController
 		ob_end_flush();
 	}
 
-	private function _render($ret)
+	public function render($ret)
 	{
 		$renderer = NULL;
 		if(is_string($ret['render']))
