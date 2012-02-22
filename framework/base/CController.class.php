@@ -44,6 +44,20 @@ abstract class CController extends CBaseController implements IFileRenderable
 		$this->_view_path = (($path === NULL)? CApplication::getConfig()->_internals->approotpath . "app/views/" : $path);
 	}
 
+	public function getDefaultLayout()
+	{
+		return $this->_default_layout;
+	}
+
+	public function getLayoutPath()
+	{
+		return $this->_layout_path;
+	}
+
+	public function getViewPath()
+	{
+		return $this->_view_path;
+	}
 	/* IController implementation */
 	public function renderInternal(IRenderer $renderer)
 	{
