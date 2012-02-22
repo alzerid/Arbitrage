@@ -1,5 +1,5 @@
 <?
-class CEvent
+class CEvent implements IEvent
 {
 	private $_propagate = true;
 	protected $_method  = NULL;

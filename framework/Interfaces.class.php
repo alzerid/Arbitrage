@@ -119,6 +119,13 @@ interface IListener
 {
 }
 
+interface IEvent
+{
+	public function stopPropagation();
+	public function getPropagation();
+	public function triggerListeners(array $listeners);
+}
+
 /**
  * IErrorHandlerListener implementation
  */
