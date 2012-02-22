@@ -155,7 +155,6 @@ abstract class CBaseController implements IController
 
 	public function render($ret)
 	{
-		$renderer = NULL;
 		if(isset($ret['render']) && is_string($ret['render']))
 		{
 			//Determine view type
