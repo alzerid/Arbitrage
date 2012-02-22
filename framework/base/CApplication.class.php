@@ -1,16 +1,13 @@
 <?
-//TODO: Move controller type methods to the controller
-//TODO: Auto load models
+//TODO: Code CCompenent class which can easy render files
 
-class CApplication implements IExceptionListener, ISingleton
+class CApplication implements ISingleton, IErrorHandlerListener
 {
 	static private $_VERSION = "2.0.0";
 	static private $_instance = NULL;    //Instance of CApplication
 
 	private $_controller;         //The controller object that was requested
 	private $_action;             //The action object that was requested
-	//private $_javascripts;
-	//private $_stylesheets;
 
 	public function __construct()
 	{
@@ -38,7 +35,7 @@ class CApplication implements IExceptionListener, ISingleton
 
 		//Load base required framework files
 		$this->requireFrameworkFile('Exceptions.class.php');                       //File full of base exception classes
-		$this->requireFrameworkFile('CExceptionHandler.class.php');                //Exception class that handles exceptions
+		$this->requireFrameworkFile('Events.class.php');                           //Events
 		$this->requireFrameworkFile('base/CApplication.class.php');                //Main application class that drive Arbitrage
 		$this->requireFrameworkFile('base/CBaseController.class.php');             //Base controller class
 		$this->requireFrameworkFile('base/CController.class.php');                 //Controller class
@@ -46,15 +43,15 @@ class CApplication implements IExceptionListener, ISingleton
 		$this->requireFrameworkFile('base/renderers/CRenderer.class.php');         //Base renderer class
 		$this->requireFrameworkFile('base/renderers/CViewFileRenderer.class.php'); //View File renderer class
 		$this->requireFrameworkFile('base/CFilterChain.class.php');                //Filter chain for CBaseControllers
-		$this->requireFrameworkFile('CExceptionHandler.class.php');                //Exception handler
 		$this->requireFrameworkFile('base/CRouter.class.php');                     //Router handler
+		$this->requireFrameWorkFile('base/CErrorHandler.class.php');               //Exception handler and PHP error handler
 
 		//Extended framework files
 		$this->requireFrameworkFile('utils/URL.class.php');
 		$this->requireFrameworkFile('config/CArbitrageConfig.class.php');
 
 		//Register exception handler
-		CExceptionHandler::getInstance()->addListener($this);
+		CErrorHandler::getInstance()->addListener($this);
 
 		//Database classes
 		$this->requireFrameworkFile('db/CModel.class.php');
@@ -228,10 +225,28 @@ class CApplication implements IExceptionListener, ISingleton
 		}
 	}
 
+	/* IErrorHandlerListener  Methods */
+	public function handleError(CErrorEvent $event)
+	{
+		//TODO: If debug is on, render
+		$debug = CApplication::getConfig()->arbitrage->debugMode;
+		if($debug === true)
+		{
+			//Flush output buffer
+			ob_end_clean();
 
+			//Render error
+			$this->requireFrameworkFile('base/CFrameworkController.class.php');
+			$controller = new CFrameworkController();
+			$content    = $controller->render('views/exception', array('event' => $event));
 
-	/* Exception Listner Methods */
-	public function handleException(Exception $ex)
+			//echo out the content
+			echo $content;
+			die();
+		}
+	}
+
+	public function handleException(CExceptionEvent $event)
 	{
 		//TODO: Handle $ex->getPrevious exceptions and show them
 		//TODO: Get error handler controller and post the error
