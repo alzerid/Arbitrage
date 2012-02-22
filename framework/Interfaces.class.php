@@ -120,11 +120,12 @@ interface IListener
 }
 
 /**
- * Exception observer implementation
+ * IErrorHandlerListener implementation
  */
-interface IExceptionListener extends IListener
+interface IErrorHandlerListener extends IListener
 {
-	public function handleException(Exception $ex);
+	public function handleException(CExceptionEvent $ex);
+	public function handleError(CErrorEvent $err);
 }
 
 /**
@@ -133,8 +134,8 @@ interface IExceptionListener extends IListener
 interface IObserver
 {
 	public function addListener(IListener $listener);
+	public function prependListener(IListener $listener);
 	public function removeListener(IListener $listener);
 	public function clearListeners();
-	public function triggerListeners();
 }
 ?>
