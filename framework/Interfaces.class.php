@@ -34,6 +34,14 @@ interface IViewRenderer extends IRenderer
 }
 
 /**
+ * ITextRenderer interface
+ */
+interface ITextRenderer extends IRenderer
+{
+	public function render($content);
+}
+
+/**
  * IViewFileRenderer interface
  */
 interface IViewFileRenderer extends IRenderer
@@ -127,12 +135,20 @@ interface IEvent
 }
 
 /**
+ * IEventListener implementation
+ */
+interface IEventListener
+{
+	public function handleEvent(CEvent $event);
+}
+
+/**
  * IErrorHandlerListener implementation
  */
 interface IErrorHandlerListener extends IListener
 {
-	public function handleException(CExceptionEvent $ex);
-	public function handleError(CErrorEvent $err);
+	public function handleException(CExceptionEvent $event);
+	public function handleError(CErrorEvent $event);
 }
 
 /**
