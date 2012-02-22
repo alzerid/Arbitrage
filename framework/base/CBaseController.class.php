@@ -18,6 +18,7 @@ abstract class CBaseController implements IController
 
 	//Controller specifics
 	private $_filters;
+	private $_renderer_type;
 	private $_view_vars;
 	private $_ajax;
 	private $_action;
@@ -39,8 +40,9 @@ abstract class CBaseController implements IController
 		$this->_files = ((isset($_FILES))? $_FILES : array());
 
 		//Internal variables
-		$this->_view_vars       = array();
-		$this->_ajax            = false;
+		$this->_view_vars     = array();
+		$this->_ajax          = false;
+		$this->_renderer_type = "view";
 	}
 
 	/**
@@ -58,7 +60,7 @@ abstract class CBaseController implements IController
 	 */
 	public function getName()
 	{
-		return get_class($this);
+		return preg_replace('/(Ajax)?Controller$/i', '', strtolower(get_class($this)));
 	}
 
 	/**
@@ -68,6 +70,33 @@ abstract class CBaseController implements IController
 	public function setAction(IAction $action)
 	{
 		$this->_action = $action;
+	}
+
+	/**
+	 * Get the action for the controller.
+	 * @returns the controller object.
+	 */
+	public function getAction()
+	{
+		return $this->_action;
+	}
+
+	/**
+	 * Set the default renderer type for this controller.
+	 * @param $type defines how the controller will render the view.
+	 */
+	public function setRendererType($type)
+	{
+		$this->_renderer_type = $type;
+	}
+
+	/**
+	 * Get the view type.
+	 * @return the view type of the controller.
+	 */
+	public function getRendererType()
+	{
+		return $this->_renderer_type;
 	}
 
 	/**
@@ -127,10 +156,27 @@ abstract class CBaseController implements IController
 	public function render($ret)
 	{
 		$renderer = NULL;
-		if(is_string($ret['render']))
+		if(isset($ret['render']) && is_string($ret['render']))
 		{
-			$renderer = new CViewFileRenderer($this);
-			$content  = $renderer->render($ret['render'], $ret['layout'], $ret['variables']);
+			//Determine view type
+			if($this->_renderer_type === "view")
+			{
+				$renderer = new CViewFileRenderer($this);
+				$content  = $renderer->render($ret['render'], $ret['layout'], $ret['variables']);
+			}
+			/*else if($this->_renderer_type === "text")
+			{
+				$renderer = new CViewTextRenderer($this);
+				$content  = $renderer->render($ret['render'], $ret['layout'], $ret['variables']);
+			}*/
+		}
+		elseif(is_array($ret))
+		{
+			if($this->_renderer_type === "json")
+			{
+				$renderer = new CJSONRenderer($this);
+				$content  = $renderer->render($ret);
+			}
 		}
 		elseif($ret['render'] instanceof IViewRenderer)
 			$content = $ret['render']->render();
