@@ -23,6 +23,10 @@ class CAction implements IAction
 	{
 		$ret = $this->_controller->{$this->_name}();
 
+		//Default action
+		if($ret === NULL)
+			$ret = array();
+
 		if(!is_array($ret))
 			throw new EArbitrageException("Actions must return an array.");
 
@@ -30,7 +34,7 @@ class CAction implements IAction
 		{
 			//Determine view, layouts, and data
 			if(!isset($ret['layout']))
-				$ret['layout'] = "default";
+				$ret['layout'] = $this->_controller->getDefaultLayout();
 
 			if(!isset($ret['render']))
 			{
