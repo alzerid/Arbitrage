@@ -97,8 +97,7 @@ class CErrorHandler implements IObserver, ISingleton
 
 		//Send event to the listeners
 		$listeners = CErrorHandler::getInstance()->_listeners;
-		foreach($listeners as $l)
-			$l->handleException($event);
+		$event->triggerListeners($listeners);
 	}
 }
 
