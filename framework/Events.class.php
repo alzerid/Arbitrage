@@ -21,6 +21,9 @@ class CEvent implements IEvent
 			$method = $this->_method;
 			foreach($listeners as $l)
 			{
+				if($l instanceof IEventListener)
+					$l->handleEvent($this);
+
 				$l->$method($this);
 				if($this->_propagate === false)
 					break;
@@ -89,6 +92,7 @@ class CErrorEvent extends CEvent
 			foreach($content as $c)
 			{
 				$class = (($idx == $line)? "selected" : "");
+				$c     = preg_replace('/^\t/', '&nbsp;&nbsp&nbsp&nbsp', htmlentities($c));
 				$code .= '<div class="line ' . $class . '">' . ($idx) . '</div><div class="code ' . $class . '">' . $c . '</div><div class="clear"></div>';
 				$idx++;
 			}
@@ -104,7 +108,7 @@ class CExceptionEvent extends CErrorEvent
 
 	public function __construct(Exception $ex)
 	{
-		$this->_method   = 'handeException';
+		$this->_method   = 'handleException';
 		$this->exception = $ex;
 		$this->errno     = $ex->getCode();
 		$this->errstr    = "";
