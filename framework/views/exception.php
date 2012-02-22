@@ -24,6 +24,7 @@
 			width: 900px;
 			margin: 0 auto;
 			margin-bottom: 15px;
+			background: #FFFFFF;
 		}
 
 		legend {
@@ -126,65 +127,65 @@
 </head>
 <body>
 
-	<fieldset>
-		<legend>Arbitrage Exception</legend>
-		<div class="error_wrapper">
-			<h3>Summary:</h3>
-			<div class="summary">
+<fieldset>
+	<legend>Arbitrage Exception</legend>
+	<div class="error_wrapper">
+		<h3>Summary:</h3>
+		<div class="summary">
 
-				<!--<div class="entry">
-					<div class="label">Scope</div>
-					<div class="value"><?=$ex['scope'];?></div>
-					<div class="clear"></div>
-				</div>-->
+			<!--<div class="entry">
+				<div class="label">Scope</div>
+				<div class="value"><?//=$ex['scope'];?></div>
+				<div class="clear"></div>
+			</div>-->
 
-				<div class="entry">
-					<div class="label">Error No</div>
-					<div class="value"><?=$event->errno;?> <?=(($event->errstr !== "")? "({$event->errstr})" : "")?></div>
-					<div class="clear"></div>
-				</div>
-
-				<div class="entry">
-					<div class="label">Message</div>
-					<div class="value"><?=$event->message;?></div>
-					<div class="clear"></div>
-				</div>
-
-				<div class="entry">
-					<div class="label">File</div>
-					<div class="value"><?=$event->file;?></div>
-					<div class="clear"></div>
-				</div>
-
-				<div class="entry">
-					<div class="label">Line</div>
-					<div class="value"><?=$event->line;?></div>
-					<div class="clear"></div>
-				</div>
-
+			<div class="entry">
+				<div class="label">Error No</div>
+				<div class="value"><?=$event->errno;?> <?=(($event->errstr !== "")? "({$event->errstr})" : "")?></div>
+				<div class="clear"></div>
 			</div>
 
-			<div style="height: 50px"></div>
-
-			<h3>Backtrace:</h3>
-			<div class="backtrace">
-				<?
-				$idx = 0;
-				foreach($event->trace as $entry)
-				{?>
-					<div class="entry">
-						<div class="expand" onclick="return toggleCode.call(this, <?=$idx?>);">[ + ]</div>
-						<div class="summary"><span style="color: red; font-weight: bold"></span> <span style="color: #999999; font-weight: bold"><?=$entry['file']?>:<?=$entry['line']?></span></div>
-						<div class="clear"></div>
-						<div class="code_wrapper" id="code_<?=$idx?>"><?=$entry['code'];?></div>
-					</div>
-				<?
-					$idx++;
-				}
-				?>
+			<div class="entry">
+				<div class="label">Message</div>
+				<div class="value"><?=$event->message;?></div>
+				<div class="clear"></div>
 			</div>
+
+			<div class="entry">
+				<div class="label">File</div>
+				<div class="value"><?=$event->file;?></div>
+				<div class="clear"></div>
+			</div>
+
+			<div class="entry">
+				<div class="label">Line</div>
+				<div class="value"><?=$event->line;?></div>
+				<div class="clear"></div>
+			</div>
+
 		</div>
-	</fieldset>
+
+		<div style="height: 50px"></div>
+
+		<h3>Backtrace:</h3>
+		<div class="backtrace">
+			<?
+			$idx = 0;
+			foreach($event->trace as $entry)
+			{?>
+				<div class="entry">
+					<div class="expand" onclick="return toggleCode.call(this, <?=$idx?>);">[ + ]</div>
+					<div class="summary"><span style="color: red; font-weight: bold">&nbsp;</span> <span style="color: #999999; font-weight: bold"><?=$entry['file']?>:<?=$entry['line']?></span></div>
+					<div class="clear"></div>
+					<div class="code_wrapper" id="code_<?=$idx?>"><?=$entry['code'];?></div>
+				</div>
+			<?
+				$idx++;
+			}
+			?>
+		</div>
+	</div>
+</fieldset>
 
 </body>
 </html>
