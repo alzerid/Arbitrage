@@ -133,11 +133,11 @@
 		<h3>Summary:</h3>
 		<div class="summary">
 
-			<!--<div class="entry">
+			<div class="entry">
 				<div class="label">Scope</div>
-				<div class="value"><?//=$ex['scope'];?></div>
+				<div class="value"><?=((isset($event->exception))? get_class($event->exception) : "PHP Error");?></div>
 				<div class="clear"></div>
-			</div>-->
+			</div>
 
 			<div class="entry">
 				<div class="label">Error No</div>
