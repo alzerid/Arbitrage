@@ -18,6 +18,53 @@ final class PHPException extends EArbitrageException
 	}
 }
 
+final class EHTTPException extends EArbitrageException
+{
+	//4xx series
+	static public $HTTP_BAD_REQUEST  = 400;
+	static public $HTTP_UNAUTHORIZED = 401;
+	static public $HTTP_FORBIDDEN    = 403;
+	static public $HTTP_NOT_FOUND    = 404;
+
+	//5xx series
+	static public $HTTP_INTERNAL_ERROR  = 500;
+	static public $HTTP_NOT_IMPLEMENTED = 501;
+
+	public function __construct($code)
+	{
+		parent::__construct($this->_getMessage($code), $code);
+	}
+
+	public function _getMessage($code)
+	{
+		switch($code)
+		{
+			//4xx series
+			case self::$HTTP_BAD_REQUEST:
+				return "Bad Request";
+
+			case self::$HTTP_UNAUTHORIZED:
+				return "Unauthorized";
+
+			case self::$HTTP_FORBIDDEN:
+				return "Forbidden";
+
+			case self::$HTTP_NOT_FOUND:
+				return "Not Found";
+
+			//5xx series
+			case self::$HTTP_INTERNAL_ERROR:
+				return "Internal Server Error";
+
+			case self::$HTTP_NOT_IMPLEMENTED:
+				return "Not Implemented";
+
+			default:
+				return "Unknown Error";
+		}
+	}
+}
+
 final class EArbitrageConfigException extends EArbitrageException
 {
 }
