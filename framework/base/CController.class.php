@@ -5,7 +5,7 @@
  * @version 2.0
  */
 
-abstract class CController extends CBaseController implements IFileRenderable
+class CController extends CBaseController implements IFileRenderable
 {
 	//Render variables
 	private $_layout_path;
@@ -68,9 +68,6 @@ abstract class CController extends CBaseController implements IFileRenderable
 	/* Implementation of IFileRenderable */
 	public function renderFile($file, $layout, $variables)
 	{
-		//ob_start();
-		//ob_implicit_flush(false);
-
 		//Get content from view
 		$content = $this->renderPartialFile($file, $variables);
 
