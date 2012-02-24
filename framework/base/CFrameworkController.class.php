@@ -10,7 +10,7 @@ class CFrameworkController extends CBaseController
 		extract($_vars);
 
 		//Generate file path
-		$path = CApplication::getConfig()->_internals->fwrootpath . "framework/views/exception.php";
+		$path = CApplication::getConfig()->_internals->fwrootpath . "framework/views/$file.php";
 
 		ob_start();
 		require_once($path);
