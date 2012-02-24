@@ -256,7 +256,7 @@ class CApplication implements ISingleton, IErrorHandlerListener
 			//Render error
 			$this->requireFrameworkFile('base/CFrameworkController.class.php');
 			$controller = new CFrameworkController();
-			$content    = $controller->render('views/exception', array('event' => $event));
+			$content    = $controller->render('views/errors/exception', array('event' => $event));
 
 			//echo out the content
 			echo $content;
@@ -275,170 +275,37 @@ class CApplication implements ISingleton, IErrorHandlerListener
 			//Render error
 			$this->requireFrameworkFile('base/CFrameworkController.class.php');
 			$controller = new CFrameworkController();
-			$content    = $controller->render('views/exception', array('event' => $event));
+			$content    = $controller->render('errors/exception', array('event' => $event));
 
 			//echo out the content
 			echo $content;
 			die();
 		}
+		elseif($event->exception instanceof EHTTPException)
+		{
+			//Flush output buffer
+			ob_end_clean();
+
+			//Check to see which view we should show, arbitrage view or application views
+			$vpath = CApplication::getConfig()->_internals->approotpath . "app/views/_internal/errors/http_" . $event->exception->getCode() . ".php";
+			if(file_exists($vpath))
+			{
+				$controller = new CController();
+				$render     = array("render" => '_internal/errors/http_' . $event->exception->getCode(), 'layout' => 'default', 'variables' => array('event' => $event));
+				$content    = $controller->render($render);
+			}
+			else
+			{
+				$this->requireFrameworkFile('base/CFrameworkController.class.php');
+				$controller = new CFrameworkController();
+				$content    = $controller->render('views/errors/http_' . $event->exception->getCode(), array('event' => $event));
+			}
+
+			//Echo out the content
+			echo $content;
+			die();
+		}
 	}
 	/* End Exception Listner Methods */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	/*static function generateJavascriptLink($file)
-	{
-		return "<script type=\"text/javascript\" language=\"JavaScript\" src=\"$file\"></script>\n";
-	}
-
-	static function includeJavascriptFile($file)
-	{
-		self::$_javascripts[] = $file;
-	}
-
-	static function includeStylesheetFile($file)
-	{
-		self::$_stylesheets[] = $file;
-	}
-
-	static public function populateJavascriptTags()
-	{
-		$ret = '';
-		if(count(self::$_javascripts))
-		{
-			foreach(self::$_javascripts as $js)
-				$ret .= "<script type=\"text/javascript\" language=\"JavaScript\" src=\"$js\"></script>\n";
-		}
-
-		return $ret;
-	}
-
-	static public function populateStylesheetTags()
-	{
-		$ret = '';
-		if(count(self::$_stylesheets))
-		{
-			foreach(self::$_stylesheets as $css)
-				$ret .= "<link rel='stylesheet' type='text/css' href='$css' />\n";
-		}
-
-		return $ret;
-	}
-
-	static public function getConfig()
-	{
-		return CArbitrageConfig::getInstance();
-	}
-
-	static public function requireLibrary($name)
-	{
-		global $_conf;
-		require_once($_conf['fwrootpath'] . "lib/$name");
-	}
-
-	static public function setBackTrace($txt)
-	{
-		self::$_backtrace = $txt;
-	}
-
-	static public function getBackTrace()
-	{
-		return self::$_backtrace;
-	}
-
-	static public function resetSession()
-	{
-		session_destroy();
-	}
-	
-	static public function requireController($filename)
-	{
-		$config = Application::getConfig();
-		$file   = "{$config->approotpath}/app/controllers/$filename";
-		if(!file_exists($file))
-			throw new #ArbitrageException("Unable to include controller '$filename'.");
-
-		require_once($file);
-	}
-
-
-	static public function getDefaultLogger()
-	{
-		$conf = Application::getConfig();
-		$log  = $conf->arbitrage['logger'];
-
-		if(!isset($log))
-			throw new ArbitrageException("Unable to get default logger. Please set it up correctly in the config file.");
-
-		$logger = LogFacilityFactory::getLogger($log['type'], $log['properties']);
-
-		return $logger;
-	}
-
-	static public function recursiveGlob($pattern, $flags=0)
-	{
-		$files = glob($pattern, $flags);
-		foreach(glob(dirname($pattern) . '/*', GLOB_ONLYDIR | GLOB_NOSORT) as $dir)
-			$files = array_merge($files, self::recursiveGlob($dir . '/' . basename($pattern), $flags));
-
-		return $files;
-	}
-
-	static protected function _selectArrayValue($path, $data, $cb=NULL)
-	{
-		$path  = explode('.', $path);
-		$cpath = $path[0];
-		$path  = implode('.', array_slice($path, 1));
-		$ret   = array();
-
-		if($cpath != "" && $cpath[0] == "*")
-		{
-			foreach($data as $key=>$value)
-			{
-				$matches = array();
-				if(preg_match('/:cb:(.*)$/', $cpath, $matches))
-				{
-					$func = $cb[$matches[1]];
-					$func($key, $value);
-				}
-
-				$ret[] = self::_selectArrayValue($path, $value, $cb);
-			}
-		}
-		elseif($cpath != "" && $cpath[0] == "$")
-		{
-			foreach($data as $key=>$value)
-			{
-				if(!isset($ret[$key]))
-					$ret[$key] = array();
-
-				$ret[$key] = self::_selectArrayValue($path, $value, $cb);
-			}
-
-			//Check for special operation
-			if(strtolower($cpath) == '$sum')
-			{
-				foreach($ret as $key => $val)
-					$ret[$key] = array_sum($ret[$key]);
-			}
-		}
-		elseif($path != "")
-			return self::_selectArrayValue($path, $data[$cpath], $cb);
-		else
-			return $data[$cpath];
-
-		return $ret;
-	}*/
 }
 ?>
