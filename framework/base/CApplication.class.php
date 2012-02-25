@@ -287,19 +287,9 @@ class CApplication implements ISingleton, IErrorHandlerListener
 			ob_end_clean();
 
 			//Check to see which view we should show, arbitrage view or application views
-			$vpath = CApplication::getConfig()->_internals->approotpath . "app/views/_internal/errors/http_" . $event->exception->getCode() . ".php";
-			if(file_exists($vpath))
-			{
-				$controller = new CController();
-				$render     = array("render" => '_internal/errors/http_' . $event->exception->getCode(), 'layout' => 'default', 'variables' => array('event' => $event));
-				$content    = $controller->render($render);
-			}
-			else
-			{
-				$this->requireFrameworkFile('base/CFrameworkController.class.php');
-				$controller = new CFrameworkController();
-				$content    = $controller->render('views/errors/http_' . $event->exception->getCode(), array('event' => $event));
-			}
+			$this->requireFrameworkFile('base/CFrameworkController.class.php');
+			$controller = new CFrameworkController();
+			$content    = $controller->render('errors/http_' . $event->exception->getCode(), array('event' => $event));
 
 			//Echo out the content
 			echo $content;
