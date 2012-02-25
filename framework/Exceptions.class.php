@@ -35,6 +35,11 @@ final class EHTTPException extends EArbitrageException
 		parent::__construct($this->_getMessage($code), $code);
 	}
 
+	public function toHeader()
+	{
+		return "HTTP/1.1 " . $this->getCode() . " " . $this->getMessage();
+	}
+
 	public function _getMessage($code)
 	{
 		switch($code)
