@@ -256,7 +256,7 @@ class CApplication implements ISingleton, IErrorHandlerListener
 			//Render error
 			$this->requireFrameworkFile('base/CFrameworkController.class.php');
 			$controller = new CFrameworkController();
-			$content    = $controller->render('views/errors/exception', array('event' => $event));
+			$content    = $controller->render('errors/exception', array('event' => $event));
 
 			//echo out the content
 			echo $content;
