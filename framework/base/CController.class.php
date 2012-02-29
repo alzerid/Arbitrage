@@ -99,7 +99,7 @@ class CController extends CBaseController implements IFileRenderable
 
 		ob_start();
 		ob_implicit_flush(false);
-		require_once($path);
+		require($path);
 		$content = ob_get_clean();
 
 		return $content;
