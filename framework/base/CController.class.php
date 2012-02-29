@@ -11,6 +11,7 @@ class CController extends CBaseController implements IFileRenderable
 	private $_layout_path;
 	private $_view_path;
 	private $_default_layout;
+	private $_view_variables;
 
 	//Tags
 	private $_javascripts;
@@ -25,8 +26,9 @@ class CController extends CBaseController implements IFileRenderable
 		$this->setViewPath();
 		$this->setDefaultLayout();
 
-		$this->_javascripts = array();
-		$this->_stylesheets = array();
+		$this->_javascripts    = array();
+		$this->_stylesheets    = array();
+		$this->_view_variables = array();
 	}
 
 	public function setDefaultLayout($layout="default")
@@ -58,6 +60,12 @@ class CController extends CBaseController implements IFileRenderable
 	{
 		return $this->_view_path;
 	}
+
+	public function setViewVariable($var, $val)
+	{
+		$this->_view_variables[$var] = $val;
+	}
+
 	/* IController implementation */
 	public function renderInternal(IRenderer $renderer)
 	{
@@ -76,7 +84,7 @@ class CController extends CBaseController implements IFileRenderable
 		if(!file_exists($path))
 			throw new EArbitrageException("Layout does not exist '$path'.");
 
-		$_vars = $variables;
+		$_vars = array_merge($this->_view_variables, $variables);
 		extract($_vars);
 
 		//Require view
