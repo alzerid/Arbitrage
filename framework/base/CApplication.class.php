@@ -44,7 +44,13 @@ class CApplication implements ISingleton, IErrorHandlerListener
 		$this->requireFrameworkFile('base/renderers/CJSONRenderer.class.php');     //JSON Renderer
 		$this->requireFrameworkFile('base/CFilterChain.class.php');                //Filter chain for CBaseControllers
 		$this->requireFrameworkFile('base/CRouter.class.php');                     //Router handler
-		$this->requireFrameWorkFile('base/CErrorHandler.class.php');               //Exception handler and PHP error handler
+		$this->requireFrameworkFile('base/CErrorHandler.class.php');               //Exception handler and PHP error handler
+		
+
+		//Templates
+		$this->requireFrameworkFile('template/CTemplate.class.php');                     //Template Class
+		$this->requireFrameworkFile('template/CTemplateFile.class.php');                 //Template File Class
+
 
 		//Array include
 		$this->requireFrameWorkFile('array/CArrayObject.class.php');               //Array Object

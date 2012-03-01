@@ -66,6 +66,14 @@ interface IFileRenderable extends IRenderable
 }
 
 /**
+ * ITemplate interface
+ */
+interface ITemplate
+{
+	public function render($variables);
+}
+
+/**
  * IController interface
  */
 interface IController
