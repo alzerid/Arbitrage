@@ -48,16 +48,18 @@ class CApplication implements ISingleton, IErrorHandlerListener
 		
 
 		//Templates
-		$this->requireFrameworkFile('template/CTemplate.class.php');                     //Template Class
-		$this->requireFrameworkFile('template/CTemplateFile.class.php');                 //Template File Class
-
-
+		$this->requireFrameworkFile('template/CTemplate.class.php');               //Template Class
+		$this->requireFrameworkFile('template/CTemplateFile.class.php');           //Template File Class
+		
 		//Array include
 		$this->requireFrameWorkFile('array/CArrayObject.class.php');               //Array Object
 
 		//Extended framework files
 		$this->requireFrameworkFile('utils/URL.class.php');
 		$this->requireFrameworkFile('config/CArbitrageConfig.class.php');          //Arbitrage config class
+
+		//Communication classes
+		$this->requireFrameworkFile("communication/CEmailCommunication.class.php");  //Email communication class
 
 		//Register exception handler
 		CErrorHandler::getInstance()->addListener($this);
