@@ -44,6 +44,7 @@ abstract class CBaseController implements IController
 		$this->_view_vars     = array();
 		$this->_ajax          = false;
 		$this->_renderer_type = "view";
+		$this->_flash         = new CFlashPropertyObject();
 	}
 
 	/**
