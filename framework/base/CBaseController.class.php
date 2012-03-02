@@ -15,6 +15,7 @@ abstract class CBaseController implements IController
 	protected $_cookie;
 	protected $_session;
 	protected $_files;
+	protected $_flash;
 
 	//Controller specifics
 	private $_filters;
@@ -113,6 +114,9 @@ abstract class CBaseController implements IController
 	 */
 	public function redirect($redirect)
 	{
+		//Add flash variable to session
+		$this->_session['_flash'] = $this->_flash->toArray();
+
 		$url = new URL($redirect);
 		header("Location: " . $url->getURL());
 		die();
@@ -142,10 +146,14 @@ abstract class CBaseController implements IController
 		//Run before filter
 		$chain->runBeforeFilterChain();
 
+		//Setup flash variables
+		$this->_flash = new CFlashPropertyObject();
+
 		//Call the action
 		$ret = $this->_action->execute();
 
-		//TODO: Set global view variables
+		//Add flash variable to session
+		$this->_session['_flash'] = $this->_flash->toArray();
 
 		//Run after filter
 		$chain->runAfterFilterChain();
