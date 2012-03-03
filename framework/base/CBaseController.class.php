@@ -44,7 +44,7 @@ abstract class CBaseController implements IController
 		$this->_view_vars     = array();
 		$this->_ajax          = false;
 		$this->_renderer_type = "view";
-		$this->_flash         = new CFlashPropertyObject();
+		$this->_flash         = NULL;
 	}
 
 	/**
@@ -116,7 +116,8 @@ abstract class CBaseController implements IController
 	public function redirect($redirect)
 	{
 		//Add flash variable to session
-		$this->_session['_flash'] = $this->_flash->toArray();
+		if($this->_flash !== NULL)
+			$this->_session['_flash'] = $this->_flash->toArray();
 
 		$url = new URL($redirect);
 		header("Location: " . $url->getURL());
