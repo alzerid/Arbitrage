@@ -1,9 +1,9 @@
 <?
-class ArrayManipulatorException extends Exception
+class CArrayManipulatorException extends Exception
 {
 }
 
-class ArrayManipulator
+class CArrayManipulator
 {
 	private $_data;
 
@@ -108,7 +108,7 @@ class ArrayManipulator
 		{
 			$diff = array_diff_key($arr1, $arr2);
 			if(count($diff))
-				throw new ArrayManipulatorException("Array key mismatch!");
+				throw new CArrayManipulatorException("Array key mismatch!");
 
 			foreach($arr1 as $key => $val)
 				$arr1[$key] = self::_deepAdd($val, $arr2[$key]);

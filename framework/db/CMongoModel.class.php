@@ -524,7 +524,7 @@ class CMongoModel extends CModel
 			$key = implode('.', array_slice($notation, 1));
 
 			//Grab array manipulator
-			$walk = new ArrayManipulator($arr);
+			$walk = new CArrayManipulator($arr);
 			$walk->setValue($key, $val);
 			$this->{$notation[0]} = $walk->getData();
 		}
@@ -543,7 +543,7 @@ class CMongoModel extends CModel
 			$key  = implode('.', array_slice($walk, 1));
 
 			//Grab array manipulator
-			$walk = new ArrayManipulator($arr);
+			$walk = new CArrayManipulator($arr);
 			$val  = $walk->getValue($key);
 		}
 
@@ -552,7 +552,7 @@ class CMongoModel extends CModel
 
 	protected function _variableDiff()
 	{
-		$walk = new ArrayManipulator($this->_originals);
+		$walk = new CArrayManipulator($this->_originals);
 		$walk->arrayDiff($this->_variables);
 
 		return $walk->toDotNotation();

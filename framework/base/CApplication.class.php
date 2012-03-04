@@ -48,6 +48,9 @@ class CApplication implements ISingleton, IErrorHandlerListener
 		$this->requireFrameworkFile('base/CPropertyObject.class.php');             //Property Object class
 		$this->requireFrameworkFile('base/CFlashPropertyObject.class.php');        //Flash Property Object class
 
+		//Utils (array manipulator)
+		$this->requireFrameworkFile('utils/CArrayManipulator.class.php');           //Array Manipulator
+
 		//Templates
 		$this->requireFrameworkFile('template/CTemplate.class.php');               //Template Class
 		$this->requireFrameworkFile('template/CTemplateFile.class.php');           //Template File Class
