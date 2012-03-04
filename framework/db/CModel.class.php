@@ -76,7 +76,7 @@ abstract class CModel /*implements IModel*/
 
 	//Normalize data
 	abstract protected function normalize();
-	
+
 	public function toArray()
 	{
 		$vars = array();

@@ -299,7 +299,11 @@ class CMongoModel extends CModel
 
 	public function getCollection()
 	{
-		return $this->_table;
+		$mongo = CDBFactory::getDataBase('mongo');
+		$db    = $this->_db;
+		$table = $this->_table;
+
+		return $mongo->$db->$table;
 	}
 
 	static public function loadExecutionFile($file)
