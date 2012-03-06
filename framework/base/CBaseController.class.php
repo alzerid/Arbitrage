@@ -57,6 +57,15 @@ abstract class CBaseController implements IController
 	}
 
 	/**
+	 * Hijacks a PHP session.
+	 */
+	public function hijackSession($id)
+	{
+		$path = session_save_path();
+		session_decode(file_get_contents($path . "/sess_$id"));
+	}
+
+	/**
 	 * Resets the PHP session.
 	 */
 	public function resetSession()

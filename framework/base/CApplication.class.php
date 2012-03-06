@@ -307,6 +307,16 @@ class CApplication implements ISingleton, IErrorHandlerListener
 			echo $content;
 			die();
 		}
+		else
+		{
+			$this->requireFrameworkFile('base/CErrorController.class.php');
+			$controller = new CErrorController();
+			$content    = $controller->render('http_500', array('event' => $event));
+
+			//Echo out the content
+			echo $content;
+			die();
+		}
 	}
 	/* End Exception Listner Methods */
 }
