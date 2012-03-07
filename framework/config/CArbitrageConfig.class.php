@@ -32,6 +32,10 @@ class CArbitrageConfig implements ISingleton
 		//Setup view and layout path
 		$this->_variables['_internals']['viewpath']   = realpath($this->_variables['_internals']['approotpath'] . "app/views/");
 		$this->_variables['_internals']['layoutpath'] = realpath($this->_variables['_internals']['approotpath'] . "app/views/layout/");
+
+		//Set arbitrage
+		$this->_variables['arbitrage']              = array();
+		$this->_variables['arbitrage']['debugMode'] = false;            //Default debug mode is off
 	}
 
 	public function getEnvironment()
