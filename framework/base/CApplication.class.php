@@ -125,8 +125,6 @@ class CApplication implements ISingleton, IErrorHandlerListener
 		//What to do with these guys?
 		/*require_once($config->fwrootpath . 'include/FastLog.class.php');
 		require_once($config->fwrootpath . 'include/Error.class.php');
-		require_once($config->fwrootpath . 'include/ReturnMedium.class.php');
-		require_once($config->fwrootpath . 'include/ArrayManipulator.class.php');
 		require_once($config->fwrootpath . 'lib/database/MongoFactory.class.php');
 		require_once($config->fwrootpath . 'lib/database/DB.class.php');
 		Application::requireFrameworkFile('base/CArbitrageException.class.php');
@@ -158,7 +156,12 @@ class CApplication implements ISingleton, IErrorHandlerListener
 
 		//Throw error if route is malformed
 		if(count($route) < 2)
-			throw new EArbitrageException("Unable to load controller because route is malformed '" . implode('/', $route) . "'.");
+		{
+			if(CApplication::getConfig()->arbitrage->debugMode)
+				throw new EArbitrageException("Unable to load controller because route is malformed '" . implode('/', $route) . "'.");
+			else
+				throw new EHTTPException(EHTTPException::$HTTP_BAD_REQUEST);
+		}
 
 		$controller = strtolower($route[0]);
 		$action     = strtolower($route[1]);
@@ -205,7 +208,12 @@ class CApplication implements ISingleton, IErrorHandlerListener
 		//Load controller into memory
 		$path = CArbitrageConfig::getInstance()->_internals->approotpath . "app/controllers/" . $controller . ".php";
 		if(!file_exists($path))
-			throw new EArbitrageException("Unable to load controller '$controller' because it does not exist.");
+		{
+			if(CApplication::getConfig()->arbitrage->debugMode)
+				throw new EArbitrageException("Unable to load controller '$controller' because it does not exist.");
+			else
+				throw new EHTTPException(EHTTPException::$HTTP_NOT_FOUND);
+		}
 
 		require_once($path);
 	}
@@ -299,9 +307,9 @@ class CApplication implements ISingleton, IErrorHandlerListener
 			ob_end_clean();
 
 			//Check to see which view we should show, arbitrage view or application views
-			$this->requireFrameworkFile('base/CFrameworkController.class.php');
-			$controller = new CFrameworkController();
-			$content    = $controller->render('errors/http_' . $event->exception->getCode(), array('event' => $event));
+			$this->requireFrameworkFile('base/CErrorController.class.php');
+			$controller = new CErrorController();
+			$content    = $controller->render('http_' . $event->exception->getCode(), array('event' => $event));
 
 			//Echo out the content
 			echo $content;
