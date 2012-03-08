@@ -26,7 +26,7 @@ class CArbitrageConfig implements ISingleton
 
 		//Setup _internals
 		$this->_variables['_internals']                = array();
-		$this->_variables['_internals']['fwrootpath']  = ARBITRAGE_FW_PATH;
+		$this->_variables['_internals']['fwrootpath']  = ARBITRAGE2_FW_PATH;
 		$this->_variables['_internals']['approotpath'] = realpath("$root/../") . "/";
 
 		//Setup view and layout path
