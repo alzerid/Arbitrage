@@ -6,6 +6,8 @@ class CWebApplication extends CApplication
 
 	protected function __construct()
 	{
+		parent::__construct();
+
 		$this->_controller = NULL;
 		$this->_action     = NULL;
 	}
