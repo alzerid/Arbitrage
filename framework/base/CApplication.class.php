@@ -3,6 +3,12 @@ abstract class CApplication implements ISingleton, IErrorHandlerListener
 {
 	static private $_VERSION = "2.0.0";
 	static protected $_instance = NULL;    //Instance of CApplication
+	protected $_model_path;
+
+	protected function __construct()
+	{
+		$this->_model_path = array();
+	}
 
 	static public function getInstance()
 	{
@@ -54,6 +60,7 @@ abstract class CApplication implements ISingleton, IErrorHandlerListener
 
 		//Utils (array manipulator)
 		$this->requireFrameworkFile('utils/CArrayManipulator.class.php');           //Array Manipulator
+		$this->requireFrameworkFile('utils/CTemporaryCache.class.php');             //Property Object class
 
 		//Templates
 		$this->requireFrameworkFile('template/CTemplate.class.php');               //Template Class
@@ -101,6 +108,9 @@ abstract class CApplication implements ISingleton, IErrorHandlerListener
 					throw new EArbitrageConfigException("Unknown database type '$db' in configuration file.");
 			}
 		}
+
+		//Add to application model path
+		$this->addModelSearchPath(CArbitrageConfig::getInstance()->_internals->approotpath . "app/models/");
 		
 		//Remote cache
 		$this->requireFrameworkFile("cache/remote/CRemoteCacheFactory.class.php");
@@ -140,11 +150,17 @@ abstract class CApplication implements ISingleton, IErrorHandlerListener
 
 	public function requireApplicationModel($model)
 	{
-		$path = CArbitrageConfig::getInstance()->_internals->approotpath . "app/models/$model.php";
-		if(!file_exists($path))
-			throw new EArbitrageException("Model '$model' does not exist.");
+		foreach($this->_model_path as $path)
+		{
+			$path .= "$model.php";
+			if(file_exists($path))
+			{
+				require_once($path);
+				return;
+			}
+		}
 
-		require_once($path);
+		throw new EArbitrageException("Model '$model' does not exist.");
 	}
 
 	public function requireApplicationLibrary($lib)
@@ -156,6 +172,15 @@ abstract class CApplication implements ISingleton, IErrorHandlerListener
 		require_once($path);
 	}
 	/** END Require File Methods **/
+
+	public function addModelSearchPath($path)
+	{
+		if(!file_exists($path))
+			throw new EArbitrageException("Model path '$path' does not exist!");
+
+		$path = realpath($path) . '/';
+		$this->_model_path[] = $path ;
+	}
 
 	static public function getConfig()
 	{
