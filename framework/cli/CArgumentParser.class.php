@@ -8,7 +8,7 @@ interface IArgument
 	public function getLongOpt();
 	public function getShortOpt();
 	public function getValue();
-	public function setValue();
+	public function setValue($arg);
 }
 
 abstract class CArgumentBase implements IArgument
@@ -162,8 +162,6 @@ class CArgumentParser
 				throw new EArgumentException("Required argument '{$opt}' is missing.");
 			}
 		}
-
-		die("PARSE");
 	}
 
 	public function __get($name)
