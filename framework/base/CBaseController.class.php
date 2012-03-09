@@ -71,6 +71,7 @@ abstract class CBaseController implements IController
 	public function resetSession()
 	{
 		session_destroy();
+		session_unset();
 	}
 
 	/**
