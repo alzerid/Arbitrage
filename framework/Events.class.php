@@ -67,8 +67,11 @@ class CErrorEvent extends CEvent
 	{
 		foreach($this->trace as &$trace)
 		{
-			$line    = $trace['line'];
-			$content = explode(PHP_EOL, file_get_contents($trace['file']));
+			if(!isset($trace['line']))
+				continue; 
+
+			$line    = ((isset($trace['line']))? $trace['line'] : '??');
+			$content = ((isset($trace['file']))? explode(PHP_EOL, file_get_contents($trace['file'])) : NULL);
 			$cnt     = count($content);
 
 			//Get range of code
