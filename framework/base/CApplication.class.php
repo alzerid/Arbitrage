@@ -61,6 +61,7 @@ abstract class CApplication implements ISingleton, IErrorHandlerListener
 		//Utils (array manipulator)
 		$this->requireFrameworkFile('utils/CArrayManipulator.class.php');           //Array Manipulator
 		$this->requireFrameworkFile('utils/CTemporaryCache.class.php');             //Property Object class
+		$this->requireFrameworkFile('utils/CStringFormatter.class.php');            //String formatter
 
 		//Templates
 		$this->requireFrameworkFile('template/CTemplate.class.php');               //Template Class
