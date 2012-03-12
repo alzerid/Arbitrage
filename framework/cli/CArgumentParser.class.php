@@ -93,6 +93,7 @@ class CArgumentParser
 
 	public function executeParse()
 	{
+		//TODO: Code --long=value
 		global $argv;
 		$args = array_slice($argv, 2);
 
@@ -103,6 +104,25 @@ class CArgumentParser
 			if($key[0] == '-' && $key[1] == '-') //Long option parse
 			{
 				$key = substr($key, 2);
+				foreach($this->_args as $arg)
+				{
+					if($arg->getLongOpt() === $key)
+					{
+						if($arg instanceof CArgumentBoolean)
+						{
+							$arg->setValue(true);
+							unset($args[0]);
+							$args = array_values($args);
+						}
+						elseif($arg instanceof CArgumentValue)
+						{
+							$arg->setValue($args[1]);
+							unset($args[0]);
+							unset($args[1]);
+							$args = array_values($args);
+						}
+					}
+				}
 			}
 			elseif($key[0] == '-')               //Short option parse
 			{
@@ -122,19 +142,12 @@ class CArgumentParser
 							//$val 
 							//$arg->setValue(
 						}
-
-						var_dump('sopt', $arg);
-						break;
 					}
-					var_dump($arg);
-					die();
 				}
 			}
 
 			//TODO: Show invalid command
 
-			var_dump($key);
-			die();
 		}
 
 		//Go through and make sure all required args have been set
@@ -166,9 +179,21 @@ class CArgumentParser
 
 	public function __get($name)
 	{
-		//TODO: Find argument and get value
-		var_dump($name);
-		die("INININI");
+		foreach($this->_args as $arg)
+		{
+			//Short OPT
+			if(strlen($name) == 1)
+			{
+				die("SHORT OPT");
+			}
+			else
+			{
+				if($arg->getLongOpt() === $name)
+					return $arg->getValue();
+			}
+		}
+
+		return NULL;
 	}
 }
 ?>
