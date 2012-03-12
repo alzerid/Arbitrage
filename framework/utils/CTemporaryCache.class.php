@@ -25,7 +25,21 @@ class CTemporaryCache
 	public function putContent($file, $content, $flags=0)
 	{
 		$file = $this->_path . $file;
+		$dir  = dirname($file);
+
+		//Ensure directory exists
+		if(!file_exists($dir))
+			mkdir($dir, 0777, true);
+
 		file_put_contents($file, $content, $flags);
+	}
+
+	public function delete($file)
+	{
+		$file = $this->_path . $file;
+
+		if(file_exists($file))
+			unlink($file);
 	}
 }
 ?>
