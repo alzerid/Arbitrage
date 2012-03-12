@@ -30,8 +30,8 @@ class CArbitrageConfig implements ISingleton
 		$this->_variables['_internals']['approotpath'] = realpath("$root/../") . "/";
 
 		//Setup view and layout path
-		$this->_variables['_internals']['viewpath']   = realpath($this->_variables['_internals']['approotpath'] . "app/views/");
-		$this->_variables['_internals']['layoutpath'] = realpath($this->_variables['_internals']['approotpath'] . "app/views/layout/");
+		$this->_variables['_internals']['viewpath']   = realpath($this->_variables['_internals']['approotpath'] . "app/views/") . "/";
+		$this->_variables['_internals']['layoutpath'] = realpath($this->_variables['_internals']['approotpath'] . "app/views/layout/") . "/";
 
 		//Set arbitrage
 		$this->_variables['arbitrage']              = array();
