@@ -10,6 +10,9 @@ class CCLIApplication extends CApplication
 		parent::__construct();
 		$this->_app   = NULL;
 		$this->_cache = NULL;
+
+		//Change to current working project directory
+		chdir(dirname($_SERVER['PHP_SELF']));
 	}
 
 	/**
