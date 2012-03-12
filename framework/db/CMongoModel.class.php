@@ -251,6 +251,10 @@ class CMongoModel extends CModel
 
 		//Save to db
 		$mongo->$db->$table->save($save);
+
+		//Set originals and clear _variables
+		$this->_originals = $save;
+		$this->_variables = array();
 	}
 
 	public function bulkInsert($models)
