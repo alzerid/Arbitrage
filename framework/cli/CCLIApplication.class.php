@@ -2,11 +2,14 @@
 class CCLIApplication extends CApplication
 {
 	static private $_EXT = array("php" => "PHP", 'js' => 'NodeJS', 'py' => 'Python', 'bin' => 'Native');
+	protected $_cache;
 	private $_app;
 
 	protected function __construct()
 	{
-		$this->_app = NULL;
+		parent::__construct();
+		$this->_app   = NULL;
+		$this->_cache = NULL;
 	}
 
 	/**
@@ -34,10 +37,21 @@ class CCLIApplication extends CApplication
 			$this->help();
 
 		//Get script to run
-		$this->_app = $this->loadApplication($argv[1]);
+		$this->_app = $this->loadApplication(strtolower($argv[1]));
+
+		//Create PID
+		$this->createPID();
 
 		//Run application
 		$this->_app->process();
+
+		//Remove PID
+		$this->removePID();
+	}
+
+	public function getCacheObject()
+	{
+		return $this->_cache;
 	}
 
 	public function loadApplication($script)
@@ -49,16 +63,70 @@ class CCLIApplication extends CApplication
 		if(count($glob) != 1)
 			throw new EArbitrageException("Unable to load script '$script'.");
 
+		//Create temporary cache
+		if($this->_cache === NULL)
+		{
+			$app    = basename(CApplication::getConfig()->_internals->approotpath);
+			$script = basename(CApplication::getConfig()->_internals->scriptrootpath);
+			$path   = "$app/$script/";
+
+			$this->_cache = new CTemporaryCache($path);
+		}
+
 		//require file
 		$file = explode(".", basename($glob[0]));
 		$file = $file[0];
 		$ext  = $file[1];
 		require_once($glob[0]);
 
+		//Add internal config variable
+		CArbitrageConfig::getInstance()->_internals->scriptrootpath = dirname($glob[0]) . "/";
+
+		//Create new object
 		$class = ucwords($file) . "Application";
 		$obj   = new $class;
 
 		return $obj;
+	}
+
+	public function createPID($pid='pid')
+	{
+		$this->_cache->putContent("pid/$pid", getmypid());
+	}
+
+	public function removePID($pid='pid')
+	{
+		$this->_cache->delete("pid/$pid");
+	}
+
+	public function checkPID($pid = 'pid')
+	{
+		//Get PID
+		$pid = $this->_cache->getContent("pid/$pid");
+		if($pid === NULL || $pid === "")
+			return false;
+
+		//Check to see if PID actually exists and is runnin
+		$pid = trim($pid);
+		if(file_exists("/proc/$pid"))
+			return true;
+
+		return false;
+	}
+
+	public function ensureOneInstance($pid='pid')
+	{
+		//Get PID
+		$pid = $this->_cache->getContent($pid);
+		if($pid === NULL)
+			return;
+
+		//Check to see if PID actually exists and is runnin
+		$pid = trim($pid);
+		if($this->checkPID($pid))
+			throw new EArbitrageException("Application currently exists in user space.");
+		else
+			$this->removePID();
 	}
 
 	public function help()
@@ -90,6 +158,8 @@ class CCLIApplication extends CApplication
 
 			echo "\n";
 		}
+
+		die();
 	}
 
 	/* IErrorHandlerListener  Methods */
@@ -105,7 +175,10 @@ class CCLIApplication extends CApplication
 	public function handleException(CExceptionEvent $event)
 	{
 		if($event->exception instanceof EArgumentException)
+		{
 			echo $this->_app->getApplicationName() . ": " . $event->exception->getMessage() ."\n\n";
+			$this->_app->help();
+		}
 		else
 		{
 			echo "Arbitrage2 Exception Handler\n";
