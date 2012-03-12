@@ -213,9 +213,6 @@ abstract class CBaseController implements IController
 		return $content;
 	}
 
-
-
-
 	public function getViewVariable($key)
 	{
 		return ((isset($this->_view_vars[$key]))? $this->_view_vars[$key] : NULL);
