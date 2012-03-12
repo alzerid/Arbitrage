@@ -120,12 +120,10 @@ interface IRemoteCache extends ISingleton
 	public function increment($key, $value=1, $expire=0);
 	public function decrement($key, $value=1, $expire=0);
 
-	/* TODO: Implement these methods
 	public function leftPush($key, $value);
-	public function leftPop($key, $value);
+	public function leftPop($key);
 	public function rightPush($key, $value);
-	public function rightPop($key, $value);
-	*/
+	public function rightPop($key);
 }
 
 /**
