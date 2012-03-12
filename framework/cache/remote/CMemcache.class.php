@@ -72,6 +72,25 @@ class CMemcache implements IRemoteCache
 
 		return $ret;
 	}
-}
 
+	public function leftPush($key, $value)
+	{
+		die("MEMCACHE: leftPush");
+	}
+
+	public function leftPop($key)
+	{
+		die("MEMCACHE: leftPop");
+	}
+
+	public function rightPush($key, $value)
+	{
+		die("MEMCACHE: rightPush");
+	}
+
+	public function rightPop($key)
+	{
+		die("MEMCACHE: rightPop");
+	}
+}
 ?>

@@ -6,7 +6,7 @@ class CRemoteCacheFactory implements IFactory
 	static public function get($type)
 	{
 		if(isset(self::$_caches[$type]))
-			return $_caches[$type];
+			return self::$_caches[$type];
 
 		return NULL;
 	}

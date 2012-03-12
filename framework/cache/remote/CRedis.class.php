@@ -64,6 +64,27 @@ class CRedis implements IRemoteCache
 	{
 		return $this->_cache->decrement($key, $value);
 	}
-}
 
+	public function leftPush($key, $value)
+	{
+		$ret = $this->_cache->lPush($key, $value);
+		return (($ret > 0)? $ret : false);
+	}
+
+	public function leftPop($key)
+	{
+		return $this->_cache->lPop($key);
+	}
+
+	public function rightPush($key, $value)
+	{
+		$ret = $this->_cache->rPush($key, $value);
+		return (($ret > 0)? $ret : false);
+	}
+
+	public function rightPop($key)
+	{
+		return $this->_cache->rPop($key);
+	}
+}
 ?>
