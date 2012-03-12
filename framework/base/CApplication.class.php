@@ -8,6 +8,9 @@ abstract class CApplication implements ISingleton, IErrorHandlerListener
 	protected function __construct()
 	{
 		$this->_model_path = array();
+
+		//Change to current working project directory
+		chdir(dirname($_SERVER['PHP_SELF']));
 	}
 
 	static public function getInstance()
