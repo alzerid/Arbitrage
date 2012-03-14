@@ -22,7 +22,7 @@ class CRouter
 						{
 							$idx    = ($pos+1);
 							$search = '/(\\\|\$)' . $idx . '/';
-							$route = preg_replace($search, $val, $route);
+							$route = preg_replace($search, ucfirst($val), $route);
 						}
 					}
 
