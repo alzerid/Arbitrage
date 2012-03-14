@@ -13,6 +13,7 @@ abstract class CBaseController implements IController
 	protected $_get;
 	protected $_post;
 	protected $_cookie;
+	protected $_request;
 	protected $_session;
 	protected $_files;
 	protected $_flash;
@@ -31,6 +32,7 @@ abstract class CBaseController implements IController
 		unset($this->_get['_route']);
 
 		$this->_post     = $_POST;
+		$this->_request  = array_merge($_GET, $_POST);
 		$this->_cookie   = $_COOKIE; 
 		
 		if(isset($_SESSION))
@@ -61,8 +63,16 @@ abstract class CBaseController implements IController
 	 */
 	public function hijackSession($id)
 	{
-		$path = session_save_path();
-		session_decode(file_get_contents($path . "/sess_$id"));
+		session_start();
+		$path = session_save_path() . "/sess_$id";
+
+		if(!file_exists($path))
+			return false;
+
+		$ret  = session_decode(file_get_contents($path));
+		$this->_session =& $_SESSION;
+
+		return true;
 	}
 
 	/**
