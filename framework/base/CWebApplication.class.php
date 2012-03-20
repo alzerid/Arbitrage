@@ -136,7 +136,7 @@ class CWebApplication extends CApplication
 		if($debug === true)
 		{
 			//Flush output buffer
-			ob_end_clean();
+			@ob_end_clean();
 
 			//Render error
 			$this->requireFrameworkFile('base/CFrameworkController.class.php');
@@ -155,7 +155,7 @@ class CWebApplication extends CApplication
 		if($debug === true)
 		{
 			//Flush output buffer
-			ob_end_clean();
+			@ob_end_clean();
 
 			//Render error
 			$this->requireFrameworkFile('base/CFrameworkController.class.php');
@@ -169,7 +169,7 @@ class CWebApplication extends CApplication
 		elseif($event->exception instanceof EHTTPException)
 		{
 			//Flush output buffer
-			ob_end_clean();
+			@ob_end_clean();
 
 			//Check to see which view we should show, arbitrage view or application views
 			$this->requireFrameworkFile('base/CErrorController.class.php');
