@@ -193,6 +193,7 @@ abstract class CBaseController implements IController
 
 	public function render($ret)
 	{
+		$content = NULL;
 		if(isset($ret['render']) && is_string($ret['render']))
 		{
 			//Determine view type
@@ -219,6 +220,9 @@ abstract class CBaseController implements IController
 			$content = $ret['render']->render();
 		else
 			throw new EArbitrageException("Unknown renderer returned.");
+
+		if($content === NULL)
+			throw new EArbitrageException("Content is NULL. Check your rendering type.");
 
 		return $content;
 	}
