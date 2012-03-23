@@ -70,6 +70,10 @@ final class EHTTPException extends EArbitrageException
 	}
 }
 
+final class EPHPApplicationException extends Exception
+{
+}
+
 final class EArbitrageConfigException extends EArbitrageException
 {
 }
