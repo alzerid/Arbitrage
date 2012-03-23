@@ -158,10 +158,9 @@ class CCLIApplication extends CApplication
 
 				printf("%-20s %-10s %s\n", $name, $type, $desc);
 			}
-
-			echo "\n";
 		}
 
+		echo "\n";
 		die();
 	}
 
