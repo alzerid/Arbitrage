@@ -10,7 +10,7 @@ abstract class CCLIBaseApplication
 
 	public function getApplicationName()
 	{
-		return preg_replace('/Application$/', '', get_class($this));
+		return strtolower(preg_replace('/Application$/', '', get_class($this)));
 	}
 
 	abstract public function getApplicationType();
