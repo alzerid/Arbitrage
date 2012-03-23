@@ -17,6 +17,11 @@ abstract class CPHPApplication extends CCLIBaseApplication
 	public function process()
 	{
 		$this->_args->executeParse();
+		if($this->_args->help === true)
+		{
+			$this->help();
+			die();
+		}
 	}
 
 	abstract public function help();
