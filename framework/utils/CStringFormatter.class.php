@@ -1,26 +1,27 @@
 <?
 class CStringFormatter
 {
-	private $_values;
+	private $_format;
 
-	public function __construct($values)
+	public function __construct($format)
 	{
-		$this->_values = $values;
+		$this->_format = $format;
 	}
 
-	public function format($format)
+	public function format($vals)
 	{
 		//Find all %X
 		$matches = array();
-		preg_match_all('/%[a-zA-Z]/s', $format, $matches);
+		$format  = $this->_format;
+		preg_match_all('/%[a-zA-Z]/s', $this->_format, $matches);
 
 		foreach($matches[0] as $m)
 		{
 			$key = substr($m, 1);
-			if(isset($this->_values[$key]))
+			if(isset($vals[$key]))
 			{
-				$val    = $this->_values[$key];
-				$format = preg_replace('/' . $m . '/', $this->_values[$key], $format);
+				$val    = $vals[$key];
+				$format = preg_replace('/' . $m . '/', $vals[$key], $format);
 			}
 		}
 
