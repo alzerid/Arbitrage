@@ -223,6 +223,22 @@ class CMongoModel extends CModel
 		$mongo->$db->$table->remove($condition);
 	}
 
+	//Upsert
+	public function upsert($opts=array())
+	{
+		$mongo = CDBFactory::getDataBase('mongo');
+		$db    = $this->_db;
+		$table = $this->_table;
+		$class = $this->_class;	
+
+		//Go through original keys
+		$walk   = new CArrayManipulator(array_merge($this->_variables, $this->_originals));
+		$update = $walk->toDotNotation();
+
+		//upsert
+		$mongo->$db->$table->update($update, $update, array('upsert' => true));
+	}
+
 	//Function only updates the entry
 	public function update($opts=array())
 	{
