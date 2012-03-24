@@ -116,6 +116,10 @@ class CArgumentParser
 						}
 						elseif($arg instanceof CArgumentValue)
 						{
+							$opt = preg_replace('/\-\-/', '', $args[0]);
+							if(count($args) < 2)
+								throw new EArgumentException("Missing value for '{$opt}'.");
+
 							$arg->setValue($args[1]);
 							unset($args[0]);
 							unset($args[1]);
