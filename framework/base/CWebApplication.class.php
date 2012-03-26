@@ -39,7 +39,7 @@ class CWebApplication extends CApplication
 
 		//HTML
 		$this->requireFrameworkFile('base/CHTMLComponent.class.php');
-		$this->requireFrameworkFile('form/Form.class.php');
+		$this->requireFrameworkFile('form/CForm.class.php');
 	}
 
 	/**

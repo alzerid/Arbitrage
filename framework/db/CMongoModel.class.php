@@ -240,7 +240,7 @@ class CMongoModel extends CModel
 	}
 
 	//Function only updates the entry
-	public function update($opts=array())
+	public function update($opts=array(), $force=false)
 	{
 		$mongo = CDBFactory::getDataBase('mongo');
 		$db    = $this->_db;
@@ -248,7 +248,8 @@ class CMongoModel extends CModel
 		$class = $this->_class;	
 
 		//Go through original keys
-		$update = $this->_variableDiff();
+		$update = (($force)? $this->_originals : $this->_variableDiff());
+		unset($update['_id']);
 
 		//Get variables
 		$cond = array('_id' => $this->_id);
