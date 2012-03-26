@@ -3,7 +3,7 @@ class CHTMLComponent /*extends Component*/
 {
 	public static function label($tag, $attribs=array())
 	{
-		$attribs = HTMLComponent::_generateAttribs($attribs);
+		$attribs = CHTMLComponent::_generateAttribs($attribs);
 		$html    = "<label $attribs>$tag</label>\n";
 
 		return $html;
@@ -11,7 +11,7 @@ class CHTMLComponent /*extends Component*/
 
 	public static function createForm($id, $attribs=array())
 	{
-		$attribs = HTMLComponent::_generateAttribs($attribs);
+		$attribs = CHTMLComponent::_generateAttribs($attribs);
 		$html    = "<form name=\"$id\">\n";
 
 		return $html;
@@ -24,7 +24,7 @@ class CHTMLComponent /*extends Component*/
 
 	public static function inputText($id, $attribs=array())
 	{
-		$attribs = HTMLComponent::_generateAttribs($attribs);
+		$attribs = CHTMLComponent::_generateAttribs($attribs);
 		$html    = "<input type=\"text\" id=\"$id\" name=\"$id\" $attribs />\n";
 
 		return $html;
@@ -32,7 +32,7 @@ class CHTMLComponent /*extends Component*/
 
 	public static function inputSelect($id, $values, $attribs=array(), $selected=array())
 	{
-		$attribs = HTMLComponent::_generateAttribs($attribs);
+		$attribs = CHTMLComponent::_generateAttribs($attribs);
 		$html  = "<select name=\"$id\" id=\"$id\" $attribs>\n";
 
 		if(count($values))
@@ -53,7 +53,7 @@ class CHTMLComponent /*extends Component*/
 
 	public static function inputMultiSelect($id, $values, $attribs=array(), $selected=array())
 	{
-		$attribs = HTMLComponent::_generateAttribs($attribs);
+		$attribs = CHTMLComponent::_generateAttribs($attribs);
 		$html  = "<select name=\"$id" . "[]\" id=\"$id\" multiple=\"multiple\" $attribs>\n";
 
 		foreach($values as $key=>$value)
@@ -102,7 +102,7 @@ class CHTMLComponent /*extends Component*/
 
 	public static function inputCheckbox($id, $attribs=array())
 	{
-		$attribs = HTMLComponent::_generateAttribs($attribs);
+		$attribs = CHTMLComponent::_generateAttribs($attribs);
 		$html    = "<input type=\"checkbox\" id=\"$id\" name=\"$id\" $attribs />\n";
 
 		return $html;
@@ -110,7 +110,7 @@ class CHTMLComponent /*extends Component*/
 
 	public static function inputRadio($id, $attribs=array())
 	{
-		$attribs = HTMLComponent::_generateAttribs($attribs);
+		$attribs = CHTMLComponent::_generateAttribs($attribs);
 		$html    = "<input type=\"radio\" id=\"$id\" name=\"$id\" $attribs />\n";
 
 		return $html;
@@ -118,7 +118,7 @@ class CHTMLComponent /*extends Component*/
 
 	public static function submitButton($id, $value, $attribs=array())
 	{
-		$attribs = HTMLComponent::_generateAttribs($attribs);
+		$attribs = CHTMLComponent::_generateAttribs($attribs);
 		$html    = "<input type=\"submit\" id=\"$id\" name=\"$id\" value=\"$value\" $attribs />\n";
 
 		return $html;	
@@ -126,7 +126,7 @@ class CHTMLComponent /*extends Component*/
         
 	public static function imageSubmitButton($id, $value, $src, $attribs=array())
         {
-                $attribs = HTMLComponent::_generateAttribs($attribs);
+                $attribs = CHTMLComponent::_generateAttribs($attribs);
                 $html    = "<input type=\"image\" id=\"$id\" name=\"$id\" value=\"$value\" src=\"$src\" alt=\"\" $attribs />\n";
 
                 return $html;
@@ -134,7 +134,7 @@ class CHTMLComponent /*extends Component*/
 
 	public static function inputButton($id, $value, $attribs=array())
 	{
-		$attribs = HTMLComponent::_generateAttribs($attribs);
+		$attribs = CHTMLComponent::_generateAttribs($attribs);
 		$html    = "<button id=\"$id\" name=\"$id\" $attribs>$value</button>\n";
 
 		return $html;	
@@ -142,7 +142,7 @@ class CHTMLComponent /*extends Component*/
 
 	public static function inputHidden($id, $value, $attribs=array())
 	{
-		$attribs = HTMLComponent::_generateAttribs($attribs);
+		$attribs = CHTMLComponent::_generateAttribs($attribs);
 		$html    = "<input type=\"hidden\" id=\"$id\" name=\"$id\" value=\"$value\" $attribs />\n";
 
 		return $html;	
@@ -150,7 +150,7 @@ class CHTMLComponent /*extends Component*/
 
 	public static function inputTextArea($id, $value = "", $attribs=array())
 	{
-		$attribs = HTMLComponent::_generateAttribs($attribs);
+		$attribs = CHTMLComponent::_generateAttribs($attribs);
 		$html    = "<textarea name=\"$id\" id=\"$id\" $attribs >$value</textarea>\n";
 
 		return $html;	
@@ -158,7 +158,7 @@ class CHTMLComponent /*extends Component*/
 
 	public static function inputFile($id, $attribs=array())
 	{
-		$attribs = HTMLComponent::_generateAttribs($attribs);
+		$attribs = CHTMLComponent::_generateAttribs($attribs);
 		$html    = "<input type=\"file\" name=\"$id\" id=\"$id\" />\n";
 
 		return $html;
@@ -166,7 +166,7 @@ class CHTMLComponent /*extends Component*/
 
 	public static function image($id, $src, $attribs=array())
 	{
-		$attribs = HTMLComponent::_generateAttribs($attribs);
+		$attribs = CHTMLComponent::_generateAttribs($attribs);
 		$html    = "<img name=\"$id\" id=\"$id\" src=\"$src\" $attribs />\n";
 
 		return $html;
@@ -225,8 +225,11 @@ class CHTMLComponent /*extends Component*/
 	private static function _generateAttribs($attribs)
 	{
 		$ret = '';
-		foreach($attribs as $k=>$v)
-			$ret .= "$k=\"$v\" ";
+		if(count($attribs))
+		{
+			foreach($attribs as $k=>$v)
+				$ret .= "$k=\"$v\" ";
+		}
 
 		return trim($ret);
 	}
