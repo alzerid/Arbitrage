@@ -167,4 +167,23 @@ interface IObserver
 	public function removeListener(IListener $listener);
 	public function clearListeners();
 }
+
+/** HTML Interfaces **/
+
+/**
+ * DataTable interface
+ */
+interface IHTMLDataTable
+{
+	public function __construct($id, $headers, $data, $attrs=array());
+	public function render();
+}
+
+interface IHTMLDataTableEntry
+{
+	public function render(IHTMLDataTable $table, array $entry);
+}
+
+/** END HTML Interfaces **/
+
 ?>

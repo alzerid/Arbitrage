@@ -81,4 +81,8 @@ final class EArbitrageConfigException extends EArbitrageException
 final class EArbitrageRemoteCacheException extends EArbitrageException
 {
 }
+
+final class EArrayObjectException extends EArbitrageException
+{
+}
 ?>

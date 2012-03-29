@@ -190,7 +190,7 @@ abstract class CApplication implements ISingleton, IErrorHandlerListener
 
 	static public function modelAutoLoad($class_name)
 	{
-		if(preg_match('/Model/', $class_name))
+		if(preg_match('/Model$/', $class_name))
 		{
 			$class = strtolower(str_replace("Model", "", $class_name));
 			CApplication::getInstance()->requireApplicationModel($class);

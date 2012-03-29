@@ -29,5 +29,69 @@ class CArrayObject
 	{
 		$this->_data[$name] = $value;
 	}
+
+	public function xpath($path)
+	{
+		static $exceptions = NULL;
+
+		if($exceptions == NULL)
+			$exceptions = array('//', '.', '..', '@');
+
+		$xpath = $this->_xpathParse($path);
+		$data  = $this->_data;
+		$ret   = NULL;
+		foreach($xpath as $x)
+		{
+			if(in_array($x, $exceptions))
+				throw new EArrayObjectException("XPath parsing for '$x' not implemented.");
+
+			if($x === "/")
+				continue;
+
+			if(isset($data[$x]))
+			{
+				$ret  = $data[$x];
+				$data = $data[$x];
+			}
+			else
+				return NULL;
+		}
+
+		return $ret;
+	}
+
+	private function _xpathParse($path)
+	{
+		$special = array('/', '//', '.', '..', '@');
+		$xpath   = array();
+		$prev    = '';
+		$len     = strlen($path);
+		$idx     = 0;
+		while($idx < $len)
+		{
+			if($path[$idx] === "/" && $prev === "/")
+				$xpath[count($xpath)-1] .= $path[$idx];
+			elseif($path[$idx] === "/")
+				$xpath[] = $path[$idx];
+			elseif($path[$idx] === ".")
+				die("Implement . parsing");
+			elseif($path[$idx] === "..")
+				die("Implement .. parsing");
+			elseif($path[$idx] === "@")
+				die("Implement attributes");
+			else
+			{
+				if(count($xpath)-1  == 0 || in_array($prev, $special))
+					$xpath[] = "";
+
+				$xpath[count($xpath)-1] .= $path[$idx];
+			}
+
+			$prev = $xpath[count($xpath)-1];
+			$idx++;
+		}
+
+		return $xpath;
+	}
 }
 ?>

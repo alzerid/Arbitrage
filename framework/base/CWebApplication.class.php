@@ -38,8 +38,14 @@ class CWebApplication extends CApplication
 		$this->requireFrameworkFile('base/CFlashPropertyObject.class.php');        //Flash Property Object class
 
 		//HTML
-		$this->requireFrameworkFile('base/CHTMLComponent.class.php');
+		$this->requireFrameworkFile('html/CHTMLComponent.class.php');
 		$this->requireFrameworkFile('form/CForm.class.php');
+
+		//HTML Data Table
+		//$this->requireFrameworkFile('html/CHTMLDivDataTable.class.php');
+		$this->requireFrameworkFile('html/CHTMLDataTable.class.php');
+		$this->requireFrameworkFile('html/CHTMLDataTableModel.class.php');
+		$this->requireFrameworkFile('html/dataentry/CHTMLImageDataEntry.class.php');
 	}
 
 	/**
