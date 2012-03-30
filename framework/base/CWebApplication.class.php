@@ -89,7 +89,7 @@ class CWebApplication extends CApplication
 		$this->requireApplicationController($controller);
 
 		//Determine if we are an ajax call
-		if(isset($_GET['_ajax']))
+		if(isset($_GET['_ajax']) || isset($_POST['_ajax']))
 		{
 			$this->requireApplicationAjaxController($controller);
 			$controller = $controller . "AjaxController";
