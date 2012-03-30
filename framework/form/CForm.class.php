@@ -76,6 +76,11 @@ Class CForm extends CHTMLComponent
 		return new $class($this->_values);
 	}
 
+	public function toArray()
+	{
+		return $this->_values;
+	}
+
 	public function __get($name)
 	{
 		$arr = new CArrayObject($this->_values);
