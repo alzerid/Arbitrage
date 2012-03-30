@@ -15,7 +15,7 @@ class CArrayObject
 
 	public function __get($name)
 	{
-		if($this->_data[$name] === NULL)
+		if(!array_key_exists($name, $this->_data) || $this->_data[$name] === NULL)
 			return NULL;
 
 		//If an array, return
