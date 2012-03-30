@@ -1,11 +1,11 @@
 <?
 Class CForm extends CHTMLComponent
 {
-	private $_properties;
+	private $_attributes;
 	private $_values;
 	private $_model;
 
-	public function __construct($properties, $values=NULL, $model=NULL)
+	public function __construct($attributes, $values=array(), $model=NULL)
 	{
 		//check if $values is a model
 		$this->_model = $model;
@@ -14,9 +14,18 @@ Class CForm extends CHTMLComponent
 			$this->_model = get_class($values);
 			$values       = $values->toArray();
 		}
-		
-		$this->_populateObjectVariables($properties);
-		$this->_values = $values;
+
+		//Set default attributes
+		$default = array('id'           => 'form-noname',
+		                 'method'       => 'POST',
+		                 'enctype'      => 'application/x-www-form-urlencoded',
+		                 'autocomplete' => 'on');
+
+		if($values === NULL)
+			$values = array();
+
+		$this->_attributes = array_merge($default, $attributes);
+		$this->_values     = $values;
 	}
 
 	static public function getForm($arr, $frm)
@@ -37,6 +46,27 @@ Class CForm extends CHTMLComponent
 		return NULL;
 	}
 
+	static public function getActiveForm($arr)
+	{
+		$frm   = preg_replace('/\-form$/', '', $arr['_form']);
+		$vals  = array();
+		$model = NULL;
+		unset($arr['_form']);
+
+		foreach($arr as $key=>$val)
+		{
+			if(preg_match('/^' . $frm . '_/i', $key) && $key !== "{$frm}__model")
+				$vals[preg_replace('/^' . $frm . '_/i', '', $key)] = $val;
+			elseif($key === "{$frm}__model")
+			 $model = $val;
+		}
+
+		if(count($vals))
+			return new CForm(array(), $vals, $model);
+
+		return NULL;
+	}
+
 	public function getModel()
 	{
 		if(!isset($this->_model))
@@ -48,15 +78,18 @@ Class CForm extends CHTMLComponent
 
 	public function __get($name)
 	{
-		if(isset($this->_properties[$name]))
-			return $this->_properties[$name];
-
-		return NULL;
+		$arr = new CArrayObject($this->_values);
+		return $arr->$name;
 	}
 
 	public function start()
 	{
-		echo "<form id=\"{$this->id}\" name=\"{$this->id}\" method=\"{$this->method}\" action=\"{$this->action}\" enctype=\"{$this->enctype}\">\n";
+		$attrs = "";
+		foreach($this->_attributes as $key => $val)
+			$attrs .= "$key=\"$val\" ";
+
+		$attrs = trim($attrs);
+		echo "<form $attrs>\n";
 	}
 
 	public function text($id, $attribs=array())
@@ -148,28 +181,13 @@ Class CForm extends CHTMLComponent
 	public function end()
 	{
 		if(isset($this->_model))
-			echo "<input type=\"hidden\" name=\"{$this->id}__model\" id=\"{$this->id}__model\" value=\"{$this->_model}\" />\n";
+		{
+			echo $this->hidden('_id', (string) $this->_values['_id']);
+			echo $this->hidden('_model', $this->_model);
+		}
 
-		echo "<input type=\"hidden\" name=\"_form\" id=\"_form\" value=\"{$this->id}-form\" />\n";
+		echo "<input type=\"hidden\" name=\"_form\" id=\"_form\" value=\"{$this->_attributes['id']}-form\" />\n";
 		echo "</form>\n";
-	}
-
-	protected function _populateObjectVariables($vars)
-	{
-		foreach($vars as $k=>$v)
-			$this->_properties[$k] = $v;
-		
-		if($this->id == NULL)
-			$this->_properties['id'] = "form-noname";
-
-		if($this->method == NULL)
-			$this->_properties['method'] = 'POST';
-		
-		if($this->action == NULL)
-			$this->_properties['action'] = '';
-
-		if($this->enctype == NULL)
-			$this->_properties['enctype'] = 'application/x-www-form-urlencoded';
 	}
 
 	private function _getValue($id)
@@ -212,14 +230,14 @@ Class CForm extends CHTMLComponent
 			$value = $name;
 
 		//Prepend form name
-		$value = "{$this->id}_$value";
+		$value = "{$this->_attributes['id']}_$value";
 
 		return $value;
 	}
 
 	private function _prependFormID($id)
 	{
-		return (($this->_prepend_name)? "{$this->id}_$id" : $id);
+		return (($this->_prepend_name)? "{$this->_attributes['id']}_$id" : $id);
 	}
 }
 ?>
