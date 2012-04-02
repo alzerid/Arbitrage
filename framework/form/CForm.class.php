@@ -1,8 +1,8 @@
 <?
 Class CForm extends CHTMLComponent
 {
+	protected $_values;
 	private $_attributes;
-	private $_values;
 	private $_model;
 
 	public function __construct($attributes, $values=array(), $model=NULL)
@@ -46,7 +46,7 @@ Class CForm extends CHTMLComponent
 		return NULL;
 	}
 
-	static public function getActiveForm($arr)
+	static public function getActiveForm($arr, $class="CForm")
 	{
 		$frm   = preg_replace('/\-form$/', '', $arr['_form']);
 		$vals  = array();
@@ -62,7 +62,7 @@ Class CForm extends CHTMLComponent
 		}
 
 		if(count($vals))
-			return new CForm(array(), $vals, $model);
+			return new $class(array(), $vals, $model);
 
 		return NULL;
 	}
