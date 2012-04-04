@@ -172,12 +172,16 @@
 			<?
 			$idx = 0;
 			foreach($event->trace as $entry)
-			{?>
+			{
+				$file = ((!empty($entry['file']))? $entry['file'] : "(UNKNOWN)");
+				$line = ((!empty($entry['line']))? $entry['line'] : "(UNKNOWN)");
+				$code = ((!empty($entry['code']))? $entry['code'] : "");
+				?>
 				<div class="entry">
 					<div class="expand" onclick="return toggleCode.call(this, <?=$idx?>);">[ + ]</div>
-					<div class="summary"><span style="color: red; font-weight: bold">&nbsp;</span> <span style="color: #999999; font-weight: bold"><?=$entry['file']?>:<?=$entry['line']?></span></div>
+					<div class="summary"><span style="color: red; font-weight: bold">&nbsp;</span> <span style="color: #999999; font-weight: bold"><?=$file?>:<?=$line?></span></div>
 					<div class="clear"></div>
-					<div class="code_wrapper" id="code_<?=$idx?>"><?=$entry['code'];?></div>
+					<div class="code_wrapper" id="code_<?=$idx?>"><?=$code;?></div>
 				</div>
 			<?
 				$idx++;
