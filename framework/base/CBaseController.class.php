@@ -157,6 +157,14 @@ abstract class CBaseController implements IController
 		return $this->_ajax;
 	}
 
+	/*
+	 * Returns the request array.
+	 */
+	 public function getRequest()
+	 {
+		 return $this->_request;
+	 }
+
 	/**
 	 * Method that actually executes the action within the Controller context.
 	 */
