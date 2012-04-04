@@ -40,12 +40,17 @@ class CWebApplication extends CApplication
 		//HTML
 		$this->requireFrameworkFile('html/CHTMLComponent.class.php');
 		$this->requireFrameworkFile('form/CForm.class.php');
+		$this->requireFrameworkFile('form/CSubmittedForm.class.php');
+		$this->requireFrameworkFile('form/CRendererForm.class.php');
 
 		//HTML Data Table
 		//$this->requireFrameworkFile('html/CHTMLDivDataTable.class.php');
 		$this->requireFrameworkFile('html/CHTMLDataTable.class.php');
 		$this->requireFrameworkFile('html/CHTMLDataTableModel.class.php');
 		$this->requireFrameworkFile('html/dataentry/CHTMLImageDataEntry.class.php');
+
+		//Autoload model handler
+		spl_autoload_register('CForm::autoLoad', true);
 	}
 
 	/**
@@ -132,6 +137,14 @@ class CWebApplication extends CApplication
 			throw new EArbitrageException("Unable to load ajax controller '$controller' because it does not exist.");
 
 		require_once($path);
+	}
+
+	/**
+	 * Returns the current controller.
+	 */
+	public function getController()
+	{
+		return $this->_controller;
 	}
 
 	/* IErrorHandlerListener  Methods */
