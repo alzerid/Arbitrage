@@ -13,7 +13,7 @@ class CFrameworkController extends CBaseController
 		$path = CApplication::getConfig()->_internals->fwrootpath . "framework/views/$file.php";
 
 		ob_start();
-		require_once($path);
+		require($path);
 		$content = ob_get_clean();
 
 		return $content;
