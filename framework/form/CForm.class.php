@@ -5,66 +5,97 @@ Class CForm extends CHTMLComponent
 	private $_attributes;
 	private $_model;
 
-	public function __construct($attributes, $values=array(), $model=NULL)
+	//public function __construct($attributes, $values=array(), $model=NULL)
+	public function __construct($properties=array())
 	{
-		//check if $values is a model
-		$this->_model = $model;
-		if($values instanceof CModel)
-		{
-			$this->_model = get_class($values);
-			$values       = $values->toArray();
-		}
-
 		//Set default attributes
-		$default = array('id'           => 'form-noname',
-		                 'method'       => 'POST',
-		                 'enctype'      => 'application/x-www-form-urlencoded',
-		                 'autocomplete' => 'on');
+		$defaults = array('attributes' => array('id'           => 'form-noname',
+		                                        'method'       => 'POST',
+		                                        'enctype'      => 'application/x-www-form-urlencoded',
+		                                        'autocomplete' => 'on'),
+		                  'values' => array());
 
-		if($values === NULL)
-			$values = array();
 
-		$this->_attributes = array_merge($default, $attributes);
-		$this->_values     = $values;
+		//Merge properties
+		$properties = self::_mergeProperties($defaults, $properties);
+
+		$this->_values     = $properties['values'];
+		$this->_attributes = $properties['attributes'];
+
+		//check if $values is a model
+		if($this->_values instanceof CModel)
+		{
+			$this->_model  = get_class($this->_values);
+			$this->_values = $this->_values->toArray();
+		}
+		elseif($this->_values === NULL)
+			$this->_values = array();
 	}
 
-	static public function getForm($arr, $frm)
+	static public function autoLoad($class_name)
+	{
+		if(preg_match('/Form$/', $class_name))
+		{
+			$path = CApplication::getConfig()->_internals->approotpath . "app/forms/$class_name.php";
+			if(!file_exists($path))
+				throw new EArbitrageException("Form '$class_name' does not exist.");
+
+			require_once($path);
+		}
+	}
+
+	static public function getSubmittedForm($class="CForm")
+	{
+		$controller = CApplication::getInstance()->getController();
+		$request    = $controller->getRequest();
+		if(isset($request['_form']))
+		{
+			//Parse form properties
+			list($vals, $model) = self::_parseFormProperties(preg_replace('/\-form$/', '', $request['_form']), $request);
+
+			if($model !== NULL)
+				$vals = new $model($vals);
+
+			return new CSubmittedForm(new $class(array('values' => $vals)));
+		}
+
+		return NULL;
+	}
+
+	static protected function _mergeProperties(array &$array1, &$array2=NULL)
+	{
+		$merged = $array1;
+		if(is_array($array2))
+		{
+			foreach($array2 as $key=>$val)
+			{
+				if(!isset($merged[$key]))
+					$merged[$key] = array();
+
+				if(is_array($array2[$key]))
+					$merged[$key] = is_array($merged[$key]) ? self::_mergeProperties($merged[$key], $array2[$key]) : $array2[$key];
+				else
+					$merged[$key] = $val;
+			}
+		}
+
+		return $merged;
+	}
+
+	static private function _parseFormProperties($form_id, $properties)
 	{
 		$vals  = array();
 		$model = NULL;
-		foreach($arr as $key=>$val)
+
+		foreach($properties as $key=>$val)
 		{
-			if(preg_match('/^' . $frm . '_/i', $key) && $key !== "{$frm}__model")
-				$vals[preg_replace('/^' . $frm . '_/i', '', $key)] = $val;
-			elseif($key === "{$frm}__model")
+			if(preg_match('/^' . $form_id . '_/i', $key) && $key !== "{$form_id}__model")
+				$vals[preg_replace('/^' . $form_id . '_/i', '', $key)] = $val;
+			elseif($key === "{$form_id}__model")
 				$model = $val;
 		}
 
-		if(count($vals))
-			return new CForm(array(), $vals, $model);
-
-		return NULL;
-	}
-
-	static public function getActiveForm($arr, $class="CForm")
-	{
-		$frm   = preg_replace('/\-form$/', '', $arr['_form']);
-		$vals  = array();
-		$model = NULL;
-		unset($arr['_form']);
-
-		foreach($arr as $key=>$val)
-		{
-			if(preg_match('/^' . $frm . '_/i', $key) && $key !== "{$frm}__model")
-				$vals[preg_replace('/^' . $frm . '_/i', '', $key)] = $val;
-			elseif($key === "{$frm}__model")
-			 $model = $val;
-		}
-
-		if(count($vals))
-			return new $class(array(), $vals, $model);
-
-		return NULL;
+		return array($vals, $model);
 	}
 
 	public function getModel()
@@ -79,6 +110,10 @@ Class CForm extends CHTMLComponent
 	public function toArray()
 	{
 		return $this->_values;
+	}
+
+	public function submitted()
+	{
 	}
 
 	public function __get($name)
