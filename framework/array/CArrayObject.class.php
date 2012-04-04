@@ -1,9 +1,9 @@
 <?
 class CArrayObject
 {
-	private $_data;
+	protected $_data;
 
-	public function __construct(array &$arr)
+	public function __construct(&$arr=array())
 	{
 		$this->_data = &$arr;
 	}
@@ -28,6 +28,12 @@ class CArrayObject
 	public function __set($name, $value)
 	{
 		$this->_data[$name] = $value;
+	}
+
+	static public function mergeArrayObject(CArrayObject $obj1, CArrayObject $obj2)
+	{
+		$ret = array_merge($obj1->toArray(), $obj2->toArray());
+		return new CArrayObject($ret);
 	}
 
 	public function xpath($path)
