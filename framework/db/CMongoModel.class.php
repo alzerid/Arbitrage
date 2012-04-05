@@ -218,6 +218,9 @@ class CMongoModel extends CModel
 		$db    = $this->_db;
 		$table = $this->_table;
 		$class = $this->_class;
+		
+		if(count($condition) == 0)
+			$condition = array('_id' => $this->_id);
 
 		//Find entry
 		$mongo->$db->$table->remove($condition);
