@@ -13,6 +13,11 @@ class CTemporaryCache
 		$this->_path = realpath($path) . "/";
 	}
 
+	public function getPath()
+	{
+		return $this->_path;
+	}
+
 	public function getContent($file)
 	{
 		$file = $this->_path . $file;
