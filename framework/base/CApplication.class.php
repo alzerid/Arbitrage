@@ -51,30 +51,34 @@ abstract class CApplication implements ISingleton, IErrorHandlerListener
 			die("Framework path is not defined in environment variable ARBITRAGE2_FW_PATH");
 
 		//Load base required framework files
-		$this->requireFrameworkFile('Exceptions.class.php');                       //File full of base exception classes
-		$this->requireFrameworkFile('Events.class.php');                           //Events
+		$this->requireFrameworkFile('Exceptions.class.php');                        //File full of base exception classes
+		$this->requireFrameworkFile('Events.class.php');                            //Events
 
 		//What do I do with these?
-		$this->requireFrameworkFile('base/CErrorHandler.class.php');               //Exception handler and PHP error handler
-		$this->requireFrameworkFile('base/CPropertyObject.class.php');             //Property Object class
+		$this->requireFrameworkFile('base/CErrorHandler.class.php');                //Exception handler and PHP error handler
+		$this->requireFrameworkFile('base/CPropertyObject.class.php');              //Property Object class
 
 		//Utils (array manipulator)
 		$this->requireFrameworkFile('utils/CArrayManipulator.class.php');           //Array Manipulator
 		$this->requireFrameworkFile('utils/CTemporaryCache.class.php');             //Property Object class
 		$this->requireFrameworkFile('utils/CStringFormatter.class.php');            //String formatter
 
+		//Helper
+		$this->requireFrameworkFile('helper/Months.class.php');                     //Months formatter
+		$this->requireFrameworkFile('helper/States.class.php');                     //States formatter
+
 		//Templates
-		$this->requireFrameworkFile('template/CTemplate.class.php');               //Template Class
-		$this->requireFrameworkFile('template/CTemplateFile.class.php');           //Template File Class
+		$this->requireFrameworkFile('template/CTemplate.class.php');                //Template Class
+		$this->requireFrameworkFile('template/CTemplateFile.class.php');            //Template File Class
 		
 		//Array Object
-		$this->requireFrameWorkFile('array/CArrayObject.class.php');               //Array Object
+		$this->requireFrameWorkFile('array/CArrayObject.class.php');                //Array Object
 
 		//Extended framework files
-		$this->requireFrameworkFile('config/CArbitrageConfig.class.php');          //Arbitrage config class
+		$this->requireFrameworkFile('config/CArbitrageConfig.class.php');           //Arbitrage config class
 
 		//Communication classes
-		$this->requireFrameworkFile("communication/CEmailCommunication.class.php");  //Email communication class
+		$this->requireFrameworkFile("communication/CEmailCommunication.class.php"); //Email communication class
 
 		//Register exception handler
 		CErrorHandler::getInstance()->addListener($this);
@@ -82,6 +86,7 @@ abstract class CApplication implements ISingleton, IErrorHandlerListener
 		//Database classes
 		$this->requireFrameworkFile('db/CModel.class.php');
 		$this->requireFrameworkFile('db/CDBFactory.class.php');
+
 		
 		//Autoload model handler
 		spl_autoload_register('CApplication::modelAutoLoad', true, true);
