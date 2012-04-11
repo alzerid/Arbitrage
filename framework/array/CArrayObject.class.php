@@ -1,11 +1,15 @@
 <?
-class CArrayObject
+class CArrayObject implements Iterator
 {
 	protected $_data;
+	private $_position;
+	private $_keys;
 
 	public function __construct(&$arr=array())
 	{
-		$this->_data = &$arr;
+		$this->_data     = &$arr;
+		$this->_position = -1;
+		$this->_keys     = array();
 	}
 
 	public function toArray()
@@ -30,10 +34,19 @@ class CArrayObject
 		$this->_data[$name] = $value;
 	}
 
-	static public function mergeArrayObject(CArrayObject $obj1, CArrayObject $obj2)
+	public function __isset($name)
 	{
-		$ret = array_merge($obj1->toArray(), $obj2->toArray());
-		return new CArrayObject($ret);
+		return isset($this->_data[$name]);
+	}
+
+	public function push($new)
+	{
+		$this->_data[] = $new;
+	}
+
+	public function pop()
+	{
+		return array_pop($this->_data);
 	}
 
 	public function xpath($path)
@@ -64,6 +77,81 @@ class CArrayObject
 		}
 
 		return $ret;
+	}
+
+	/* Iterator Implementation */
+	public function rewind()
+	{
+		$this->_position = -1;
+	}
+
+	public function current()
+	{
+		return $this->_data[$this->_keys[$this->_position]];
+	}
+
+	public function key()
+	{
+		return $this->_keys[$this-_position];
+	}
+
+	public function next()
+	{
+		++$this->_position;
+	}
+
+	public function valid()
+	{
+		if($this->_position == -1)
+			$this->_setupIterator();
+
+		return isset($this->_keys[$this->_position]);
+	}
+
+	private function _setupIterator()
+	{
+		$this->_keys     = array_keys($this->_data);
+		$this->_position = 0;
+	}
+	/* END Iterator Implementation */
+
+	static public function mergeArrayObject(CArrayObject $obj1, CArrayObject $obj2)
+	{
+		$ret = array_merge($obj1->toArray(), $obj2->toArray());
+		return new CArrayObject($ret);
+	}
+
+	static public function mergeRecursiveUnique(CArrayObject $obj1, CArrayObject $obj2)
+	{
+		$merged = $obj1->_toArrayReference();
+		$arr2   = $obj2->_toArrayReference();
+
+		if(is_array($arr2))
+		{
+			foreach($arr2 as $key => $val)
+			{
+				if(is_array($arr2[$key]))
+				{
+					if(is_array($merged[$key]))
+					{
+						$ret = self::mergeRecursiveUnique(new CArrayObject($merged[$key]));
+					}
+					else
+						$ret = $arr2[$key];
+
+					$merged[$key] = $ret->_toArrayReference();
+				}
+				else
+					$merged[$key] = $val;
+			}
+		}
+
+		return new CArrayObject($merged);
+	}
+
+	protected function &_toArrayReference()
+	{
+		return $this->_data;
 	}
 
 	private function _xpathParse($path)
