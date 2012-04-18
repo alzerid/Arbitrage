@@ -16,7 +16,10 @@ class CTemplate implements ITemplate
 		foreach($matches as $val)
 		{
 			if(isset($variables[$val]))
-				$ret = preg_replace('/{{' . $val . '}}/', $variables[$val], $ret);
+			{
+				$replace = preg_replace('/\$/', '\\\$', $variables[$val]);
+				$ret     = preg_replace('/{{' . $val . '}}/', $replace, $ret);
+			}
 		}
 
 		return $ret;
