@@ -17,11 +17,11 @@ abstract class CBaseController implements IController
 	protected $_session;
 	protected $_files;
 	protected $_flash;
+	protected $_view_variables;
 
 	//Controller specifics
 	private $_filters;
 	private $_renderer_type;
-	private $_view_vars;
 	private $_ajax;
 	private $_action;
 
@@ -43,10 +43,10 @@ abstract class CBaseController implements IController
 		$this->_files = ((isset($_FILES))? $_FILES : array());
 
 		//Internal variables
-		$this->_view_vars     = array();
-		$this->_ajax          = false;
-		$this->_renderer_type = "view";
-		$this->_flash         = NULL;
+		$this->_ajax           = false;
+		$this->_renderer_type  = "view";
+		$this->_flash          = NULL;
+		$this->_view_variables = array();
 	}
 
 	/**
@@ -182,6 +182,10 @@ abstract class CBaseController implements IController
 		//Call the action
 		$ret = $this->_action->execute();
 
+		//Set view variables
+		if(isset($ret['variables']))
+			$this->_view_variables = array_merge($ret['variables'], $this->_view_variables);
+
 		//Add flash variable to session
 		$this->_session['_flash'] = $this->_flash->toArray();
 
@@ -235,19 +239,39 @@ abstract class CBaseController implements IController
 		return $content;
 	}
 
+	/**
+	 * Sets a specific view variable to a value.
+	 */
+	public function setViewVariable($var, $val)
+	{
+		$this->_view_variables[$var] = $val;
+	}
+
+	/**
+	 * Returns the view variable based on the key.
+	 * @return mixed Returns a mixed result based on the value.
+	 */
 	public function getViewVariable($key)
 	{
-		return ((isset($this->_view_vars[$key]))? $this->_view_vars[$key] : NULL);
+		return ((isset($this->_view_variables[$key]))? $this->_view_variables[$key] : NULL);
 	}
 
+	/**
+	 * Returns the entire view variable array.
+	 * @return array view variables.
+	 */
 	public function getViewVariables()
 	{
-		return $this->_view_vars;
+		return $this->_view_variables;
 	}
 
+	/**
+	 * Adds a view variable to the array.
+	 * @return mixed Adds a variable to the view variable array.
+	 */
 	public function addViewVariables($vars)
 	{
-		$this->_view_vars = array_merge($this->_view_vars, $vars);
+		$this->_view_variables = array_merge($this->_view_variables, $vars);
 	}
 
 	protected function filters()

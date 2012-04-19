@@ -11,7 +11,6 @@ class CController extends CBaseController implements IFileRenderable
 	private $_layout_path;
 	private $_view_path;
 	private $_default_layout;
-	private $_view_variables;
 
 	//Tags
 	private $_javascripts;
@@ -28,7 +27,6 @@ class CController extends CBaseController implements IFileRenderable
 
 		$this->_javascripts    = array();
 		$this->_stylesheets    = array();
-		$this->_view_variables = array();
 	}
 
 	public function setDefaultLayout($layout="default")
@@ -61,11 +59,6 @@ class CController extends CBaseController implements IFileRenderable
 		return $this->_view_path;
 	}
 
-	public function setViewVariable($var, $val)
-	{
-		$this->_view_variables[$var] = $val;
-	}
-
 	/* IController implementation */
 	public function renderInternal(IRenderer $renderer)
 	{
@@ -84,7 +77,8 @@ class CController extends CBaseController implements IFileRenderable
 		if(!file_exists($path))
 			throw new EArbitrageException("Layout does not exist '$path'.");
 
-		$_vars = array_merge($this->_view_variables, $variables);
+		//Extract the variables
+		$_vars = $this->_view_variables;
 		extract($_vars);
 
 		//Require view
@@ -180,33 +174,5 @@ class CController extends CBaseController implements IFileRenderable
 		return $ret;
 	}
 	/* END HTML View Helper Methods */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	/*public function getViewVariable($key)
-	{
-		return ((isset($this->_view_vars[$key]))? $this->_view_vars[$key] : NULL);
-	}
-
-	public function getViewVariables()
-	{
-		return $this->_view_vars;
-	}
-
-	public function addViewVariables($vars)
-	{
-		$this->_view_vars = array_merge($this->_view_vars, $vars);
-	}*/
 }
 ?>
