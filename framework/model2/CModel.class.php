@@ -8,8 +8,8 @@ abstract class CModel extends CModelData
 	static public function loadDriver($driver)
 	{
 		$ucase = ucwords($driver);
-		\CApplication::getInstance()->requireFrameworkFile("db2/$driver/C{$ucase}ModelQuery.class.php");
-		\CApplication::getInstance()->requireFrameworkFile("db2/$driver/C{$ucase}ModelResults.class.php");
+		\CApplication::getInstance()->requireFrameworkFile("model2/$driver/C{$ucase}ModelQuery.class.php");
+		\CApplication::getInstance()->requireFrameworkFile("model2/$driver/C{$ucase}ModelResults.class.php");
 	}
 
 	static public function model(array $data, $class=NULL)
