@@ -19,6 +19,21 @@ class CMongoModelQuery extends CModelQuery
 		return $this;
 	}
 
+	public function update($query, $data)
+	{
+		$this->_cmd   = "update";
+		$this->_query = $query;
+		$this->_data  = $data;
+
+		return $this;
+		die();
+	}
+
+	public function save($query, $data)
+	{
+		die("SAVE");
+	}
+
 	public function execute()
 	{
 		//TODO: DB Factory
@@ -30,32 +45,48 @@ class CMongoModelQuery extends CModelQuery
 		//Query
 		$handle = new \Mongo;
 		$handle = $handle->{$prop['database']}->{$prop['table']};
-		$res    = $handle->{$this->_cmd}($this->_query);
 
-		if($res === NULL)
-			return NULL;
-
-		//Check if multiple entries, if so return list
-		if($this->_cmd === "find")
+		//Query
+		if(in_array($this->_cmd, array('find', 'findOne')))
 		{
-			//Limit
-			if($this->_limit !== NULL)
-				$res = $res->limit($this->_limit);
+			$res = $handle->{$this->_cmd}($this->_query);
+			if($res === NULL)
+				return NULL;
 
-			//Create ModelList
-			if($res->count() > 0)
+			if($this->_cmd == "find")
 			{
-				$list = new CMongoModelResults($res, $this->_class);
-				return $list;
+				//Limit
+				if($this->_limit !== NULL)
+					$res = $res->limit($this->_limit);
+
+				//Create ModelList
+				if($res->count() > 0)
+				{
+					$list = new CMongoModelResults($res, $this->_class);
+					return $list;
+				}
+			}
+			else
+			{
+				$class = $this->_class;
+				return $class::model($res);
 			}
 		}
-		elseif($this->_cmd === "findOne")
+		elseif($this->_cmd == "update")
 		{
-			$class = $this->_class;
-			return $class::model($res);
-		}
+			//Setup update
+			$update = new \CArrayObject($this->_data);
+			$update = array('$set' => $update->flatten()->toArray());
 
-		die("unknown execution");
+			//Setup conditions
+			$query = new \CArrayObject($this->_query);
+			$query = $query->flatten()->toArray();
+
+			//Update
+			$ret = $handle->update($query, $update);
+		}
+		else
+			die("unknown execution {$this->_cmd}");
 	}
 }
 ?>
