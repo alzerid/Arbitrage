@@ -12,6 +12,12 @@ class CArrayObject implements Iterator
 		$this->_keys     = array();
 	}
 
+	public function flatten()
+	{
+		$ret = self::flattenArray($this->_data);
+		return new CArrayObject($ret);
+	}
+
 	public function toArray()
 	{
 		return $this->_data;
@@ -114,6 +120,31 @@ class CArrayObject implements Iterator
 		$this->_position = 0;
 	}
 	/* END Iterator Implementation */
+
+	static public function flattenArray(array $arr, &$idx="")
+	{
+		$ret = array();
+		foreach($arr as $key=>$val)
+		{
+			if($idx === "")
+			{
+				if(is_array($arr[$key]))
+					$val = self::flattenArray($arr[$key], $key);
+
+				$ret[$key] = $val;
+			}
+			else
+			{
+				$idx .= ".$key";
+				if(is_array($arr[$key]))
+					return self::flattenArray($arr[$key], $idx);
+				else
+					return $val;
+			}
+		}
+
+		return $ret;
+	}
 
 	static public function mergeArrayObject(CArrayObject $obj1, CArrayObject $obj2)
 	{
