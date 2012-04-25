@@ -1,0 +1,6 @@
+EModelException.class.php
+CModelResults.class.php
+CModelData.class.php
+CModelArrayData.class.php
+CModelQuery.class.php
+CModel.class.php
