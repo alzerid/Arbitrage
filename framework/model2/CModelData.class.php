@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\DB2;
+namespace Arbitrage2\Model2;
 
 class CModelData
 {
@@ -63,8 +63,12 @@ class CModelData
 			if(strpos($val, 'object:') === 0)
 			{
 				$obj = substr($val, 7);
-				if(get_parent_class($obj) == 'Arbitrage2\DB2\CModelData')
+				if(get_parent_class($obj) == 'Arbitrage2\Model2\CModelData')
 					$vars[$key] = $this->_originals[$key]->getUpdatedData();
+				elseif($obj == 'Arbitrage2\Model2\CModelArrayData')
+				{
+					die("ARRAY DATA");
+				}
 			}
 		}
 
@@ -103,8 +107,9 @@ class CModelData
 		//TODO: Normalize Variables
 
 		//Get types
-		$types = self::_types();
-		$data  = &$this->_originals;
+		$defaults = self::defaults();
+		$types    = self::_types();
+		$data     = &$this->_originals;
 
 		//Typecast
 		foreach($types as $key=>$type)
@@ -113,7 +118,27 @@ class CModelData
 			if(strpos($type, 'object:') === 0)
 			{
 				$obj = substr($type, 7);
-				if(is_object($data[$key]))
+				$cls = "";
+				if(($idx = strpos($obj, ":")) !== false)
+				{
+					$cls = substr($obj, $idx+1);
+					$obj = substr($obj, 0, $idx);
+				}
+
+				if($obj === 'Arbitrage2\Model2\CModelArrayData')
+				{
+					$list = new CModelArrayData($cls);
+					foreach($data[$key] as $k=>$v)
+					{
+						$val = new $cls($v);
+						$val->_normalizeData();
+						$list[$k] = $val;
+					}
+
+					//Set data
+					$data[$key] = $list;
+				}
+				elseif(is_object($data[$key]))
 				{
 					if(get_class($data[$key]) !== $obj)
 						throw new EModelData('Object not correct type!');
@@ -121,7 +146,7 @@ class CModelData
 				else
 				{
 					$parent = get_parent_class($obj);
-					if($parent === 'Arbitrage2\DB2\CModelData')
+					if($parent === 'Arbitrage2\Model2\CModelData')
 					{
 						//Create new object
 						$obj = new $obj;
@@ -138,6 +163,8 @@ class CModelData
 						throw new EModelData("Unable to handle object type '$obj'");
 				}
 			}
+			elseif(!array_key_exists($key, $data))
+				$data[$key] = $defaults[$key];
 			elseif($type != gettype($data[$key]))
 				settype($data[$key], $type);
 		}
@@ -187,7 +214,13 @@ class CModelData
 			{
 				$type = gettype($val);
 				if($type == "object")
-					$type = "object:" . get_class($val);
+				{
+					$cls  = get_class($val);
+					$type = "object:" . $cls;
+
+					if($cls == 'Arbitrage2\Model2\CModelArrayData')
+						$type .= ":{$val->getClass()}";
+				}
 
 				$types[$key] = $type;
 			}

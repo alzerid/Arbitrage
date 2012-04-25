@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\DB2;
+namespace Arbitrage2\Model2;
 
 /* Mongo */
 class CMongoModelResults extends CModelResults

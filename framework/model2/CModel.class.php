@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\DB2;
+namespace Arbitrage2\Model2;
 
 abstract class CModel extends CModelData
 {
@@ -34,7 +34,7 @@ abstract class CModel extends CModelData
 		$driver = $driver['driver'];
 
 		//Return Query Object
-		$class = "Arbitrage2\DB2\\C" . $driver . "ModelQuery";
+		$class = 'Arbitrage2\Model2\C' . $driver . "ModelQuery";
 		$query = new $class(get_called_class());
 
 		return $query;
@@ -52,10 +52,7 @@ abstract class CModel extends CModelData
 	{
 		//Ensure _id is there
 		if(!isset($this->_id))
-		{
-			var_dump("IN UPDATE WITHOUT ID");
-			die();
-		}
+			throw new CModelException("Cannot update without an ID");
 
 		//Grab $variables not originals
 		$vars = $this->getUpdatedData();

@@ -131,7 +131,35 @@ abstract class CApplication implements ISingleton, IErrorHandlerListener
 		$this->requireFrameworkFile('utils/URL.class.php');
 	}
 
+	/*
+	 * Load extension
+	 */
+	public function loadExtension($dir)
+	{
+		$path = realpath(ARBITRAGE2_FW_PATH . "/$dir");
+		if($path === false)
+			throw new EArbitrageException("Unable to load extension '$dir'.");
 
+		//Get load order
+		if(!file_exists("$path/.loadorder"))
+			throw new EArbitrageException("Unable to find .loadorder config file for '$dir'.");
+
+		$files = file_get_contents("$path/.loadorder");
+		$files = explode(PHP_EOL, trim($files));
+		foreach($files as $file)
+		{
+			if(!file_exists("$path/$file"))
+				throw new EArbitrageException("Unable to load '$file' for extension '$dir'.");
+
+			require_once("$path/$file");
+		}
+	}
+	
+	/*
+	 * Abstract run function that is called to run
+	 * the application after initialization and
+	 * bootstrap.
+	 */
 	abstract public function run();
 
 
