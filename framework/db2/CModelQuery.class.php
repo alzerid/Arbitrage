@@ -7,6 +7,7 @@ abstract class CModelQuery
 
 	//Query
 	protected $_query;
+	protected $_data;
 	protected $_limit;
 	protected $_skip;
 	protected $_cmd;
@@ -19,6 +20,7 @@ abstract class CModelQuery
 
 		//Query
 		$this->_query = NULL;
+		$this->_data  = NULL;
 		$this->_limit = NULL;
 		$this->_skip  = NULL;
 		$this->_cmd   = NULL;
@@ -27,8 +29,10 @@ abstract class CModelQuery
 
 	abstract public function findOne($query);
 	abstract public function findAll($query);
-	//abstract public function update($query);
+	abstract public function update($query, $data);
+	abstract public function save($query, $data);
 
+	//Actually execute
 	abstract public function execute();
 
 	//Other options
