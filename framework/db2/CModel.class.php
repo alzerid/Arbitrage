@@ -1,20 +1,9 @@
 <?
 namespace Arbitrage2\DB2;
 
-abstract class CModel
+abstract class CModel extends CModelData
 {
-	private $_variables;
-
-	public function __construct()
-	{
-		$defaults          = self::defaults();
-		$this->_variables  = new CModelData($defaults);
-	}
-
-	public function __get($name)
-	{
-		return ((isset($this->_variables->$name))? $this->_variables->$name : NULL);
-	}
+	private $_idKey;
 
 	static public function loadDriver($driver)
 	{
@@ -28,9 +17,12 @@ abstract class CModel
 		if($class === NULL)
 			$class = get_called_class();
 
-		//Get model
+		//Create new Model
 		$model = new $class;
+
+		//Set data and normalize
 		$model->_setData($data);
+		$model->_normalizeData();
 
 		return $model;
 	}
@@ -55,14 +47,35 @@ abstract class CModel
 		return static::properties();
 	}
 
-	static public function defaults()
+	/* Update Methods */
+	public function update()
 	{
-		return static::defaults();
+		//Ensure _id is there
+		if(!isset($this->_id))
+		{
+			var_dump("IN UPDATE WITHOUT ID");
+			die();
+		}
+
+		//Grab $variables not originals
+		$vars = $this->getUpdatedData();
+		self::query()->update(array('_id' => $this->_id), $vars)->execute();
+
+		//Merge variables to originals
+		$this->_merge();
 	}
 
-	private function _setData(array $data)
+	public function save()
 	{
-		$this->_variables->merge(new CModelData($data));
+		die("SAVE");
+	}
+	/* End Update Methods */
+
+	public function equals(UseModel $model)
+	{
+		//TODO: _id is mongo baseed, should not be! --EMJ
+
+		return (($this->_id !== NULL && $model->_id !== NULL) && ($this->_id == $model->_id));
 	}
 }
 ?>
