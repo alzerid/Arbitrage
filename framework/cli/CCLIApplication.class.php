@@ -26,6 +26,7 @@ class CCLIApplication extends CApplication
 		$this->requireFrameworkFile('cli/CArgumentParser.class.php');
 		$this->requireFrameworkFile('cli/CCLIBaseApplication.class.php');
 		$this->requireFrameworkFile('cli/CPHPApplication.class.php');
+		$this->requireFrameworkFile('cli/CCLICommand.class.php');
 	}
 
 	/**
