@@ -23,7 +23,7 @@ class CEmailCommunication
 	{
 		$headers = "";
 		foreach($this->_headers as $key => $val)
-			$headers .= "$key: $val\r\n";
+			$headers .= "$key: " . trim($val) . "\n";
 
 		return mail($this->_to, $this->_subject, $this->_body, trim($headers));
 	}
