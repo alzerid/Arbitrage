@@ -5,7 +5,7 @@ class EModelException extends \Exception
 {
 }
 
-class EModelData extends \Exception
+class EModelDataException extends \Exception
 {
 }
 ?>

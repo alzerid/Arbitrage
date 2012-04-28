@@ -47,6 +47,13 @@ abstract class CModel extends CModelData
 		return static::properties();
 	}
 
+	static public function upgrade(CModel $model)
+	{
+		$class = get_called_class();
+		var_dump($class);
+		die("UPGRADE");
+	}
+
 	/* Update Methods */
 	public function update()
 	{

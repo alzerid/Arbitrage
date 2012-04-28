@@ -11,8 +11,12 @@ class CModelData
 
 	public function __construct(array &$originals=array(), array &$variables=array())
 	{
+		//Get defaults
 		if(count($originals) === 0)
 			$originals = static::defaults();
+
+		if($originals === NULL)
+			throw new EModelDataException("Unable to get default values for '" . get_called_class() . "'.");
 
 		$this->_setData($originals, $variables);
 		$this->_path = array();
@@ -115,7 +119,9 @@ class CModelData
 		foreach($types as $key=>$type)
 		{
 			//check type
-			if(strpos($type, 'object:') === 0)
+			if(!array_key_exists($key, $data))
+				$data[$key] = $defaults[$key];
+			elseif(strpos($type, 'object:') === 0)
 			{
 				$obj = substr($type, 7);
 				$cls = "";
@@ -163,8 +169,6 @@ class CModelData
 						throw new EModelData("Unable to handle object type '$obj'");
 				}
 			}
-			elseif(!array_key_exists($key, $data))
-				$data[$key] = $defaults[$key];
 			elseif($type != gettype($data[$key]))
 				settype($data[$key], $type);
 		}
