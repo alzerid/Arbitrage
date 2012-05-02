@@ -80,6 +80,11 @@ class CArgumentRequired
 	{
 		return call_user_func_array(array($this->_arg, $name), $args);
 	}
+
+	public function getArgument()
+	{
+		return $this->_arg;
+	}
 }
 
 class CArgumentParser
@@ -108,6 +113,10 @@ class CArgumentParser
 				{
 					if($arg->getLongOpt() === $key)
 					{
+						//Check rqeuired
+						if($arg instanceof CArgumentRequired)
+							$arg = $arg->getArgument();
+
 						if($arg instanceof CArgumentBoolean)
 						{
 							$arg->setValue(true);
