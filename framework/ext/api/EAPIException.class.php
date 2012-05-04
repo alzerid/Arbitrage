@@ -1,0 +1,3 @@
+<?
+class EAPIException extends Exception { }
+?>
