@@ -141,6 +141,15 @@ Class CForm extends CHTMLComponent
 		return CHTMLComponent::inputText($this->_prependFormID($id), $attribs);
 	}
 
+	public function password($id, $attribs=array())
+	{
+		$value   = $this->_getValue($id);
+		$value   = ((isset($value))? $value: '');
+		$attribs = array_merge($attribs, array('value' => $value));
+		$id      = $this->_normalizeName($id);
+		return CHTMLComponent::inputPassword($this->_prependFormID($id), $attribs);
+	}
+
 	public function select($id, $values, $attribs=array(), $default=array())
 	{
 		$d = $this->_getValue($id);

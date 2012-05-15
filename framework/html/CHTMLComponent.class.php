@@ -30,6 +30,14 @@ class CHTMLComponent /*extends Component*/
 		return $html;
 	}
 
+	public static function inputPassword($id, $attribs=array())
+	{
+		$attribs = CHTMLComponent::generateAttribs($attribs);
+		$html    = "<input type=\"password\" id=\"$id\" name=\"$id\" $attribs />\n";
+
+		return $html;
+	}
+
 	public static function inputSelect($id, $values, $attribs=array(), $selected=array())
 	{
 		$attribs = CHTMLComponent::generateAttribs($attribs);
@@ -47,7 +55,6 @@ class CHTMLComponent /*extends Component*/
 		}
 
 		$html .= "</select>\n";
-		
 		return $html;
 	}
 
