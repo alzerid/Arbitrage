@@ -30,7 +30,7 @@ abstract class CModelQuery
 	abstract public function findOne($query);
 	abstract public function findAll($query);
 	abstract public function update($query, $data);
-	abstract public function save($query, $data);
+	abstract public function save($data);
 
 	//Actually execute
 	abstract public function execute();

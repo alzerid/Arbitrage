@@ -3,7 +3,7 @@ namespace Arbitrage2\Model2;
 
 class CMongoModelQuery extends CModelQuery
 {
-	public function findOne($query)
+	public function findOne($query=array())
 	{
 		$this->_cmd   = 'findOne';
 		$this->_query = $query;
@@ -11,7 +11,7 @@ class CMongoModelQuery extends CModelQuery
 		return $this;
 	}
 
-	public function findAll($query)
+	public function findAll($query=array())
 	{
 		$this->_cmd   = 'find';
 		$this->_query = $query;
@@ -26,12 +26,15 @@ class CMongoModelQuery extends CModelQuery
 		$this->_data  = $data;
 
 		return $this;
-		die();
 	}
 
-	public function save($query, $data)
+	public function save($data)
 	{
-		die("SAVE");
+		$this->_cmd   = "save";
+		$this->_query = NULL;
+		$this->_data  = $data;
+
+		return $this;
 	}
 
 	public function execute()
@@ -85,8 +88,16 @@ class CMongoModelQuery extends CModelQuery
 			//Update
 			$ret = $handle->update($query, $update);
 		}
+		elseif($this->_cmd == "save")
+		{
+			$handle->save($this->_data);
+			return $this->_data['_id'];
+		}
 		else
 			die("unknown execution {$this->_cmd}");
+
+
+		return NULL;
 	}
 }
 ?>

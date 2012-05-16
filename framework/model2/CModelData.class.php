@@ -43,7 +43,9 @@ class CModelData
 
 		//type cast
 		$types = static::_types();
-		settype($val, $types[$name]);
+		if(!preg_match('/^object:/', $types[$name]))
+			settype($val, $types[$name]);
+
 		$this->_variables[$name] = $val;
 	}
 
@@ -54,6 +56,11 @@ class CModelData
 			$ret = array_key_exists($name, $this->_variables);
 
 		return $ret;
+	}
+
+	public function getOriginalData()
+	{
+		return $this->_originals;
 	}
 
 	public function getUpdatedData()
@@ -183,10 +190,10 @@ class CModelData
 			{
 				die("ASSOC");
 			}
-			else
+			/*else
 			{
 				die("NOT ASSOCIATIVE");
-			}
+			}*/
 		}
 
 		//Return value not reference
@@ -197,7 +204,7 @@ class CModelData
 
 	static public function isAssoc(array $arr)
 	{
-		return (is_array($arr) &&  array_keys($arr) !== range(0, count($arr) - 1));
+		return (count($arr) > 0 && is_array($arr) &&  array_keys($arr) !== range(0, count($arr) - 1));
 	}
 
 	static public function defaults()
