@@ -194,7 +194,11 @@ Class CForm extends CHTMLComponent
 
 	public function file($id, $attribs=array())
 	{
-		$id = $this->_normalizeName($id);
+		$value   = $this->_getValue($id);
+		$value   = ((isset($value))? $value: '');
+		$attribs = array_merge($attribs, array('value' => $value));
+		$id      = $this->_normalizeName($id);
+
 		return CHTMLComponent::inputFile($this->_prependFormID($id), $attribs);
 	}
 

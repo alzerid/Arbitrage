@@ -166,7 +166,7 @@ class CHTMLComponent /*extends Component*/
 	public static function inputFile($id, $attribs=array())
 	{
 		$attribs = CHTMLComponent::generateAttribs($attribs);
-		$html    = "<input type=\"file\" name=\"$id\" id=\"$id\" />\n";
+		$html    = "<input type=\"file\" name=\"$id\" id=\"$id\" $attribs />\n";
 
 		return $html;
 	}
