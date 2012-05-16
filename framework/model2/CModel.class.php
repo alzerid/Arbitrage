@@ -3,7 +3,7 @@ namespace Arbitrage2\Model2;
 
 abstract class CModel extends CModelData
 {
-	private $_idKey;
+	private $_idKey=NULL;
 
 	static public function loadDriver($driver)
 	{
@@ -59,7 +59,7 @@ abstract class CModel extends CModelData
 	{
 		//Ensure _id is there
 		if(!isset($this->_id))
-			throw new CModelException("Cannot update without an ID");
+			throw new EModelException("Cannot update without an ID");
 
 		//Grab $variables not originals
 		$vars = $this->getUpdatedData();
@@ -71,7 +71,18 @@ abstract class CModel extends CModelData
 
 	public function save()
 	{
-		die("SAVE");
+		$this->_merge();
+		$vars = $this->getOriginalData();
+
+		//Check if id is set
+		if($this->_idKey !== NULL)
+			$vars['_id'] = $this->_idKey;
+
+		//Call
+		$id = self::query()->save($vars)->execute();
+
+		if($this->_idKey === NULL)
+			$this->_idKey = $id;
 	}
 	/* End Update Methods */
 
