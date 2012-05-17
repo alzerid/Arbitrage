@@ -58,6 +58,10 @@ class CMongoModelQuery extends CModelQuery
 
 			if($this->_cmd == "find")
 			{
+				//Sort
+				if($this->_sort !== NULL)
+					$res = $res->sort($this->_sort);
+					
 				//Limit
 				if($this->_limit !== NULL)
 					$res = $res->limit($this->_limit);
