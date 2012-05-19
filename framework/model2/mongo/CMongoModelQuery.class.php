@@ -28,6 +28,24 @@ class CMongoModelQuery extends CModelQuery
 		return $this;
 	}
 
+	public function upsert($query, $data)
+	{
+		$this->_cmd   = "upsert";
+		$this->_query = $query;
+		$this->_data  = $data;
+
+		return $this;
+	}
+
+	public function insert($data)
+	{
+		$this->_cmd   = "insert";
+		$this->_query = NULL;
+		$this->_data  = $data;
+
+		return $this;
+	}
+
 	public function save($data)
 	{
 		$this->_cmd   = "save";
@@ -39,14 +57,14 @@ class CMongoModelQuery extends CModelQuery
 
 	public function execute()
 	{
-		//TODO: DB Factory
 		
 		//Execute command
 		$class = $this->_class;
 		$prop  = $class::properties();
 
 		//Query
-		$handle = new \Mongo;
+		//TODO: DB Factory
+		$handle = new \Mongo('mongodb://localhost:27017', array('persist' => 'php'));
 		$handle = $handle->{$prop['database']}->{$prop['table']};
 
 		//Query
@@ -91,6 +109,22 @@ class CMongoModelQuery extends CModelQuery
 
 			//Update
 			$ret = $handle->update($query, $update);
+		}
+		elseif($this->_cmd == "upsert")
+		{
+			$data = new \CArrayObject($this->_data);
+			$data = array('$set' => $data->flatten()->toArray());
+
+			$cond = new \CArrayObject($this->_query);
+			$cond = $cond->flatten()->toArray();
+
+			//Upsert
+			$ret = $handle->update($cond, $data, array('upsert' => true));
+		}
+		elseif($this->_cmd == "insert")
+		{
+			die("Code insert!");
+			//TODO: Do not insert if data has an id
 		}
 		elseif($this->_cmd == "save")
 		{
