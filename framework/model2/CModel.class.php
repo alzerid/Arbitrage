@@ -9,6 +9,7 @@ abstract class CModel extends CModelData
 	{
 		$ucase = ucwords($driver);
 		\CApplication::getInstance()->requireFrameworkFile("model2/$driver/C{$ucase}ModelQuery.class.php");
+		\CApplication::getInstance()->requireFrameworkFile("model2/$driver/C{$ucase}ModelBatch.class.php");
 		\CApplication::getInstance()->requireFrameworkFile("model2/$driver/C{$ucase}ModelResults.class.php");
 	}
 
@@ -38,6 +39,19 @@ abstract class CModel extends CModelData
 		$query = new $class(get_called_class());
 
 		return $query;
+	}
+
+	static public function batch()
+	{
+		//Setup model object
+		$driver = static::properties();
+		$driver = $driver['driver'];
+
+		//Return Query Object
+		$class = 'Arbitrage2\Model2\C' . $driver . "ModelBatch";
+		$batch = new $class(get_called_class());
+
+		return $batch;
 	}
 
 	//Static methods needed to be overridden

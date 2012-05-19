@@ -13,7 +13,6 @@ class CMongoModelResults extends CModelResults
 	public function key()
 	{
 		return $this->_results->key();
-
 	}
 
 	public function next()

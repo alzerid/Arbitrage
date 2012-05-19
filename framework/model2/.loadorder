@@ -3,4 +3,5 @@ CModelResults.class.php
 CModelData.class.php
 CModelArrayData.class.php
 CModelQuery.class.php
+CModelBatch.class.php
 CModel.class.php
