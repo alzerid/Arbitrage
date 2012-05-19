@@ -71,9 +71,9 @@ class CCLIApplication extends CApplication
 		if($this->_cache === NULL)
 		{
 			$app    = basename(CApplication::getConfig()->_internals->approotpath);
-			$script = basename(CApplication::getConfig()->_internals->scriptrootpath);
 			$path   = "$app/$script/";
 
+			//Create cache
 			$this->_cache = new CTemporaryCache($path);
 		}
 
