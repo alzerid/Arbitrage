@@ -27,12 +27,15 @@ class CWebApplication extends CApplication
 	{
 		parent::bootstrap();
 
+		//Renderers and Renderables
+		$this->requireFrameworkFile('base/renderables/CHTMLRenderable.class.php');
+		$this->requireFrameworkFile('base/renderables/CJSONRenderable.class.php');
+		$this->requireFrameworkFile('base/renderables/CViewFileRenderable.class.php');
+
+		//Controller, Actions, etc...
 		$this->requireFrameworkFile('base/CBaseController.class.php');             //Base controller class
 		$this->requireFrameworkFile('base/CController.class.php');                 //Controller class
 		$this->requireFrameworkFile('base/CAction.class.php');                     //Action class
-		$this->requireFrameworkFile('base/renderers/CRenderer.class.php');         //Base renderer class
-		$this->requireFrameworkFile('base/renderers/CViewFileRenderer.class.php'); //View File renderer class
-		$this->requireFrameworkFile('base/renderers/CJSONRenderer.class.php');     //JSON Renderer
 		$this->requireFrameworkFile('base/CFilterChain.class.php');                //Filter chain for CBaseControllers
 		$this->requireFrameworkFile('base/CRouter.class.php');                     //Router handler
 		$this->requireFrameworkFile('base/CFlashPropertyObject.class.php');        //Flash Property Object class
@@ -160,7 +163,7 @@ class CWebApplication extends CApplication
 			//Render error
 			$this->requireFrameworkFile('base/CFrameworkController.class.php');
 			$controller = new CFrameworkController();
-			$content    = $controller->render('errors/exception', array('event' => $event));
+			$content    = $controller->renderContent('errors/exception', array('event' => $event));
 
 			//echo out the content
 			echo $content;
@@ -179,7 +182,7 @@ class CWebApplication extends CApplication
 			//Render error
 			$this->requireFrameworkFile('base/CFrameworkController.class.php');
 			$controller = new CFrameworkController();
-			$content    = $controller->render('errors/exception', array('event' => $event));
+			$content    = $controller->renderContent('errors/exception', array('event' => $event));
 
 			//echo out the content
 			echo $content;

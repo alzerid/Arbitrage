@@ -32,8 +32,8 @@ class CAction implements IAction
 		if($ret === NULL)
 			$ret = array();
 
-		if(!is_array($ret))
-			throw new EArbitrageException("Actions must return an array.");
+		if(!is_array($ret) && !($ret instanceof IRenderable))
+			throw new EArbitrageException("Actions must return an array or of type IRenderable.");
 
 		if($this->_controller->getRendererType() === "view")
 		{

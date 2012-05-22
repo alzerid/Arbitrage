@@ -5,13 +5,8 @@
  * @version 2.0
  */
 
-class CController extends CBaseController implements IFileRenderable
+class CController extends CBaseController
 {
-	//Render variables
-	private $_layout_path;
-	private $_view_path;
-	private $_default_layout;
-
 	//Tags
 	private $_javascripts;
 	private $_stylesheets;
@@ -20,101 +15,10 @@ class CController extends CBaseController implements IFileRenderable
 	{
 		parent::__construct();
 
-		//setup view and layout paths
-		$this->setLayoutPath();
-		$this->setViewPath();
-		$this->setDefaultLayout();
-
+		//Set other variables
 		$this->_javascripts    = array();
 		$this->_stylesheets    = array();
 	}
-
-	public function setDefaultLayout($layout="default")
-	{
-		$this->_default_layout = $layout;
-	}
-
-	public function setLayoutPath($path=NULL)
-	{
-		$this->_layout_path = (($path === NULL)? CApplication::getConfig()->_internals->approotpath . "app/views/layout/" : $path);
-	}
-
-	public function setViewPath($path=NULL)
-	{
-		$this->_view_path = (($path === NULL)? CApplication::getConfig()->_internals->approotpath . "app/views/" : $path);
-	}
-
-	public function getDefaultLayout()
-	{
-		return $this->_default_layout;
-	}
-
-	public function getLayoutPath()
-	{
-		return $this->_layout_path;
-	}
-
-	public function getViewPath()
-	{
-		return $this->_view_path;
-	}
-
-	/* IController implementation */
-	public function renderInternal(IRenderer $renderer)
-	{
-		return $this->renderFile($renderer->getFile(), $renderer->getLayout(), $renderer->getVariables());
-	}
-	/* END IController implementation */
-
-	/* Implementation of IFileRenderable */
-	public function renderFile($file, $layout, $variables)
-	{
-		//Get content from view
-		$content = $this->renderPartialFile($file, $variables);
-
-		//Now render layout
-		$path = $this->_layout_path . $layout . ".php";
-		if(!file_exists($path))
-			throw new EArbitrageException("Layout does not exist '$path'.");
-
-		//Extract the variables
-		$_vars = $this->_view_variables;
-		extract($_vars);
-
-		//Require view
-		require_once($path);
-
-		return ob_get_clean();
-	}
-
-	public function renderPartialFile($file, $variables=NULL)
-	{
-		$_vars = $variables;
-		if($_vars !== NULL)
-			extract($_vars);
-
-		//Generate file path
-		$path = $this->_view_path . $file . ".php";
-		
-		if(!file_exists($path))
-			throw new EArbitrageException("View file does not exist '$path'.");
-
-		ob_start();
-		ob_implicit_flush(false);
-		require($path);
-		$content = ob_get_clean();
-
-		return $content;
-	}
-
-	/* renderPartial
-	 * Convinence method that calls CController::renderPartialFile
-	 */
-	public function renderPartial($file, $variables=NULL)
-	{
-		return $this->renderPartialFile($file, $variables);
-	}
-	/* END Implementation of IFileRenderable */
 
 	/* HTML View Helper Methods */
 	public function includeJavaScriptController()

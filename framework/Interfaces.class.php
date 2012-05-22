@@ -21,39 +21,47 @@ interface IFactory
  */
 interface IRenderer
 {
-	public function __construct(IRenderable $ctx);
-	public function getContext();
+	public function renderContent($content);
 }
 
 /**
  * IViewRenderer
  */
-interface IViewRenderer extends IRenderer
+/*interface IViewRenderer extends IRenderer
 {
 	public function render();
-}
+}*/
 
 /**
  * ITextRenderer interface
  */
-interface ITextRenderer extends IRenderer
+/*interface ITextRenderer extends IRenderer
 {
 	public function render($content);
-}
+}*/
 
 /**
  * IViewFileRenderer interface
  */
-interface IViewFileRenderer extends IRenderer
+/*interface IViewFileRenderer extends IRenderer
 {
 	public function render($file, $layout, $variables);
-}
+}*/
 
 /*
  *
  */
 interface IRenderable
 {
+	public function render();
+}
+
+/**
+ * IViewFileRenderable interface
+ */
+interface IViewFileRenderable extends IRenderable
+{
+	public function renderPartial($file, $vars);
 }
 
 /**
@@ -76,10 +84,7 @@ interface ITemplate
 /**
  * IController interface
  */
-interface IController
-{
-	public function renderInternal(IRenderer $renderer);
-}
+interface IController extends IRenderer  { }
 
 /**
  * IAction interface

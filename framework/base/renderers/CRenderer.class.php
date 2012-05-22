@@ -1,7 +1,7 @@
 <?
-class CRenderer implements IRenderer
+class CRenderer implements IRenderable
 {
-	protected $_ctx;
+/*	protected $_ctx;
 
 	final public function __construct(IRenderable $ctx)
 	{
@@ -11,6 +11,11 @@ class CRenderer implements IRenderer
 	public function getContext()
 	{
 		return $this->_context;
+	}*/
+
+	public function render($ret)
+	{
+		echo "IN";
 	}
 }
 ?>

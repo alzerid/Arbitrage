@@ -7,7 +7,7 @@
 
 //TODO: Possibly move _layout_path, _view_path, _default_layout to CController
 //TODO: Possibly move the rendering IFileRenerable implementation to the CController class
-abstract class CBaseController implements IController
+abstract class CBaseController extends CViewFileRenderable implements IController
 {
 	//PHP Variables attatched to the session
 	protected $_get;
@@ -17,7 +17,7 @@ abstract class CBaseController implements IController
 	protected $_session;
 	protected $_files;
 	protected $_flash;
-	protected $_view_variables;
+	protected $_content;
 
 	//Controller specifics
 	private $_filters;
@@ -27,6 +27,8 @@ abstract class CBaseController implements IController
 
 	public function __construct()
 	{
+		parent::__construct();
+
 		//PHP variables
 		$this->_get = $_GET;
 		unset($this->_get['_route']);
@@ -46,7 +48,6 @@ abstract class CBaseController implements IController
 		$this->_ajax           = false;
 		$this->_renderer_type  = "view";
 		$this->_flash          = NULL;
-		$this->_view_variables = array();
 	}
 
 	/**
@@ -183,7 +184,7 @@ abstract class CBaseController implements IController
 		$ret = $this->_action->execute();
 
 		//Set view variables
-		if(isset($ret['variables']))
+		if($this->_renderer_type == "view" && isset($ret['variables']))
 			$this->_view_variables = array_merge($ret['variables'], $this->_view_variables);
 
 		//Add flash variable to session
@@ -194,7 +195,7 @@ abstract class CBaseController implements IController
 
 		//TODO: Ensure PHP Exception is on
 		ob_start();
-		$content = $this->render($ret);
+		$content = $this->renderContent($ret);
 		$content = $chain->runPostProcess($content);
 
 		echo $content;
@@ -203,9 +204,29 @@ abstract class CBaseController implements IController
 		ob_end_flush();
 	}
 
-	public function render($ret)
+	public function renderContent($content)
 	{
-		$content = NULL;
+		$out = NULL;
+
+		//Default return type $ret['render'] etc...
+		if(is_array($content) && $this->_renderer_type === "view")
+		{
+			$this->_renderable = $content;
+			$out               = $this->render();
+		}
+		elseif($content instanceof IRenderable)
+			$out = $content->render();
+
+		if($out === NULL)
+			throw new EArbitrageException("Content is NULL. Check your rendering type.");
+
+		return $out;
+
+		die();
+		//elseif($ret instanceof
+
+
+
 		if(isset($ret['render']) && is_string($ret['render']))
 		{
 			//Determine view type

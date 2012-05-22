@@ -1,7 +1,7 @@
 <?
 class CFrameworkController extends CBaseController
 {
-	public function render($file, $_vars=NULL)
+	public function renderContent($file, $_vars=NULL)
 	{
 		if($_vars === NULL)
 			$_vars = array();
@@ -17,10 +17,6 @@ class CFrameworkController extends CBaseController
 		$content = ob_get_clean();
 
 		return $content;
-	}
-
-	public function renderInternal(IRenderer $renderer)
-	{
 	}
 }
 ?>
