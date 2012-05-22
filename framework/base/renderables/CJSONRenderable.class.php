@@ -10,6 +10,7 @@ class CJSONRenderable implements IRenderable
 
 	public function render()
 	{
+		header("Content-Type: application/json");
 		return json_encode($this->_data);
 	}
 }
