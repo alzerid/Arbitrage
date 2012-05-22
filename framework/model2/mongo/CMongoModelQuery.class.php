@@ -64,7 +64,7 @@ class CMongoModelQuery extends CModelQuery
 
 		//Query
 		//TODO: DB Factory
-		$handle = new \Mongo('mongodb://localhost:27017', array('persist' => 'php'));
+		$handle = \CDBFactory::getDatabase('mongo');
 		$handle = $handle->{$prop['database']}->{$prop['table']};
 
 		//Query

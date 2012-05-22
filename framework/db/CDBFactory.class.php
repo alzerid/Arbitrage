@@ -21,7 +21,7 @@ class CDBFactory
 		{
 			case 'mongo':
 				$host = $config->host . ":" . $config->port;
-				self::$_DB[$type][$db] = new Mongo($host);
+				self::$_DB[$type][$db] = new Mongo($host, array('persist' => 'arbitrage2'));
 
 				break;
 
