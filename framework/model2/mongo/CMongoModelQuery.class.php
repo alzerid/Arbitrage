@@ -57,7 +57,6 @@ class CMongoModelQuery extends CModelQuery
 
 	public function execute()
 	{
-		
 		//Execute command
 		$class = $this->_class;
 		$prop  = $class::properties();
