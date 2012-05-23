@@ -118,6 +118,10 @@ abstract class CBaseController extends CViewFileRenderable implements IControlle
 	 */
 	public function setRendererType($type)
 	{
+		static $types = array('view', 'renderable');
+		if(!in_array($type, $types))
+			throw new EArbitrageException("Invalid renderer type '$type'.");
+
 		$this->_renderer_type = $type;
 	}
 
