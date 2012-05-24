@@ -100,6 +100,11 @@ abstract class CModel extends CModelData
 	}
 	/* End Update Methods */
 
+	public function remove()
+	{
+		self::query()->remove(array('_id' => $this->_idKey))->execute();
+	}
+
 	public function equals(UseModel $model)
 	{
 		//TODO: _id is mongo baseed, should not be! --EMJ

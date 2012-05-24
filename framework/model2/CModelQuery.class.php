@@ -33,6 +33,7 @@ abstract class CModelQuery
 	abstract public function upsert($query, $data);
 	abstract public function insert($data);
 	abstract public function save($data);
+	abstract public function remove($query);
 
 	//Actually execute
 	abstract public function execute();

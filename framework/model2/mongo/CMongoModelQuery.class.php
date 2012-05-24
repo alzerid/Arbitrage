@@ -55,6 +55,15 @@ class CMongoModelQuery extends CModelQuery
 		return $this;
 	}
 
+	public function remove($query)
+	{
+		$this->_cmd   = "remove";
+		$this->_query = $query;
+		$this->_data  = NULL;
+
+		return $this;
+	}
+
 	public function execute()
 	{
 		//Execute command
@@ -130,9 +139,10 @@ class CMongoModelQuery extends CModelQuery
 			$handle->save($this->_data);
 			return $this->_data['_id'];
 		}
+		elseif($this->_cmd == "remove")
+			$handle->remove($this->_query);
 		else
 			die("unknown execution {$this->_cmd}");
-
 
 		return NULL;
 	}
