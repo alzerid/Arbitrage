@@ -30,6 +30,8 @@ class CWebApplication extends CApplication
 		//Renderers and Renderables
 		$this->requireFrameworkFile('base/renderables/CHTMLRenderable.class.php');
 		$this->requireFrameworkFile('base/renderables/CJSONRenderable.class.php');
+		$this->requireFrameworkFile('base/renderables/CTextRenderable.class.php');
+		$this->requireFrameworkFile('base/renderables/CJavascriptRenderable.class.php');
 		$this->requireFrameworkFile('base/renderables/CViewFileRenderable.class.php');
 
 		//Controller, Actions, etc...
