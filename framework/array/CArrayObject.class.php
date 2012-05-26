@@ -12,9 +12,9 @@ class CArrayObject implements Iterator
 		$this->_keys     = array();
 	}
 
-	public function flatten()
+	public function flatten($depth=-1)
 	{
-		$ret = self::flattenArray($this->_data);
+		$ret = self::flattenArray($this->_data, $depth);
 		return new CArrayObject($ret);
 	}
 
@@ -121,26 +121,13 @@ class CArrayObject implements Iterator
 	}
 	/* END Iterator Implementation */
 
-	static public function flattenArray(array $arr, &$idx="")
+	static public function flattenArray(array &$arr, $depth=-1, $pre="")
 	{
 		$ret = array();
 		foreach($arr as $key=>$val)
 		{
-			if($idx === "")
-			{
-				if(is_array($arr[$key]))
-					$val = self::flattenArray($arr[$key], $key);
-
-				$ret[$key] = $val;
-			}
-			else
-			{
-				$idx .= ".$key";
-				if(is_array($arr[$key]))
-					return self::flattenArray($arr[$key], $idx);
-				else
-					return $val;
-			}
+			$key       = (($pre != "")? "$pre{$key}" : $key);
+			$ret[$key] = ((is_array($val) && ($depth>0 || $depth==-1))? self::flattenArray($val, (($depth>0)? $depth-1 : -1), "$key.") : $val);
 		}
 
 		return $ret;

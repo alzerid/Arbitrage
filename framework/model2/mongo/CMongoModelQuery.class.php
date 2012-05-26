@@ -109,7 +109,7 @@ class CMongoModelQuery extends CModelQuery
 		{
 			//Setup update
 			$update = new \CArrayObject($this->_data);
-			$update = array('$set' => $update->flatten()->toArray());
+			$update = array('$set' => $update->flatten(0)->toArray());
 
 			//Setup conditions
 			$query = new \CArrayObject($this->_query);
