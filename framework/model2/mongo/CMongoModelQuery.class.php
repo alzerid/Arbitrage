@@ -19,6 +19,14 @@ class CMongoModelQuery extends CModelQuery
 		return $this;
 	}
 
+	public function count($query=array())
+	{
+		$this->_cmd   = 'count';
+		$this->_query = $query;
+
+		return $this;
+	}
+
 	public function update($query, $data)
 	{
 		$this->_cmd   = "update";
@@ -76,7 +84,7 @@ class CMongoModelQuery extends CModelQuery
 		$handle = $handle->{$prop['database']}->{$prop['table']};
 
 		//Query
-		if(in_array($this->_cmd, array('find', 'findOne')))
+		if(in_array($this->_cmd, array('find', 'findOne', 'count')))
 		{
 			$res = $handle->{$this->_cmd}($this->_query);
 			if($res === NULL)
@@ -99,6 +107,8 @@ class CMongoModelQuery extends CModelQuery
 					return $list;
 				}
 			}
+			elseif($this->_cmd == "count")
+				return $res;
 			else
 			{
 				$class = $this->_class;

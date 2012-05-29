@@ -29,6 +29,7 @@ abstract class CModelQuery
 
 	abstract public function findOne($query);
 	abstract public function findAll($query);
+	abstract public function count($query);
 	abstract public function update($query, $data);
 	abstract public function upsert($query, $data);
 	abstract public function insert($data);
