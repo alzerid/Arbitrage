@@ -13,6 +13,15 @@ abstract class CModelResults implements \Iterator
 		$this->_class   = $class;
 	}
 
+	public function toArrayObject()
+	{
+		$arr = new \ArrayObject();
+		foreach($this as $result)
+			$arr[] = $result;
+
+		return $arr;
+	}
+
 	protected function _getModel(array $arr)
 	{
 		$class = $this->_class;
