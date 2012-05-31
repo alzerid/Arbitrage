@@ -16,7 +16,7 @@ class CMongoModelResults extends CModelResults
 	public function offsetExists($offset)
 	{
 		if($this->_raw == NULL)
-			$this->_raw = iterator_to_array($this->results);
+			$this->_raw = iterator_to_array($this->_results, false);
 
 		return isset($this->_raw[$offset]);
 	}
@@ -24,12 +24,12 @@ class CMongoModelResults extends CModelResults
 	public function offsetGet($offset)
 	{
 		if($this->_raw == NULL)
-			$this->_raw = iterator_to_array($this->results);
+			$this->_raw = iterator_to_array($this->_results, false);
 
 		if(!isset($this->_raw[$offset]))
 			return NULL;
 
-		return$this->_getModel($ret);
+		return$this->_getModel($this->_raw[$offset]);
 	}
 
 	public function offsetSet($offset, $value)
