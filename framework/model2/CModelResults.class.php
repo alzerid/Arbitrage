@@ -2,7 +2,7 @@
 namespace Arbitrage2\Model2;
 
 /* Base DB Classes */
-abstract class CModelResults implements \Iterator
+abstract class CModelResults implements \ArrayAccess, \Iterator
 {
 	protected $_results;
 	protected $_class;

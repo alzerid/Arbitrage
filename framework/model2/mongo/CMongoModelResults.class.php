@@ -4,6 +4,45 @@ namespace Arbitrage2\Model2;
 /* Mongo */
 class CMongoModelResults extends CModelResults
 {
+	private $_raw;
+
+	public function __construct($results, $class)
+	{
+		parent::__construct($results, $class);
+		$this->_raw = NULL;
+	}
+
+	/* Array Access */
+	public function offsetExists($offset)
+	{
+		if($this->_raw == NULL)
+			$this->_raw = iterator_to_array($this->results);
+
+		return isset($this->_raw[$offset]);
+	}
+
+	public function offsetGet($offset)
+	{
+		if($this->_raw == NULL)
+			$this->_raw = iterator_to_array($this->results);
+
+		if(!isset($this->_raw[$offset]))
+			return NULL;
+
+		return$this->_getModel($ret);
+	}
+
+	public function offsetSet($offset, $value)
+	{
+		throw new \EArbitrageException("Unable to set offset for Model Results.");
+	}
+
+	public function offsetUnset($offset)
+	{
+		throw new \EArbitrageException("Unable to unset offset for Model Results.");
+	}
+	/* End Array Access */
+
 	/* Iterator */
 	public function current()
 	{
