@@ -44,6 +44,11 @@ class CMongoModelResults extends CModelResults
 	/* End Array Access */
 
 	/* Iterator */
+	public function count()
+	{
+		return $this->_results->count();
+	}
+
 	public function current()
 	{
 		return $this->_getModel($this->_results->current());
