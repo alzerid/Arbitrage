@@ -188,7 +188,8 @@ class CModelData
 		{
 			if(self::isAssoc($val))
 			{
-				die("ASSOC");
+				var_dump($val, $this);
+				die("CModelData: ASSOC");
 			}
 			/*else
 			{
