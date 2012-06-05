@@ -1,32 +1,35 @@
 <?
 class CErrorController extends CController
 {
-	public function render($file, $_vars=NULL)
+	private $_err_vars;
+	private $_err_file;
+
+	public function __construct($file, $_vars=array())
 	{
-		if($_vars === NULL)
-			$_vars = array();
-
-		//Extract variables
-		extract($_vars);
-
-		//Check for application files
-		$path = CApplication::getConfig()->_internals->approotpath . "app/views/_internal/errors/$file.php";
-		if(file_exists($path))
-			$content = parent::renderFile("_internal/errors/$file", 'error/default', $_vars);
-		else
-		{
-			$path = CApplication::getConfig()->_internals->fwrootpath . "framework/views/$file.php"; //Get framework view
-
-			ob_start();
-			require_once($path);
-			$content = ob_get_clean();
-		}
-
-		return $content;
+		parent::__construct();
+		$this->_err_vars = $_vars;
+		$this->_err_file = $file;
 	}
 
-	public function renderInternal(IRenderer $renderer)
+	public function processAction()
 	{
+		if($this->_err_vars === NULL)
+			$this->_err_vars = array();
+
+		//Check for application files
+		$file = $this->_err_file;
+		$path = CApplication::getConfig()->_internals->approotpath . "app/views/_internal/errors/$file.php";
+		if(!file_exists($path))  //set viewpath to framework
+			$this->setViewPath(CApplication::getConfig()->_internals->fwrootpath . "framework/views/");
+		else
+		{
+			$this->setViewPath(CApplication::getConfig()->_internals->approotpath . "app/views/_internal/");
+			$this->setLayoutPath(CApplication::getConfig()->_internals->approotpath . "app/views/_internal/errors/");
+			$this->setDefaultLayout('layout');
+		}
+
+
+		return array('render' => "errors/$file", 'variables' => $this->_err_vars);
 	}
 }
 
