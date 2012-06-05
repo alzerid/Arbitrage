@@ -197,21 +197,25 @@ class CWebApplication extends CApplication
 
 			//Check to see which view we should show, arbitrage view or application views
 			$this->requireFrameworkFile('base/CErrorController.class.php');
-			$controller = new CErrorController();
-			$content    = $controller->render('http_' . $event->exception->getCode(), array('event' => $event));
+			$this->_controller = new CErrorController('http_' . $event->exception->getCode(), array('event' => $event));
+			$this->_action     = new CAction($this->_controller, 'process');
+			$this->_controller->setAction($this->_action);
+			$this->_controller->execute();
 
-			//Echo out the content
-			echo $content;
 			die();
 		}
 		else
 		{
-			$this->requireFrameworkFile('base/CErrorController.class.php');
-			$controller = new CErrorController();
-			$content    = $controller->render('http_500', array('event' => $event));
+			//Flush output buffer
+			@ob_end_clean();
 
-			//Echo out the content
-			echo $content;
+			//Check to see which view we should show, arbitrage view or application views
+			$this->requireFrameworkFile('base/CErrorController.class.php');
+			$this->_controller = new CErrorController('http_500', array('event' => $event));
+			$this->_action     = new CAction($this->_controller, 'process');
+			$this->_controller->setAction($this->_action);
+			$this->_controller->execute();
+
 			die();
 		}
 	}
