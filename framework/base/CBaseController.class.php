@@ -225,43 +225,6 @@ abstract class CBaseController extends CViewFileRenderable implements IControlle
 			throw new EArbitrageException("Content is NULL. Check your rendering type.");
 
 		return $out;
-
-		die();
-		//elseif($ret instanceof
-
-
-
-		if(isset($ret['render']) && is_string($ret['render']))
-		{
-			//Determine view type
-			if($this->_renderer_type === "view")
-			{
-				$renderer = new CViewFileRenderer($this);
-				$content  = $renderer->render($ret['render'], $ret['layout'], $ret['variables']);
-			}
-			/*else if($this->_renderer_type === "text")
-			{
-				$renderer = new CViewTextRenderer($this);
-				$content  = $renderer->render($ret['render'], $ret['layout'], $ret['variables']);
-			}*/
-		}
-		elseif(is_array($ret))
-		{
-			if($this->_renderer_type === "json")
-			{
-				$renderer = new CJSONRenderer($this);
-				$content  = $renderer->render($ret);
-			}
-		}
-		elseif($ret['render'] instanceof IViewRenderer)
-			$content = $ret['render']->render();
-		else
-			throw new EArbitrageException("Unknown renderer returned.");
-
-		if($content === NULL)
-			throw new EArbitrageException("Content is NULL. Check your rendering type.");
-
-		return $content;
 	}
 
 	/**
@@ -299,7 +262,7 @@ abstract class CBaseController extends CViewFileRenderable implements IControlle
 		$this->_view_variables = array_merge($this->_view_variables, $vars);
 	}
 
-	protected function filters()
+	public function filters()
 	{
 		return array();
 	}
