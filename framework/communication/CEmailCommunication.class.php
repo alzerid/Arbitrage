@@ -1,10 +1,10 @@
 <?
 class CEmailCommunication
 {
-	private $_to;
-	private $_subject;
-	private $_body;
-	private $_headers;
+	protected $_to;
+	protected $_subject;
+	protected $_body;
+	protected $_headers;
 
 	public function __construct($to, $subject, $body, array $headers = NULL)
 	{
