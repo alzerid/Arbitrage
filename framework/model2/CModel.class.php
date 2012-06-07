@@ -13,6 +13,15 @@ abstract class CModel extends CModelData
 		\CApplication::getInstance()->requireFrameworkFile("model2/$driver/C{$ucase}ModelResults.class.php");
 	}
 
+	//Loads the model specified into memory
+	static public function load($class=NULL)
+	{
+		if($class === NULL)
+			$class = get_called_class();
+
+		new $class;
+	}
+
 	static public function model(array $data, $class=NULL)
 	{
 		if($class === NULL)
