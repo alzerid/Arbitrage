@@ -20,8 +20,22 @@ class CMongoModelBatch extends CMongoModelQuery
 			$list = new CMongoModelResults($this->_data, $class);
 			return $list;
 		}
+		elseif($this->_cmd == 'update')
+		{
+			//Setup update
+			$update = new \CArrayObject($this->_data);
+			$update = array('$set' => $update->flatten(0)->toArray());
+
+			//Setup conditions
+			$query = new \CArrayObject($this->_query);
+			$query = $query->flatten()->toArray();
+
+			//Update
+			$ret = $handle->update($query, $update, array('multiple' => true));
+		}
+
 		else
-			throw new EModelExceptoin("Cannot do batch operation on '{$this->_cmd}'.");
+			throw new EModelException("Cannot do batch operation on '{$this->_cmd}'.");
 	}
 }
 ?>

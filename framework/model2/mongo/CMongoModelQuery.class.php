@@ -152,7 +152,7 @@ class CMongoModelQuery extends CModelQuery
 		elseif($this->_cmd == "remove")
 			$handle->remove($this->_query);
 		else
-			die("unknown execution {$this->_cmd}");
+			throw new EModelException("Cannot do batch operation on '{$this->_cmd}'.");
 
 		return NULL;
 	}
