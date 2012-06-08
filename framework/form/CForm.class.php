@@ -5,7 +5,6 @@ Class CForm extends CHTMLComponent
 	private $_attributes;
 	private $_model;
 
-	//public function __construct($attributes, $values=array(), $model=NULL)
 	public function __construct($properties=array())
 	{
 		//Set default attributes
@@ -28,6 +27,8 @@ Class CForm extends CHTMLComponent
 			$this->_model  = get_class($this->_values);
 			$this->_values = $this->_values->toArray();
 		}
+		elseif($this->_values instanceof \Arbitrage2\Model2\CModel)
+			$this->_model = get_class($this->_values);
 		elseif($this->_values === NULL)
 			$this->_values = array();
 	}
@@ -102,6 +103,8 @@ Class CForm extends CHTMLComponent
 	{
 		if(!isset($this->_model))
 			return NULL;
+
+		die("CHECK INSTANCE OF MODEL");
 
 		$class = $this->_model;
 		return new $class($this->_values);

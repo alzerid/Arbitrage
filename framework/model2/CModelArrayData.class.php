@@ -3,18 +3,18 @@ namespace Arbitrage2\Model2;
 
 class CModelArrayData extends \ArrayObject
 {
-	private $_class;
+	private $_type;
 
-	public function __construct($class)
+	public function __construct($type)
 	{
 		parent::__construct();
-		$this->_class = $class;
+		$this->_type = $type;
 	}
 
 	public function __set($name, $val)
 	{
-		if(!is_object($val) || get_class($val) != $this->_class)
-			throw new EModelData("Class type mismatch: Got '" . gettype($val) . "' expecting '{$this->_class}'");
+		if(!is_object($val) || get_type($val) != $this->_type)
+			throw new EModelData("Class type mismatch: Got '" . gettype($val) . "' expecting '{$this->_type}'");
 
 		$this[$name] = $val;
 	}
@@ -29,13 +29,13 @@ class CModelArrayData extends \ArrayObject
 	
 	public function getClass()
 	{
-		return $this->_class;
+		return $this->_type;
 	}
 
 	public function offsetSet($key, $val)
 	{
-		if(!is_object($val) || get_class($val) != $this->_class)
-			throw new EModelDataExecption("Class type mismatch");
+		if(get_type($val) != $this->_type)
+			throw new EModelDataExecption("Type mismatch. Expecting '{$this->_type}' got '" . get_type($val) . "'");
 
 		parent::offsetSet($key, $val);
 	}

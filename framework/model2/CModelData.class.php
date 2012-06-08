@@ -1,19 +1,19 @@
 <?
 namespace Arbitrage2\Model2;
 
-class CModelData
+class CModelData implements \ArrayAccess
 {
 	static private $_TYPES = array();  //Typecasts
 
-	private $_originals;
-	private $_variables;
-	protected $_path;
+	private $_originals;      //The original values provided to the CModelData
+	private $_variables;      //The updated variables that were set programatically
+	protected $_path;         //The array path from the root CModel class
 
 	public function __construct(array &$originals=array(), array &$variables=array())
 	{
-		//Get defaults
+		//If originals not provided, we are probably programatically instantiated
 		if(count($originals) === 0)
-			$originals = static::defaults();
+			$originals = self::defaults();
 
 		if($originals === NULL)
 			throw new EModelDataException("Unable to get default values for '" . get_called_class() . "'.");
@@ -57,6 +57,42 @@ class CModelData
 
 		return $ret;
 	}
+
+	/* ArrayAccess methods */
+	public function offsetExists($offset)
+	{
+		//Check if exists in _variables
+		if(array_key_exists($offset, $this->_variables))
+			return true;
+
+		if(array_key_exists($offset, $this->_originals))
+			return true;
+
+		return false;
+	}
+
+	public function offsetGet($offset)
+	{
+		if(array_key_exists($offset, $this->_variables))
+			return $this->_variables[$offset];
+
+		if(array_key_exists($offset, $this->_originals))
+			return $this->_originals[$offset];
+
+		return NULL;
+	}
+
+	public function offsetSet($offset, $val)
+	{
+		throw new EMOdelData('offsetSet not coded');
+	}
+
+	public function offsetUnset($offset)
+	{
+		throw new EMOdelData('offsetUnset not coded');
+	}
+
+	/* End ArrayAccess methods */
 
 	public function getOriginalData()
 	{
@@ -122,13 +158,13 @@ class CModelData
 		$types    = self::_types();
 		$data     = &$this->_originals;
 
-		//Typecast
+		//Go through types and do special operations on internal classes
 		foreach($types as $key=>$type)
 		{
 			//check type
 			if(!array_key_exists($key, $data))
 				$data[$key] = $defaults[$key];
-			elseif(strpos($type, 'object:') === 0)
+			elseif(strpos($type, 'object:') === 0)  //Property value is an object
 			{
 				$obj = substr($type, 7);
 				$cls = "";
@@ -138,6 +174,7 @@ class CModelData
 					$obj = substr($obj, 0, $idx);
 				}
 
+				//If it is a CModelArrayData, do some special operations
 				if($obj === 'Arbitrage2\Model2\CModelArrayData')
 				{
 					$list = new CModelArrayData($cls);
@@ -154,7 +191,7 @@ class CModelData
 				elseif(is_object($data[$key]))
 				{
 					if(get_class($data[$key]) !== $obj)
-						throw new EModelData('Object not correct type!');
+						throw new EModelDataException('Object not correct type!');
 				}
 				else
 				{
@@ -172,8 +209,15 @@ class CModelData
 						$obj->_normalizeData();
 						$data[$key] = $obj;
 					}
+					elseif($data[$key] instanceof Arbitrage2\Model2\CModelHashData)
+					{
+						die('key');
+					}
 					else
-						throw new EModelData("Unable to handle object type '$obj'");
+					{
+						var_dump($data[$key]);
+						throw new EModelDataException("Unable to handle object type '$obj'");
+					}
 				}
 			}
 			elseif($type != gettype($data[$key]))
@@ -210,7 +254,20 @@ class CModelData
 
 	static public function defaults()
 	{
-		return static::defaults();
+		//Get defaults from CModelData
+		$defaults = static::defaults();
+		$class    = get_called_class();
+		var_dump($defaults);
+
+		//Get types if not set already
+		if(!isset(self::$_TYPES[$class]))
+		{
+			self::$_TYPES[$class] = array();
+			foreach($defaults as $key=>$val)
+				self::$_TYPES[$class][$key] = gettype($val);
+		}
+
+		return $defaults;
 	}
 
 	static protected function _types()
@@ -230,8 +287,10 @@ class CModelData
 					$cls  = get_class($val);
 					$type = "object:" . $cls;
 
-					if($cls == 'Arbitrage2\Model2\CModelArrayData')
+					if($val instanceof Arbitrage2\Model2\CModelArrayData)  //CModelHashData is also included here
 						$type .= ":{$val->getClass()}";
+
+					var_dump($type, $val);
 				}
 
 				$types[$key] = $type;
