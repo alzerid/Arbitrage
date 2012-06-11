@@ -3,7 +3,18 @@ namespace Arbitrage2\Model2;
 
 abstract class CModel extends CModelData
 {
-	private $_idKey=NULL;
+	static private $_ID_KEYS = array();
+	private $_idVal=NULL;
+
+	public function __construct(array &$originals=array(), array &$variables=array())
+	{
+		$class      = get_called_class();
+		$properties = self::properties();
+		if(!isset($properties['idKey']))
+			self::$_ID_KEYS[$class] = $properties['idKey'];
+
+		parent::__construct($originals, $variables);
+	}
 
 	static public function loadDriver($driver)
 	{
@@ -22,19 +33,34 @@ abstract class CModel extends CModelData
 		new $class;
 	}
 
+	/* Called when one wants to create a model with the data
+	   from the DB. */
 	static public function model(array $data, $class=NULL)
 	{
 		if($class === NULL)
 			$class = get_called_class();
 
 		//Create new Model
-		$model = new $class;
+		$object = new $class();
 
-		//Set data and normalize
-		$model->_setData($data);
-		$model->_normalizeData();
+		//Unset the _id and set locally if exists
+		if(isset($data['_id']))
+		{
+			$object->_idVal = $data['_id'];
+			unset($data['_id']);
+		}
 
-		return $model;
+		//Set database data into model
+		$object->_setModelData($data);
+
+		return $object;
+	}
+
+	/* Called when a form wants to set the _varables to the form
+	   content. */
+	static public function form(array $form)
+	{
+		die("FORM");
 	}
 
 	static public function query()
@@ -95,6 +121,8 @@ abstract class CModel extends CModelData
 	public function save()
 	{
 		$this->_merge();
+		var_dump($this);
+		die();
 		$vars = $this->getOriginalData();
 
 		//Check if id is set
