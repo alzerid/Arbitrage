@@ -16,19 +16,22 @@ class CEvent implements IEvent
 
 	public function triggerListeners(array $listeners)
 	{
+		$ret = NULL;
 		if(count($listeners))
 		{
 			$method = $this->_method;
 			foreach($listeners as $l)
 			{
 				if($l instanceof IEventListener)
-					$l->handleEvent($this);
+					$ret = $l->handleEvent($this);
 
-				$l->$method($this);
+				$ret = $l->$method($this);
 				if($this->_propagate === false)
 					break;
 			}
 		}
+
+		return $ret;
 	}
 }
 
