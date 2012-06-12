@@ -126,8 +126,11 @@ class CArrayObject implements Iterator
 		$ret = array();
 		foreach($arr as $key=>$val)
 		{
-			$key       = (($pre != "")? "$pre{$key}" : $key);
-			$ret[$key] = ((is_array($val) && ($depth>0 || $depth==-1))? self::flattenArray($val, (($depth>0)? $depth-1 : -1), "$key.") : $val);
+			$key = (($pre != "")? "$pre{$key}" : $key);
+			if(is_array($val) && ($depth>0 || $depth==-1))
+				$ret = array_merge($ret, self::flattenArray($val, (($depth>0)? $depth-1 : -1), "$key."));
+			else
+				$ret[$key] = $val;
 		}
 
 		return $ret;
