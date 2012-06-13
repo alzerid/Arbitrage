@@ -22,6 +22,15 @@ abstract class CModelResults implements \ArrayAccess, \Iterator
 		return $arr;
 	}
 
+	public function toArray()
+	{
+		$ret = array();
+		foreach($this as $result)
+			$ret[] = $result;
+
+		return $ret;
+	}
+
 	protected function _getModel(array $arr)
 	{
 		$class = $this->_class;
