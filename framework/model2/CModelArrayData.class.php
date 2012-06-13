@@ -1,9 +1,11 @@
 <?
 namespace Arbitrage2\Model2;
 
-class CModelArrayData extends CModelData
+class CModelArrayData extends CModelData implements \Iterator
 {
 	private $_unset;
+	private $_iterate;
+	private $_idx;
 
 	public function __construct($defaults = array())
 	{
@@ -11,6 +13,8 @@ class CModelArrayData extends CModelData
 		$this->_variables = array();
 		$this->_unset     = array();
 		$this->_path      = array();
+		$this->_iterate   = array();
+		$this->_idx       = 0;
 	}
 
 	public function reset()
@@ -34,8 +38,35 @@ class CModelArrayData extends CModelData
 	public function toArrayUpdated()
 	{
 		return $this->toArray();
-
 	}
+
+	/* Iterator methods */
+	public function current()
+	{
+		return $this->_iterate[$this->_idx];
+	}
+
+	public function key()
+	{
+		return $this->_idx;
+	}
+
+	public function next()
+	{
+		$this->_idx++;
+	}
+
+	public function rewind()
+	{
+		$this->_iterate = $this->toArray();
+		$this->_idx     = 0; //real index
+	}
+
+	public function valid()
+	{
+		return array_key_exists($this->_idx, $this->_iterate);
+	}
+	/* End Iterator methods */
 
 	protected function _getData($idx)
 	{
