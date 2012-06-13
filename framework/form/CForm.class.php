@@ -104,8 +104,6 @@ Class CForm extends CHTMLComponent
 		if(!isset($this->_model))
 			return NULL;
 
-		die("CHECK INSTANCE OF MODEL");
-
 		$class = $this->_model;
 		return new $class($this->_values);
 	}
