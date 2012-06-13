@@ -1,43 +1,106 @@
 <?
 namespace Arbitrage2\Model2;
 
-class CModelArrayData extends \ArrayObject
+class CModelArrayData extends CModelData
 {
-	private $_type;
+	private $_unset;
 
-	public function __construct($type)
+	public function __construct($defaults = array())
 	{
-		parent::__construct();
-		$this->_type = $type;
+		$this->_originals = $defaults;
+		$this->_variables = array();
+		$this->_unset     = array();
+		$this->_path      = array();
 	}
 
-	public function __set($name, $val)
+	public function reset()
 	{
-		if(!is_object($val) || get_type($val) != $this->_type)
-			throw new EModelData("Class type mismatch: Got '" . gettype($val) . "' expecting '{$this->_type}'");
-
-		$this[$name] = $val;
+		$this->_unset = array();
+		parent::reset();
 	}
 
-	public function __get($name)
+	public function toArray()
 	{
-		if(!array_key_exists($name, $this))
-			throw new EModelDataException("Unknown $name");
+		$vars = $this->_originals;
 
-		return $this[$name];
+		//If unset is set, remove from oritinals
+		foreach($this->_unset as $key=>$val)
+			unset($vars[$key]);
+
+		$vars = array_values(array_merge($vars, $this->_variables));
+		return $vars;
 	}
-	
-	public function getClass()
+
+	public function toArrayUpdated()
 	{
-		return $this->_type;
+		return $this->toArray();
+
 	}
 
-	public function offsetSet($key, $val)
+	protected function _getData($idx)
 	{
-		if(get_type($val) != $this->_type)
-			throw new EModelDataExecption("Type mismatch. Expecting '{$this->_type}' got '" . get_type($val) . "'");
+		if(array_key_exists($idx, $this->_variables))
+			return $this->_variables[$idx];
+		elseif(array_key_exists($idx, $this->_originals))
+			return $this->_originals[$idx];
 
-		parent::offsetSet($key, $val);
+		return NULL;
 	}
+
+	protected function _setData($idx, $val)
+	{
+		//Ensure $val is primitive and not a CModelData or Mongo*
+		$type = gettype($val);
+		if($type == "object")
+		{
+			$class = get_class($val);
+			if(!preg_match('/^mongo/i', $class) || !($val instanceof CModelData))
+				throw new EModelDataException("Value must be a primitive type, Mongo* class, or CModelData type");
+		}
+
+		if($idx === "")
+		{
+			$idx = count($this->_originals) + count($this->_variables);
+			$this->_variables[$idx] = $val;
+		}
+		elseif(array_key_exists($idx, $this->_originals) || array_key_exists($idx, $this->_variables))
+			$this->_variables[$idx] = $val;
+		else
+			throw new EModelDataException("Unknown index $idx.");
+	}
+
+	protected function _issetData($idx)
+	{
+		return (!isset($this->_unset[$idx]) && (array_key_exists($idx, $this->_variables) || array_key_exists($idx, $this->_originals)));
+	}
+
+	protected function _unsetData($idx)
+	{
+		if(array_key_exists($idx, $this->_variables))
+			unset($this->_variables[$idx]);
+
+		if(array_key_exists($idx, $this->_originals))
+			$this->_unset[(int) $idx] = true;
+	}
+
+	protected function _setModelData(array &$originals=array())
+	{
+		$this->_originals = $originals;
+	}
+
+	protected function _merge()
+	{
+		$originals = $this->_originals;
+
+		//If unset is set, remove from oritinals
+		foreach($this->_unset as $key=>$val)
+			unset($originals[$key]);
+
+		$originals        = array_values(array_merge($originals, $this->_variables));
+		$this->_originals = $this->toArray();
+
+		$this->reset();
+	}
+
 }
 ?>
