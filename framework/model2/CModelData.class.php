@@ -72,6 +72,41 @@ class CModelData implements \ArrayAccess
 		$this->_variables = array();
 	}
 
+	//Grab only updated entries
+	public function toArrayUpdated()
+	{
+		$ret = array();
+		foreach($this->_originals as $key => $val)
+		{
+			if($val instanceof CModelData)
+			{
+				$data = $val->toArrayUpdated();
+				if(count($data) > 0)
+					$ret[$key] = $data;
+			}
+			elseif(array_key_exists($key, $this->_variables))
+				$ret[$key] = $this->_variables[$key];
+		}
+
+		return $ret;
+	}
+
+	public function toArray()
+	{
+		//Convert Data points to an array
+		$ret = array();
+
+		foreach($this->_originals as $key => $val)
+		{
+			if($val instanceof CModelData)
+				$ret[$key] = $val->toArray();
+			else
+				$ret[$key] = ((array_key_exists($key, $this->_variables))? $this->_variables[$key] : $val);
+		}
+
+		return $ret;
+	}
+
 	protected function _setModelData(array &$originals=array())
 	{
 		$class = get_called_class();
