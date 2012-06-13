@@ -1,6 +1,33 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+<!--
+Scope: <?=((isset($event->exception))? get_class($event->exception) : "PHP Error")?>
+
+Errno: <?=$event->errno;?> <?=(($event->errstr !== "")? "({$event->errstr})" : "")?>
+
+Message: <?=$event->message;?>
+
+File: <?=$event->file;?>
+
+Line: <?=$event->line;?>
+
+
+Stack Trace:
+<?
+$idx = 0;
+foreach($event->trace as $entry)
+{
+	$file = ((!empty($entry['file']))? $entry['file'] : "(UNKNOWN)");
+	$line = ((!empty($entry['line']))? $entry['line'] : "(UNKNOWN)");
+	$code = ((!empty($entry['code']))? $entry['code'] : "");
+
+	echo "$file:$line\n";
+	$idx++;
+}
+?>
+
+-->
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title></title>
 
