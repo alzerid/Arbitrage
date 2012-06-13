@@ -68,6 +68,11 @@ class CModelArrayData extends CModelData implements \Iterator
 	}
 	/* End Iterator methods */
 
+	public function contains($val)
+	{
+		return (in_array($val, $this->_originals) || in_array($val, $this->_variables));
+	}
+
 	protected function _getData($idx)
 	{
 		if(array_key_exists($idx, $this->_variables))
