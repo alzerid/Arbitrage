@@ -162,7 +162,7 @@ class CMongoModelQuery extends CModelQuery
 		foreach($arr as $key=>$val)
 		{
 			$key = (($namespace == "")? $key : "$namespace.$key");
-			if(is_array($val) && (array_keys($val) !== range(0, count($val)-1))) //Ignore numerical arrays
+			if(is_array($val) && count($val) > 0 && (array_keys($val) !== range(0, count($val)-1))) //Ignore numerical arrays
 				$ret = array_merge($ret, $this->_smartFlatten($val, $key));
 			else
 				$ret[$key] = $val;

@@ -78,7 +78,9 @@ class CModelData implements \ArrayAccess
 		$ret = array();
 		foreach($this->_originals as $key => $val)
 		{
-			if($val instanceof CModelData)
+			if($val instanceof CModelArrayData)
+				$ret[$key] = $val->toArrayUpdated();
+			elseif($val instanceof CModelData)
 			{
 				$data = $val->toArrayUpdated();
 				if(count($data) > 0)
