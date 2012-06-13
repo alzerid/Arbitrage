@@ -180,8 +180,8 @@ abstract class CModel extends CModelData
 
 	protected function _issetData($name)
 	{
-		if(!empty($this->_idVal))
-			return $this->_idval;
+		if($name == self::$_ID_KEYS[get_called_class()] && !empty($this->_idVal))
+			return true;
 
 		return parent::_issetData($name);
 	}
