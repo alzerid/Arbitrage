@@ -40,6 +40,19 @@ class CModelArrayData extends CModelData implements \Iterator
 		return $this->toArray();
 	}
 
+	public function set(array $arr)
+	{
+		//Ensure $arr is not associative
+		if(array_keys($arr) !== range(0, count($arr)-1))
+			throw new EModelDataException("Array must be consecutive numerical and non associative");
+
+		$this->_variables = $arr;
+
+		//Set all _originals to unset
+		if(count($this->_originals) > 0)
+			$this->_unset = array_fill(0, count($this->_originals), true);
+	}
+
 	/* Iterator methods */
 	public function current()
 	{
