@@ -70,7 +70,22 @@ class CModelArrayData extends CModelData implements \Iterator
 
 	public function contains($val)
 	{
+		//TODO: Possibly need to use $this->_unset here!! --EMJ
 		return (in_array($val, $this->_originals) || in_array($val, $this->_variables));
+	}
+
+	public function search($val)
+	{
+		$idx = false;
+		$idx = array_search($val, $this->_variables);
+		if($idx !== false)
+			return $idx;
+
+		$idx = array_search($val, $this->_originals);
+		if(!isset($this->_unset[$idx]) && $idx !== false)
+			return $idx;
+
+		return false;
 	}
 
 	protected function _getData($idx)
@@ -90,7 +105,7 @@ class CModelArrayData extends CModelData implements \Iterator
 		if($type == "object")
 		{
 			$class = get_class($val);
-			if(!preg_match('/^mongo/i', $class) || !($val instanceof CModelData))
+			if(!preg_match('/^mongo/i', $class) && !($val instanceof CModelData))
 				throw new EModelDataException("Value must be a primitive type, Mongo* class, or CModelData type");
 		}
 
