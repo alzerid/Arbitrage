@@ -10,7 +10,7 @@ abstract class CModel extends CModelData
 	{
 		$class      = get_called_class();
 		$properties = self::properties();
-		if(!isset($properties['idKey']))
+		if(isset($properties['idKey']))
 			self::$_ID_KEYS[$class] = $properties['idKey'];
 
 		parent::__construct($originals, $variables);
@@ -71,6 +71,10 @@ abstract class CModel extends CModelData
 
 		//Return Query Object
 		$class = 'Arbitrage2\Model2\C' . $driver . "ModelQuery";
+		if(!class_exists($class))
+			throw new EModelException("Unable to load query for '$driver'. Driver not loaded?");
+
+
 		$query = new $class(get_called_class());
 
 		return $query;
@@ -107,33 +111,51 @@ abstract class CModel extends CModelData
 	public function update()
 	{
 		//Ensure _id is there
-		if(!isset($this->_id))
+		if(!isset($this->_idVal))
 			throw new EModelException("Cannot update without an ID");
 
 		//Grab $variables not originals
-		$vars = $this->getUpdatedData();
-		self::query()->update(array('_id' => $this->_id), $vars)->execute();
+		$vars = $this->toArrayUpdated();
+		$key  = self::$_ID_KEYS[get_called_class()];
+		self::query()->update(array(self::$_ID_KEYS[get_called_class()] => $this->_idVal), $vars)->execute();
 
 		//Merge variables to originals
 		$this->_merge();
+	}
+
+	public function upsert(array $keys)
+	{
+		if(count($keys) <= 0)
+			throw new EModelDataException("Keys must be specified for an upsert.");
+
+		//Merge the variables
+		$this->_merge();
+
+		//setup query
+		$query = array();
+		foreach($keys as $key)
+			$query[$key] = $this->_originals[$key];
+	
+		//Upsert
+		self::query()->upsert($query, $this->toArray())->execute();
 	}
 
 	public function save()
 	{
 		$this->_merge();
 		var_dump($this);
-		die();
+		die('SAVE!!!');
 		$vars = $this->getOriginalData();
 
 		//Check if id is set
-		if($this->_idKey !== NULL)
-			$vars['_id'] = $this->_idKey;
+		if($this->_idVal !== NULL)
+			$vars[self::$_ID_KEYS[get_class_name()]] = $this->_idVal;
 
 		//Call
 		$id = self::query()->save($vars)->execute();
 
-		if($this->_idKey === NULL)
-			$this->_idKey = $id;
+		if($this->_idVal === NULL)
+			$this->_idVal = $id;
 	}
 	/* End Update Methods */
 
@@ -147,6 +169,23 @@ abstract class CModel extends CModelData
 		//TODO: _id is mongo baseed, should not be! --EMJ
 
 		return (($this->_id !== NULL && $model->_id !== NULL) && ($this->_id == $model->_id));
+	}
+
+	//Ovverride __get, __isset to ensure _id
+	protected function _getData($name)
+	{
+		if($name == "_id")
+			return $this->_idVal;
+
+		return parent::_getData($name);
+	}
+
+	protected function _issetData($name)
+	{
+		if(!empty($this->_idVal))
+			return $this->_idval;
+
+		return parent::_issetData($name);
 	}
 }
 ?>
