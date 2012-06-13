@@ -119,7 +119,7 @@ class CMongoModelQuery extends CModelQuery
 		{
 			//Setup update
 			$update = new \CArrayObject($this->_data);
-			$update = array('$set' => $update->flatten(0)->toArray());
+			$update = array('$set' => $update->flatten()->toArray());
 
 			//Setup conditions
 			$query = new \CArrayObject($this->_query);
@@ -130,8 +130,10 @@ class CMongoModelQuery extends CModelQuery
 		}
 		elseif($this->_cmd == "upsert")
 		{
+			$data = NULL;
 			$data = new \CArrayObject($this->_data);
-			$data = array('$set' => $data->flatten()->toArray());
+			$data = $data->flatten()->toArray();
+			$data = array('$set' => $data);
 
 			$cond = new \CArrayObject($this->_query);
 			$cond = $cond->flatten()->toArray();
