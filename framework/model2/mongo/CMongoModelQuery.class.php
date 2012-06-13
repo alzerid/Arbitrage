@@ -118,9 +118,8 @@ class CMongoModelQuery extends CModelQuery
 		elseif($this->_cmd == "update")
 		{
 			//Setup update
-			$update = new \CArrayObject($this->_data);
-			$update = array('$set' => $update->flatten()->toArray());
-
+			$update = array('$set' => $this->_smartFlatten($this->_data));
+			
 			//Setup conditions
 			$query = new \CArrayObject($this->_query);
 			$query = $query->flatten()->toArray();
@@ -130,11 +129,9 @@ class CMongoModelQuery extends CModelQuery
 		}
 		elseif($this->_cmd == "upsert")
 		{
-			$data = NULL;
-			$data = new \CArrayObject($this->_data);
-			$data = $data->flatten()->toArray();
-			$data = array('$set' => $data);
 
+			//Setup update
+			$data = array('$set' => $this->_smartFlatten($this->_data));
 			$cond = new \CArrayObject($this->_query);
 			$cond = $cond->flatten()->toArray();
 
@@ -157,6 +154,21 @@ class CMongoModelQuery extends CModelQuery
 			throw new EModelException("Cannot do batch operation on '{$this->_cmd}'.");
 
 		return NULL;
+	}
+
+	private function _smartFlatten($arr, $namespace='')
+	{
+		$ret = array();
+		foreach($arr as $key=>$val)
+		{
+			$key = (($namespace == "")? $key : "$namespace.$key");
+			if(is_array($val) && (array_keys($val) !== range(0, count($val)-1))) //Ignore numerical arrays
+				$ret = array_merge($ret, $this->_smartFlatten($val, $key));
+			else
+				$ret[$key] = $val;
+		}
+
+		return $ret;
 	}
 }
 ?>
