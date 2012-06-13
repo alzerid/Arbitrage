@@ -143,13 +143,11 @@ abstract class CModel extends CModelData
 	public function save()
 	{
 		$this->_merge();
-		var_dump($this);
-		die('SAVE!!!');
-		$vars = $this->getOriginalData();
+		$vars = $this->toArray();
 
 		//Check if id is set
 		if($this->_idVal !== NULL)
-			$vars[self::$_ID_KEYS[get_class_name()]] = $this->_idVal;
+			$vars[self::$_ID_KEYS[get_called_class()]] = $this->_idVal;
 
 		//Call
 		$id = self::query()->save($vars)->execute();
