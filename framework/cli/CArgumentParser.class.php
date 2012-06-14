@@ -87,6 +87,89 @@ class CArgumentRequired
 	}
 }
 
+/**
+ * Behavior class wrapper that acceps multiple arguments.
+*/
+class CArgumentMultiple implements ArrayAccess, Iterator
+{
+	private $_arg;
+	private $_values;
+	private $_idx;
+
+	public function __construct(CArgumentBase $arg)
+	{
+		$this->_arg = $arg;
+		$this->_idx = 0;
+	}
+
+	public function __call($name, $args)
+	{
+		return call_user_func_array(array($this->_arg, $name), $args);
+	}
+
+	public function getArgument()
+	{
+		return $this->_arg;
+	}
+
+	public function count()
+	{
+		return count($this->_values);
+	}
+
+	/* ArrayAccess Implementation */
+	public function offsetExists($idx)
+	{
+		return isset($this->_values[$idx]);
+	}
+
+	public function offsetGet($idx)
+	{
+		return $this->_values[$idx];
+	}
+
+	public function offsetSet($idx, $val)
+	{
+		if($idx == "")
+			$this->_values[] = $val;
+		else
+			$this->_values[$idx] = $val;
+	}
+
+	public function offsetUnset($idx)
+	{
+		unset($this->_values[$idx]);
+	}
+	/* End ArrayAccess Implementation */
+
+	/* Iterator Implementation */
+	public function current()
+	{
+		return $this->_values[$this->_idx];
+	}
+
+	public function key()
+	{
+		return $this->_idx;
+	}
+
+	public function next()
+	{
+		$this->_idx++;
+	}
+
+	public function rewind()
+	{
+		$this->_idx = 0;
+	}
+
+	public function valid()
+	{
+		return isset($this->_values[$this->_idx]);
+	}
+	/* End Iterator Implementation */
+}
+
 class CArgumentParser
 {
 	private $_args;
@@ -108,20 +191,32 @@ class CArgumentParser
 			$key = $args[0];
 			if($key[0] == '-' && $key[1] == '-') //Long option parse
 			{
-				$key = substr($key, 2);
+				$key   = substr($key, 2);
+				$found = false;
 				foreach($this->_args as $arg)
 				{
 					if($arg->getLongOpt() === $key)
 					{
 						//Check rqeuired
+						$multiple = NULL;
 						if($arg instanceof CArgumentRequired)
 							$arg = $arg->getArgument();
+						elseif($arg instanceof CArgumentMultiple)
+						{
+							$multiple = $arg;
+							$arg      = $arg->getArgument();
+						}
 
 						if($arg instanceof CArgumentBoolean)
 						{
-							$arg->setValue(true);
+							if($multiple != NULL)
+								$multiple[] = true;
+							else
+								$arg->setValue(true);
+
 							unset($args[0]);
-							$args = array_values($args);
+							$args  = array_values($args);
+							$found = true;
 						}
 						elseif($arg instanceof CArgumentValue)
 						{
@@ -129,13 +224,22 @@ class CArgumentParser
 							if(count($args) < 2)
 								throw new EArgumentException("Missing value for '{$opt}'.");
 
-							$arg->setValue($args[1]);
+							if($multiple != NULL)
+								$multiple[] = $args[1];
+							else
+								$arg->setValue($args[1]);
+
 							unset($args[0]);
 							unset($args[1]);
-							$args = array_values($args);
+							$args  = array_values($args);
+							$found = true;
 						}
 					}
 				}
+
+				//Key not found
+				if(!$found)
+					throw new EArgumentException("Unknown argument '$key'.");
 			}
 			elseif($key[0] == '-')               //Short option parse
 			{
@@ -158,9 +262,8 @@ class CArgumentParser
 					}
 				}
 			}
-
-			//TODO: Show invalid command
-
+			else  //Show invalid command
+				throw new EArgumentException("Unknown argument '$key'.");
 		}
 
 		//Go through and make sure all required args have been set
@@ -201,8 +304,19 @@ class CArgumentParser
 			}
 			else
 			{
-				if($arg->getLongOpt() === $name)
-					return $arg->getValue();
+				if($arg instanceof CArgumentRequired || $arg instanceof CArgumentMultiple)
+				{
+					$type = $arg;
+					$arg  = $arg->getArgument();
+
+					if($arg->getLongOpt() === $name)
+						return $type;
+				}
+				else
+				{
+					if($arg->getLongOpt() === $name)
+						return $arg->getValue();
+				}
 			}
 		}
 
