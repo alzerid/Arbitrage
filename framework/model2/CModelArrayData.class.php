@@ -43,7 +43,7 @@ class CModelArrayData extends CModelData implements \Iterator
 	public function set(array $arr)
 	{
 		//Ensure $arr is not associative
-		if(array_keys($arr) !== range(0, count($arr)-1))
+		if(count($arr) > 0 && array_keys($arr) !== range(0, count($arr)-1))
 			throw new EModelDataException("Array must be consecutive numerical and non associative");
 
 		$this->_variables = $arr;
