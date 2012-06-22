@@ -304,7 +304,13 @@ class CArgumentParser
 			}
 			else
 			{
-				if($arg instanceof CArgumentRequired || $arg instanceof CArgumentMultiple)
+				if($arg instanceof CArgumentRequired)
+				{
+					$arg = $arg->getArgument();
+					if($arg->getLongOpt() === $name)
+						return $arg->getValue();
+				}
+				if($arg instanceof CArgumentMultiple)
 				{
 					$type = $arg;
 					$arg  = $arg->getArgument();
