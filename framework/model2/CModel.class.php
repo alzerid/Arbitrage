@@ -159,7 +159,10 @@ abstract class CModel extends CModelData
 
 	public function remove()
 	{
-		self::query()->remove(array('_id' => $this->_idKey))->execute();
+		if(empty($this->_idVal))
+			throw new EModelException("Cannot update without an ID");
+
+		self::query()->remove(array('_id' => $this->_idVal))->execute();
 	}
 
 	public function equals(UseModel $model)
