@@ -213,6 +213,11 @@ Class CForm extends CHTMLComponent
 		return CHTMLComponent::inputCheckbox($this->_prependFormID($id), $attribs);
 	}
 
+	public function button($id, $value, $attribs=array())
+	{
+		return CHTMLComponent::inputButton($this->_prependFormID($id), $value, $attribs);
+	}
+
 	public function submit($id, $value, $attribs=array())
 	{
 		return CHTMLComponent::submitButton($this->_prependFormID($id), $value, $attribs);
