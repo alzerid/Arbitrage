@@ -285,7 +285,7 @@ _arbitrage2.base.gui.Dialog.prototype.close = function() {
 /** InforBar Class **/
 
 /**
-	@description InfoBar class. Shows an info bar with text and certain info bar levets, error, warning, info
+	@description InfoBar class. Shows an info bar with text and certain info bar levels, error, warning, info
 	@constructor
 	@param $obj The object to convert to a InfoBar.
 	@param opts The options associated with the InfoBar.
@@ -393,5 +393,137 @@ _arbitrage2.base.gui.InfoBar.prototype.hide = function() {
 	self._animate[self.options.animation].hide.call(self, function() {	self.$element.find('.arbitrage2_gui_infobar_content').html(''); });
 };
 /** End InfoBar Class **/
+
+/** SlideShow Class **/
+
+/**
+	@description SlideShow class allows slideshowing of images.
+	@constructor
+	@param $obj The object to convert into a SlideShow.
+	@params opts The options to set for the SlideShow.
+*/
+_arbitrage2.base.gui.SlideShow = function($obj, opts) {
+	var self   = this;
+	self.timer = null;
+	self.index = 0;
+	_arbitrage2.base.gui.SlideShow.superproto.constructor.call(self, $obj, opts);
+
+	//Setup options
+	self.options.interval = self.options.interval * 1000; //convert to ms
+
+	//Content
+	self.$content = $('<div class="arbitrage2_gui_slideshow_content_wrapper"></div>');
+	$('<div class="arbitrage2_gui_slideshow_content_background"></div>').appendTo(self.$content);
+	$('<div class="arbitrage2_gui_slideshow_content_text"></div>').appendTo(self.$content);
+	self.$content.appendTo($obj);
+
+	//Create divs based on options
+	self.$background = $('<div class="arbitrage2_gui_slideshow_background"></div>');
+	$('<div class="arbitrage2_gui_slideshow_image"></div>').appendTo(self.$background);
+	self.$background.appendTo($obj);
+
+	//Main canvas
+	self.$canvas = $('<div class="arbitrage2_gui_slideshow_canvas"></div>');
+	$('<div class="arbitrage2_gui_slideshow_image"></div>').appendTo(self.$canvas);
+	self.$canvas.appendTo($obj);
+
+	//draw
+	var slide = self.options.slides[self.index];
+	self.$element.find('div.arbitrage2_gui_slideshow_image').css('background-image', "url(" + slide.image + ")");
+	self.$content.find('.arbitrage2_gui_slideshow_content_text').html(slide.text);
+
+	//Pre load all images
+	for(var i=0; i<self.options.slides.length; i++)
+		$('<img src="' + self.options.slides[i].image + '" style="visibility: hidden; position: absolute; top: -1000px; left: 0;" />').appendTo(self.$element);
+};
+arbitrage2.inherit(_arbitrage2.base.gui.SlideShow, _arbitrage2.base.gui.GUIObject);
+
+/**
+	@description Default options associated with SlideShow.
+	@static
+	@protected
+*/
+_arbitrage2.base.gui.SlideShow.prototype._defaultOptions = {
+	interval: 5,
+	scale: true,
+	slides: []
+};
+
+/**
+  @description Starts a slide show.
+*/
+_arbitrage2.base.gui.SlideShow.prototype.start = function() {
+	var self =this;
+	self.timer = setTimeout(function() { self.next() }, self.options.interval);
+};
+
+/**
+	@description Stops a slide show.
+*/
+_arbitrage2.base.gui.SlideShow.prototype.stop = function() {
+	var self = this;
+	clearTimeout(self.timer);
+	self.timer = null;
+};
+
+/**
+	@description Slides the SlideShow to the next slide.
+*/
+_arbitrage2.base.gui.SlideShow.prototype.next = function() {
+	var self = this;
+	var idx  = self.index;
+
+	//Next slide
+	idx = ((++idx >= self.options.slides.length)? 0 : idx);
+
+	//Move current to temp
+	var $btmp  = $('<div class="arbitrage2_gui_slideshow_image temp"></div>').hide();
+	var $ctmp  = $('<div class="arbitrage2_gui_slideshow_image temp"></div>').hide();
+	var $breal = self.$background.find('.arbitrage2_gui_slideshow_image');
+	var $creal = self.$canvas.find('.arbitrage2_gui_slideshow_image');
+	var slide  = self.options.slides[idx];
+
+	//Set sources
+	var source = $breal.css('background-image');
+	$btmp.css('background-image', source); 
+	$ctmp.css('background-image', source);
+	
+	//Move contents to tmp
+	$btmp.insertBefore($breal);
+	$ctmp.insertBefore($creal);
+
+	//Hide/show
+	$breal.hide();
+	$creal.hide();
+	$btmp.show();
+	$ctmp.show();
+
+	//Setup new slide
+	$breal.css('background-image', 'url(' + slide.image + ')');
+	$creal.css('background-image', 'url(' + slide.image + ')');
+	self.$content.find('.arbitrage2_gui_slideshow_content_text').html(slide.text);
+
+	//Set index
+	self.index = idx;
+
+	//Slide out
+	var bwidth = $btmp.outerWidth();
+	var cwidth = $ctmp.outerWidth();
+
+	//Set position
+	$breal.css('left', bwidth);
+	$creal.css('left', cwidth);
+
+	//Animate all
+	$btmp.animate({ left: -bwidth }, 'slow');
+	$ctmp.animate({ left: -cwidth }, 'slow');
+	$breal.show().animate({ left: 0 }, 'slow');
+	$creal.show().animate({ left: 0 }, 'slow', function() {
+		self.$element.find('div.arbitrage2_gui_slideshow_image.temp').remove();
+		self.timer = setTimeout(function() { self.next() }, self.options.interval);
+	});
+};
+
+/** End SlideShow Class **/
 
 arbitrage2.exportSymbol('arbitrage2.gui', _arbitrage2.base.gui);
