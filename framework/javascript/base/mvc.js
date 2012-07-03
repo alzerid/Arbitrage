@@ -7,14 +7,18 @@ arbitrage2.provide('_arbitrage2.base.mvc');
 	@params routes Any routing rules to abide by.
 */
 _arbitrage2.base.mvc.Application = function(routes) {
-	var self           = this;
-	self.routes        = routes || { };
-	self.controllers   = { };
-	self.loadCount     = 0;
-	self.needStart     = true;
-	self.cache         = new arbitrage2.cache.CacheManager();
-	self.currentAction = null;
-	self.ajax          = new _arbitrage2.base.mvc.Application.prototype.Ajax(self);
+	var self            = this;
+	self.routes         = routes || { };
+	self.controllers    = { };
+	self.pageController = null;
+	self.loadCount      = 0;
+	self.needStart      = true;
+	self.cache          = new arbitrage2.cache.CacheManager();
+	self.currentAction  = null;
+	self.ajax           = new _arbitrage2.base.mvc.Application.prototype.Ajax(self);
+
+	//Set instance to self
+	_arbitrage2.base.mvc.Application.prototype._instance = self;
 
 	//Onhash change event
 	var listen = true;
@@ -53,6 +57,12 @@ _arbitrage2.base.mvc.Application = function(routes) {
 };
 
 /**
+	@description Global static instance of the application.
+	@static
+*/
+_arbitrage2.base.mvc.Application.prototype._instance = undefined;
+
+/**
 	@description Requires a controller to this specific application instance.
 	@param namespace The fully qualified namespace.
 	@canvas <_arbitrage2.base.mvc.Canvas> The canvas to associate the controller to.
@@ -85,6 +95,23 @@ _arbitrage2.base.mvc.Application.prototype.requireController = function(namespac
 		});
 	})(require, controller);
 };
+
+/**
+	@description Requires a page controller to this specific application instance.
+  @param page Registers a page controller and runs load/unload.
+*/
+_arbitrage2.base.mvc.Application.prototype.registerPageController = function(page) {
+	var proto = page.prototype;
+
+	//Inherit
+	arbitrage2.inherit(page, _arbitrage2.base.mvc.PageController);
+	page.prototype = proto;
+
+	//Set page controller
+	self.pageController = new page();
+	self.pageController.load();
+};
+
 
 /**
 	@description Requires a css stylesheet.
@@ -159,7 +186,11 @@ _arbitrage2.base.mvc.Application.prototype.route = function(url) {
 
 			if(exp.test(url))
 			{
-				url = val;
+				//Do replacements
+				url        = url[0].replace(exp, val);
+				route      = url.split('/');
+				controller = route[1] || "";
+				action     = route[2] || "";
 				break;
 			}
 		}
@@ -308,7 +339,6 @@ _arbitrage2.base.mvc.Application.prototype.flush = function() {
 };
 
 
-
 /**
 	@description Info bar static object.
 */
@@ -395,6 +425,27 @@ _arbitrage2.base.mvc.Application.prototype.Ajax.prototype.post = function(url, p
 	//Start timer, if more than 1 second, show loading bar
 	self._escalate(1);
 	arbitrage2.ajax.post(url, parameters, function(ev) {
+
+		//Remove loading bar
+		self._escalate(0);
+
+		if(cb_success)
+			cb_success(ev);
+	});
+};
+
+/**
+	@description Does an AJAX Get call
+	@param url The URL to query.
+	@param parameters The parameters to send with the AJAX call.
+	@param cb_success The success callback function to execute upon success.
+*/
+_arbitrage2.base.mvc.Application.prototype.Ajax.prototype.get = function(url, parameters, cb_success) {
+	var self = this;
+
+	//Start timer, if more than 1 second, show loading bar
+	self._escalate(1);
+	arbitrage2.ajax.get(url, parameters, function(ev) {
 
 		//Remove loading bar
 		self._escalate(0);
@@ -554,6 +605,7 @@ _arbitrage2.base.mvc.Action.prototype.arguments = function(opt_params) {
 _arbitrage2.base.mvc.Canvas = function($element) {
 	var self      = this;
 	self.$element = $element;
+	self.$element.hide();
 };
 
 /**
@@ -564,8 +616,18 @@ _arbitrage2.base.mvc.Canvas.prototype.render = function($data) {
 	var self = this;
 
 	//TODO: When detaching do we ensure caching?
+	self.$element.show();
 	self.$element.children().detach();
 	$data.appendTo(self.$element);
+};
+
+
+/**
+  @description Page controller
+*/
+_arbitrage2.base.mvc.PageController = function() {
+	var self = this;
+	self.page = window.location.pathname;
 };
 
 arbitrage2.exportSymbol('arbitrage2.mvc', _arbitrage2.base.mvc);
