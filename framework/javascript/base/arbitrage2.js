@@ -241,3 +241,4 @@ arbitrage2.require('arbitrage2.base.cache');
 arbitrage2.require('arbitrage2.base.dbus');
 arbitrage2.require('arbitrage2.base.mvc');
 arbitrage2.require('arbitrage2.base.gui');
+arbitrage2.require('arbitrage2.base.form');
