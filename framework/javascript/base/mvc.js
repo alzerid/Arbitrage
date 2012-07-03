@@ -605,7 +605,6 @@ _arbitrage2.base.mvc.Action.prototype.arguments = function(opt_params) {
 _arbitrage2.base.mvc.Canvas = function($element) {
 	var self      = this;
 	self.$element = $element;
-	self.$element.hide();
 };
 
 /**
