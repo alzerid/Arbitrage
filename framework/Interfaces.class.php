@@ -24,30 +24,6 @@ interface IRenderer
 	public function renderContent($content);
 }
 
-/**
- * IViewRenderer
- */
-/*interface IViewRenderer extends IRenderer
-{
-	public function render();
-}*/
-
-/**
- * ITextRenderer interface
- */
-/*interface ITextRenderer extends IRenderer
-{
-	public function render($content);
-}*/
-
-/**
- * IViewFileRenderer interface
- */
-/*interface IViewFileRenderer extends IRenderer
-{
-	public function render($file, $layout, $variables);
-}*/
-
 /*
  *
  */
