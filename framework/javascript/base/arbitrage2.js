@@ -86,8 +86,9 @@ arbitrage2.provide = function(namespace) {
 	@description Requires a dependency file.
 	@params namespace The namespace to requires.
 	@params opt_cb_load Optional onload callback.
+	@params opt_cb_error Optional onload error callback.
 */
-arbitrage2.require = function(namespace, opt_cb_load) {
+arbitrage2.require = function(namespace, opt_cb_load, opt_cb_error) {
 	var self = this;
 
 	function _checkReady() {
@@ -102,6 +103,19 @@ arbitrage2.require = function(namespace, opt_cb_load) {
 		//User callback
 		if(opt_cb_load)
 			opt_cb_load.call(this);
+	};
+
+	function _markError() {
+		arbitrage2._loading--;
+
+		if(arbitrage2._loading == 0)
+			arbitrage2.ready = true;
+
+		$l('error requiring', this.getAttribute('src'), arbitrage2._loading, arbitrage2.ready);
+
+		//User callback
+		if(opt_cb_error)
+			opt_cb_error.call(this);
 	};
 
 	var file      = namespace.split('.');
@@ -138,9 +152,22 @@ arbitrage2.require = function(namespace, opt_cb_load) {
 	script.src      = path;
 
 	if('onreadystatechange' in script)
-		script.onreadystatechange = function() { if(this.readyState == "complete" || this.readyState == 'loaded') _checkReady(); };
+	{
+		script.onerror = function(ev) {
+			if(opt_cb_error)
+				opt_cb_error();
+		};
+
+		script.onreadystatechange = function(ev) {
+			if(this.readyState == "complete" || this.readyState == 'loaded')
+				_checkReady();
+		};
+	}
 	else
-		script.onload = _checkReady;
+	{
+		script.onload  = _checkReady;
+		script.onerror = _markError;
+	}
 
 	script.async = false;
 	
