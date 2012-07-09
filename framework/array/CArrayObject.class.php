@@ -45,6 +45,12 @@ class CArrayObject implements Iterator
 		return isset($this->_data[$name]);
 	}
 
+	public function __unset($name)
+	{
+		if(isset($this->_data[$name]))
+			unset($this->_data[$name]);
+	}
+
 	public function push($new)
 	{
 		$this->_data[] = $new;
