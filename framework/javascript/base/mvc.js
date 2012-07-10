@@ -3,19 +3,27 @@ arbitrage2.provide('_arbitrage2.base.mvc');
 /**
 	@description Application container class that manages controllers, canvases, etc...
 	@constructor
-	@params def Default route.
-	@params routes Any routing rules to abide by.
+	@params config The configuration rules.
 */
-_arbitrage2.base.mvc.Application = function(routes) {
+_arbitrage2.base.mvc.Application = function(config) {
 	var self            = this;
-	self.routes         = routes || { };
+	self.config         = config || self.config;
+	self.routes         = self.config && (self.config.mvc.routing || { });
 	self.controllers    = { };
+	self.canvases       = { };
 	self.pageController = null;
 	self.loadCount      = 0;
 	self.needStart      = true;
 	self.cache          = new arbitrage2.cache.CacheManager();
 	self.currentAction  = null;
 	self.ajax           = new _arbitrage2.base.mvc.Application.prototype.Ajax(self);
+
+	//Setup canvases
+	if(self.config.mvc.canvases)
+	{
+		for(var idx in self.config.mvc.canvases)
+			self.canvases[idx] = new arbitrage2.mvc.Canvas($(self.config.mvc.canvases[idx]));
+	}
 
 	//Set instance to self
 	_arbitrage2.base.mvc.Application.prototype._instance = self;
@@ -57,6 +65,21 @@ _arbitrage2.base.mvc.Application = function(routes) {
 };
 
 /**
+	@description Default configuration
+	@static
+*/
+_arbitrage2.base.mvc.Application.prototype.config = _arbitrage2.config;
+
+arbitrage2.config['mvc'] = {
+	serverCanvas: false,       //Determines if the server dictates where to draw returned HTML
+	autoRequire: false,        //Determines if Arbitrage should auto require javascript
+	controllerNamespace: '',   //The namespace to use when including controllers
+	canvases: { },             //Key value pair, where KEY is the name and value is the CSS selector
+	debug: false,              //Wether debug is toggled
+	routing: { }               //Routing rules
+};
+
+/**
 	@description Global static instance of the application.
 	@static
 */
@@ -65,9 +88,9 @@ _arbitrage2.base.mvc.Application.prototype._instance = undefined;
 /**
 	@description Requires a controller to this specific application instance.
 	@param namespace The fully qualified namespace.
-	@canvas <_arbitrage2.base.mvc.Canvas> The canvas to associate the controller to.
+	@param opt_cb_success The optional callback to execute.
 */
-_arbitrage2.base.mvc.Application.prototype.requireController = function(namespace, canvas) {
+_arbitrage2.base.mvc.Application.prototype.requireController = function(namespace, opt_cb_success, opt_cb_error) {
 	var self = this;
 	self.loadCount++;
 
@@ -81,19 +104,26 @@ _arbitrage2.base.mvc.Application.prototype.requireController = function(namespac
 	$l('mvc requiring ' + require, self.loadCount);
 
 	//Get script, call in closure for variable persistency
-	(function(require, controller) {
+	(function(require, controller, opt_cb_success, opt_cb_error) {
 		arbitrage2.require(require, function() {
 			var symbol = arbitrage2.getSymbol(namespace.join('.') + '.' + controller);
 			require    = require.split('.');
 			controller = require[require.length-1];
 
 			//Add controller to application
-			self.controllers[controller] = new symbol(self, canvas);
+			self.controllers[controller] = new symbol(self);
 			self.loadCount--;
 
 			$l('mvc required ' + require, self.loadCount);
+
+			//Callback
+			if(opt_cb_success)
+				opt_cb_success();
+		}, function() {
+			if(opt_cb_error)
+				opt_cb_error(controller);
 		});
-	})(require, controller);
+	})(require, controller, opt_cb_success, opt_cb_error);
 };
 
 /**
@@ -213,7 +243,19 @@ _arbitrage2.base.mvc.Application.prototype.route = function(url) {
 	var controller = this.controllers[route.controller];
 	if(!controller)
 	{
-		alert("Unknown controller '" + route.controller + "'.");
+		if(self.config.mvc.autoRequire)
+		{
+			//Require namespace
+			self.requireController(self.config.mvc.controllerNamespace + '.' + route.controller.toUpperCaseFirst() + "Controller", function() {
+				self.route(url);
+			},
+			function() {
+				alert("Unable to auto require controller '" + route.controller + "'.");
+			});
+		}
+		else
+			alert("Unknown controller '" + route.controller + "'.");
+
 		return false;
 	}
 
@@ -241,6 +283,30 @@ _arbitrage2.base.mvc.Application.prototype.execute = function(route, controller,
 	var params = { };
 	var key    = route.url + "?";
 
+	function _renderCache(cache) {
+		//Hide current
+		if(self.currentAction)
+			self.currentAction.hide();
+
+		//Print out to canvas
+		for(var idx in cache.returns)
+		{
+			var canvas = cache.returns[idx].canvas;
+			var $obj   = cache.returns[idx].$obj;
+			canvas.render($obj);
+		}
+
+		//Call initialize 
+		if(!cache.action.initialized)
+			cache.action.initialize(cache.ev.data);
+
+		//Show action
+		cache.action.show();
+
+		//Set current action
+		self.currentAction = cache.action;
+	};
+
 	function _generateParams(parameters) {
 		for(var idx in parameters)
 		{
@@ -262,38 +328,41 @@ _arbitrage2.base.mvc.Application.prototype.execute = function(route, controller,
 	{
 		//Call ajax post
 		self.ajax.post(route.url, params, function(ev) {
-			var $obj = ((typeof(ev.data) == "string")? $(ev.data) : $(ev.data.user.html));
 
-			//Catche the request
-			self.cache.add(key, { $obj: $obj, data: ev.data, url: key, controller: controller, action: action});
-			
-			//Hide current
-			if(self.currentAction)
-				self.currentAction.hide();
+			//Check return type
+			var returns = [ ];
+			if(ev.data.header && ev.data.header.type == "canvas")
+			{
+				for(var idx in ev.data.canvas)
+				{
+					var canvas = self.canvases[idx];
+					if(!canvas)
+					{
+						alert("Unable to paint on canvas '" + idx + "'. Is it registered?");
+						continue;
+					}
 
-			//Print out to canvas
-			canvas.render($obj);
+					//Add for caching
+					var data = { $obj: $(ev.data.canvas[idx]),  data: ev.data.canvas[idx], canvas: canvas };
+					returns.push(data);
+				}
+			}
+			else
+			{
+				alert('Unknown return type!');
+				console.log(ev);
+			}
 
-			//Call initialize 
-			action.initialize(ev.data);
-			action.show();
+			//Add to cache
+			self.cache.add(key, { returns: returns, url: key, controller: controller, action: action, ev: ev });
+			cache = self.cache.get(key);
 
-			//Set current action
-			self.currentAction = action;
+			//Render It
+			_renderCache(cache);
 		});
 	}
 	else
-	{
-		if(self.currentAction)
-			self.currentAction.hide();
-
-		//Render
-		canvas.render(cache.$obj);
-		action.show();
-
-		//Set current action
-		self.currentAction = action;
-	}
+		_renderCache(cache);
 };
 
 /**
@@ -534,16 +603,19 @@ _arbitrage2.base.mvc.Controller.prototype.arguments = function() {
 */
 _arbitrage2.base.mvc.Action = function(controller, args) {
 	var self = this;
-	self.controller = controller;
-	self.args_list  = args || [];
-	self.args       = { };
+	self.initialized = false;
+	self.controller  = controller;
+	self.args_list   = args || [];
+	self.args        = { };
 };
 
 /**
 	@description Called when the action needs to be initialized for the first time.
 	@param opt_data Optional data that is passed (depending if ajax structured response).
 */
-_arbitrage2.base.mvc.Action.prototype.initialize = function(opt_data) { };
+_arbitrage2.base.mvc.Action.prototype.initialize = function(opt_data) { 
+	self.initialize = true;
+};
 
 /**
 	@description Called when the action is being removed from memory.
