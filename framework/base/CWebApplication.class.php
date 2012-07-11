@@ -64,7 +64,6 @@ class CWebApplication extends CApplication
 	 */
 	public function run()
 	{
-		//TODO: Add a primary buffer layer then flush it
 		//Parse URL and grab correct route
 		$route = CRouter::route($_SERVER['REQUEST_URI']);
 
@@ -86,7 +85,7 @@ class CWebApplication extends CApplication
 		//Throw error if route is malformed
 		if(count($route) < 2)
 		{
-			if(CApplication::getConfig()->arbitrage->debugMode)
+			if(CApplication::getConfig()->server->debugMode)
 				throw new EArbitrageException("Unable to load controller because route is malformed '" . implode('/', $route) . "'.");
 			else
 				throw new EHTTPException(EHTTPException::$HTTP_BAD_REQUEST);
@@ -122,7 +121,7 @@ class CWebApplication extends CApplication
 		$path = CArbitrageConfig::getInstance()->_internals->approotpath . "app/controllers/" . $controller . ".php";
 		if(!file_exists($path))
 		{
-			if(CApplication::getConfig()->arbitrage->debugMode)
+			if(CApplication::getConfig()->server->debugMode)
 				throw new EArbitrageException("Unable to load controller '$controller' because it does not exist.");
 			else
 				throw new EHTTPException(EHTTPException::$HTTP_NOT_FOUND);
@@ -156,7 +155,7 @@ class CWebApplication extends CApplication
 	public function handleError(CErrorEvent $event)
 	{
 		//TODO: If debug is on, render
-		$debug = CApplication::getConfig()->arbitrage->debugMode;
+		$debug = CApplication::getConfig()->server->debugMode;
 		if($debug === true)
 		{
 			//Flush output buffer
@@ -175,7 +174,7 @@ class CWebApplication extends CApplication
 
 	public function handleException(CExceptionEvent $event)
 	{
-		$debug = CApplication::getConfig()->arbitrage->debugMode;
+		$debug = CApplication::getConfig()->server->debugMode;
 		if($debug === true)
 		{
 			//Flush output buffer
