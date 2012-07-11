@@ -75,6 +75,7 @@ abstract class CApplication implements ISingleton, IErrorHandlerListener
 		$this->requireFrameWorkFile('array/CArrayObject.class.php');                //Array Object
 
 		//Extended framework files
+		$this->requireFrameworkFile('config/CArbitrageConfigLoader.class.php');     //Arbitrage config class
 		$this->requireFrameworkFile('config/CArbitrageConfig.class.php');           //Arbitrage config class
 
 		//Communication classes
@@ -84,9 +85,10 @@ abstract class CApplication implements ISingleton, IErrorHandlerListener
 		CErrorHandler::getInstance()->addListener($this);
 
 		//Database classes
-		$this->requireFrameworkFile('db/CModel.class.php');
-		$this->requireFrameworkFile('db/CDBFactory.class.php');
+		$this->requireFrameworkFile('database/CDatabaseDriverFactory.class.php');     //Require the Driver Factory
 
+		//Remote cache
+		$this->requireFrameworkFile("cache/remote/CRemoteCacheFactory.class.php");    //Remote cache factory (memcache, redis)
 		
 		//Autoload model handler
 		spl_autoload_register('CApplication::modelAutoLoad', true, true);
@@ -102,25 +104,29 @@ abstract class CApplication implements ISingleton, IErrorHandlerListener
 		//Load application config
 		$this->loadApplicationConfig($path);
 
-		//Determine what db models we should load
-		$databases = CArbitrageConfig::getInstance()->arbitrage->databases;
-		if(count($databases))
+		//Get config
+		$config = CArbitrageConfig::getInstance();
+
+		//Load correct drivers
+		$databases = $config->server->databases;
+		$factory   = CDatabaseDriverFactory::getInstance();
+		if($databases)
 		{
-			foreach($databases as $db => $vals)
-			{
-				if(strtolower($db) === "mongo")
-					$this->requireFrameworkFile("db/CMongoModel.class.php");
-				else
-					throw new EArbitrageConfigException("Unknown database type '$db' in configuration file.");
-			}
+			foreach($databases as $database => $list)
+				$factory->load($database, $list);
 		}
 
 		//Add to application model path
 		$this->addModelSearchPath(CArbitrageConfig::getInstance()->_internals->approotpath . "app/models/");
 		
 		//Remote cache
-		$this->requireFrameworkFile("cache/remote/CRemoteCacheFactory.class.php");
-		CRemoteCacheFactory::initialize(CArbitrageConfig::getInstance()->arbitrage->remoteCache);
+		$remotes = $config->server->remoteCache;
+		$factory = CRemoteCacheFactory::getInstance();
+		if($remotes)
+		{
+			foreach($remotes as $remote => $list)
+				$factory->load($remote, $list);
+		}
 
 		//TODO: Local cache loading
 		
