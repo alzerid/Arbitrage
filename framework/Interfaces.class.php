@@ -16,6 +16,17 @@ interface IFactory
 }
 
 /**
+ * IModuleLoader interface
+ * Interface used when loading modules (see CDatabaseDriverFactory)
+*/
+interface IModuleLoader extends ISingleton
+{
+	public function registerPath($path);
+	public function load($driver, $config);
+	public function getHandle($driver, $opt);
+}
+
+/**
  * IRenderer interface
  * Describes a renderer object.  A render object is responsible for rendering IRenderable objects.
  */
