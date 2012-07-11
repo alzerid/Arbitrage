@@ -6,7 +6,7 @@ class CRouter
 		//Remove Query strings
 		$url = preg_replace('/\?.*$/', '', $url);
 		
-		$routes = CApplication::getConfig()->routing;
+		$routes = CApplication::getConfig()->server->routing;
 		if(isset($routes))
 		{
 			foreach($routes as $key=>$route)
