@@ -1,8 +1,0 @@
-EModelException.class.php
-CModelResults.class.php
-CModelData.class.php
-CModelArrayData.class.php
-CModelHashData.class.php
-CModelQuery.class.php
-CModelBatch.class.php
-CModel.class.php
