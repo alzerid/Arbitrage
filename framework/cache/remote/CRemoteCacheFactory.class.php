@@ -1,35 +1,47 @@
 <?
-class CRemoteCacheFactory implements IFactory
+class CRemoteCacheFactory implements IModuleLoader
 {
-	static private $_caches = array();
+	static private $_INSTANCE = NULL;
+	private $_search_paths;
 
-	static public function get($type)
+	protected function __construct()
 	{
-		if(isset(self::$_caches[$type]))
-			return self::$_caches[$type];
-
-		return NULL;
+		$this->_search_paths = array(dirname(realpath(__FILE__)));
 	}
 
-	static public function initialize($caches)
+	static public function getInstance()
 	{
-		//TODO: Error checking to check if file exists
-		foreach($caches as $key=>$value)
+		if(self::$_INSTANCE == NULL)
+			self::$_INSTANCE = new CRemoteCacheFactory();
+
+		return self::$_INSTANCE;
+	}
+
+	public function registerPath($path)
+	{
+		$this->_search_paths[] = $path;
+	}
+
+	public function load($driver, $config)
+	{
+		$ucase = ucwords($driver);
+		foreach($this->_search_paths as $path)
 		{
-			$class = "C" . ucwords($key);
-
-			CApplication::getInstance()->requireFrameworkFile("cache/remote/$class.class.php");
-			$cache = new $class();
-			$cache->connect($value->host, $value->port);
-
-			//Connect
-			self::addCacheHandler($key, $cache);
+			if(file_exists($path . "/C$ucase.class.php"))
+			{
+				require_once($path . "/C$ucase.class.php");
+				return;
+			}
 		}
+
+		throw new CRemoteCacheException("Unable to load remote cache driver '$driver'.");
 	}
 
-	static public function addCacheHandler($type, $obj)
+	public function getHandle($driver, $opt)
 	{
-		self::$_caches[$type] = $obj;
+		throw new Exception("NOT IMPLEMENTED");
 	}
 }
+
+class CRemoteCacheException extends Exception { }
 ?>
