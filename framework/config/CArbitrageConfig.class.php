@@ -4,7 +4,7 @@ class CArbitrageConfig implements ISingleton
 	static private $_instance = NULL;
 	protected $_variables;
 	protected $_env;
-	protected $_root;
+	protected $_root;        //Root path for configuration
 
 	public function __construct()
 	{
@@ -25,17 +25,19 @@ class CArbitrageConfig implements ISingleton
 		$this->_env  = $env;
 
 		//Setup _internals
-		$this->_variables['_internals']                = array();
-		$this->_variables['_internals']['fwrootpath']  = ARBITRAGE2_FW_PATH;
-		$this->_variables['_internals']['approotpath'] = realpath("$root/../") . "/";
+		$this->_variables['_internals']                  = array();
+		$this->_variables['_internals']['fwrootpath']    = ARBITRAGE2_FW_PATH;
+		$this->_variables['_internals']['approotpath']   = realpath("$root/../") . "/";
+		$this->_variables['_internals']['appconfigpath'] = realpath("$root/../") . "/";
+
 
 		//Setup view and layout path
 		$this->_variables['_internals']['viewpath']   = realpath($this->_variables['_internals']['approotpath'] . "app/views/") . "/";
 		$this->_variables['_internals']['layoutpath'] = realpath($this->_variables['_internals']['approotpath'] . "app/views/layout/") . "/";
 
-		//Set arbitrage
-		$this->_variables['arbitrage']              = array();
-		$this->_variables['arbitrage']['debugMode'] = false;            //Default debug mode is off
+		//Setup arbitrage
+		$this->_variables['server']              = array();
+		$this->_variables['server']['debugMode'] = false;            //Default debug mode is off
 	}
 
 	public function getEnvironment()
@@ -55,18 +57,12 @@ class CArbitrageConfig implements ISingleton
 
 	public function load($filename)
 	{
-		//Determine if it is a YAML file or PHP file
-		$file = basename($filename);
-		$file = explode('.', $file);
-		$ext  = strtolower($file[count($file)-1]);
+		//Ensure full path
+		$path = $this->_root . "/" . basename($filename);
 
-		switch($ext)
-		{
-			case "yaml":
-			case "yml":
-				$this->_loadYAML($filename);
-				break;
-		}
+		//Get loader
+		$loader = CArbitrageConfigLoader::getLoader($path);
+		$loader->load($this->_variables);
 	}
 
 	public function __get($name)
@@ -79,15 +75,11 @@ class CArbitrageConfig implements ISingleton
 	{
 		$this->_variables[$name] = $val;
 	}
-
-	private function _loadYAML($file)
-	{
-		$conf = yaml_parse_file("{$this->_root}/$file");
-		$this->_variables = array_merge($this->_variables, $conf);
-	}
 }
 
-class CArbitrageConfigProperty implements Iterator
+
+
+class CArbitrageConfigProperty extends CArrayObject
 {
 	private $_config;
 	private $_position;
