@@ -49,22 +49,6 @@ arbitrage2.inherit = function(child, parent) {
 };
 
 /**
-	@description Private variable counting how many javascript files are still being loaded.
-*/
-arbitrage2._loading_javascripts = 0;
-
-/**
-	@description List of javascript required files and their associative states.
-	@static
-*/
-arbitrage2._required_javascripts = [ ];
-
-/**
-	@description List of stylesheet required files and their associative states.
-*/
-arbitrage2._required_stylesheets = [ ];
-
-/**
 	@description Called when the arbitrage2 application is ready.
 */
 arbitrage2.ready = false;
@@ -101,17 +85,14 @@ arbitrage2.provide = function(namespace) {
 	@params opt_cb_load Optional onload callback.
 	@params opt_cb_error Optional onload error callback.
 */
-arbitrage2.RequiredFile = function(opt_cb_load, opt_cb_error) {
+arbitrage2.RequiredFile = function(src, opt_cb_load, opt_cb_error) {
 	var self       = this;
+	self.src       = src;           //Source of the file
 	self.state     = "requiring";   //The state the file is in
 	self.element   = undefined;     //The DOM element associated with the RequiredFile  
 	self.cb_load   = [ ];           //The array of callback functions to call when loaded
 	self.cb_error  = [ ];           //The array of callback functions to call when an error occurs
 	self.namespace = undefined;     //Associated namespace if relavent
-
-	//Loading variables
-	self.js_loading  = 0;
-	self.css_loading = 0;
 
 	//Events setup
 	if(opt_cb_load)
@@ -122,69 +103,45 @@ arbitrage2.RequiredFile = function(opt_cb_load, opt_cb_error) {
 };
 
 /**
-	@description Static variable keeping track of all required javascript files.
-	@static
+	@description Calls all cb_load functions.
+	@params ev The event attached to the callback.
 */
-arbitrage2.RequiredFile.javascripts = [ ];
-
-/**
-	@description Static variable keeping track of all required stylesheet files.
-	@static
-*/
-arbitrage2.RequiredFile.stylesheets = [ ];
-
-
-/**
-	@description Adds an SCRIPT element to the DOM.
-*/
-arbitrage2.RequiredFile.prototype.loadJavascript = function() {
-	var self = this;
-
-	//Add to javascripts
-	arbitrage2.RequiredFile.javascripts.push(self);
-	arbitrage2.RequiredFile.
+arbitrage2.RequiredFile.prototype.cbLoaded = function(ev) {
+	var self   = this;
+	self.state = 'loaded';
 	
-	/*arbitrage2._required_javascripts.push(script);
-
-	//Create javascript tag
-	script.element = document.createElement('script');
-
-	//setup script attributes
-	script.element.type     = 'text/javascript';
-	script.element.language = "JavaScript";
-	script.element.src      = path;
-	script.element.async    = false;
-
-	//Setup state change events
-	if('onreadystatechange' in script.element) //IE browsers
-	{
-		alert('state change browser');
-		/*requiring.element.onerror = function(ev) {
-			if(opt_cb_error)
-				opt_cb_error();
-		};
-
-		requiring.element.onreadystatechange = function(ev) {
-			if(this.readyState == "complete" || this.readyState == 'loaded')
-				_checkReady();
-		};*/
-	/*}
-	else
-	{
-		script.element.onload  = _cbLoaded();
-		script.element.onerror = _cbError();
-	}
-
-	//Add to loading
-	arbitrage2._loading_javascripts++;
-	$l('requiring "' + path + '"', arbitrage2._loading_javascripts, arbitrage2.ready);
-
-	//Set state
-	script.state = 'loading';
+	for(var i=0; i<self.cb_load.length; i++)
+		self.cb_load[i].call(self);
 	
-	//Add to HEAD
-	document.getElementByTagName('head').item(0).appendChild(script.element);*/
+	//Remove callbacks
+	self.cb_load  = [ ];
+	self.cb_error = [ ];
 };
+
+/**
+	@description Calls all cb_error functions.
+	@params ev The event attached to the callback.
+*/
+arbitrage2.RequiredFile.prototype.cbError = function(ev) {
+	var self   = this;
+	self.state = 'error';
+	
+	for(var i=0; i<self.cb_error.length; i++)
+		self.cb_error[i].call(self);
+	
+	//Remove callbacks
+	self.cb_load  = [ ];
+	self.cb_error = [ ];
+};
+
+/**
+	@description Loads the required file
+*/
+arbitrage2.RequiredFile.prototype.load = function() { };
+
+
+
+
 
 
 /**
@@ -222,6 +179,74 @@ arbitrage2.RequiredFile.prototype.appendCallbacks = function(opt_cb_load, opt_cb
 	return false;
 };
 
+/**
+	@description Require file class specific to javascript that holds relavent information and methods.
+	@params opt_cb_load Optional onload callback.
+	@params opt_cb_error Optional onload error callback.
+*/
+arbitrage2.RequiredJavascriptFile = function(src, opt_cb_load, opt_cb_error) {
+	var self = this;
+	arbitrage2.RequiredJavascriptFile.superproto.constructor.call(self, src, opt_cb_load, opt_cb_error);
+};
+arbitrage2.inherit(arbitrage2.RequiredJavascriptFile, arbitrage2.RequiredFile);
+
+/**
+	@description An array of files associated with this RequiredFile type.
+	@static
+*/
+arbitrage2.RequiredJavascriptFile.prototype.files = [ ];
+
+/**
+	@description Adds an SCRIPT element to the DOM.
+*/
+arbitrage2.RequiredJavascriptFile.prototype.load = function() {
+	var self = this;
+
+	//Add to files
+	self.files.push(self);
+
+	//Create javascript tag
+	self.element = document.createElement('script');
+
+	//setup script attributes
+	self.element.type     = 'text/javascript';
+	self.element.language = "JavaScript";
+	self.element.src      = self.src;
+	self.element.async    = false;
+
+	//Setup state change events
+	if('onreadystatechange' in self.element) //IE browsers
+	{
+		alert('state change browser');
+		/*requiring.element.onerror = function(ev) {
+			if(opt_cb_error)
+				opt_cb_error();
+		};
+
+		requiring.element.onreadystatechange = function(ev) {
+			if(this.readyState == "complete" || this.readyState == 'loaded')
+				_checkReady();
+		};*/
+	}
+	else
+	{
+		self.element.onload  = function(ev) { self.cbLoaded(ev); };
+		self.element.onerror = function(ev) { self.cbError(ev); };
+	}
+
+	//Add to loading
+	arbitrage2._loading_javascripts++;
+	$l('requiring "' + self.src + '"');
+
+	//Set state
+	self.state = 'loading';
+	
+	//Add to HEAD
+	document.getElementsByTagName('head').item(0).appendChild(self.element);
+};
+
+
+
 
 /**
 	@description Requires a javascript dependency file into the DOM.
@@ -232,8 +257,8 @@ arbitrage2.RequiredFile.prototype.appendCallbacks = function(opt_cb_load, opt_cb
 arbitrage2.requireJavascript = function(file, opt_cb_load, opt_cb_error) {
 
 	//Include script
-	var script = new arbitrage2.RequiredFile(opt_cb_load, opt_cb_error);
-	script.loadJavascript();
+	var script = new arbitrage2.RequiredJavascriptFile(file, opt_cb_load, opt_cb_error);
+	script.load();
 };
 
 /**
@@ -276,7 +301,7 @@ arbitrage2.require = function(namespace, opt_cb_load, opt_cb_error) {
 
 	//Ensure symbol does not exist
 	var symbol = arbitrage2.getSymbol(namespace);
-	if(symbol)
+	/*if(symbol)
 	{
 		for(var i=0, script; i<arbitrage2._required_javascripts.length, script=arbitrage2._required_javascripts[i]; i++)
 		{
@@ -286,7 +311,7 @@ arbitrage2.require = function(namespace, opt_cb_load, opt_cb_error) {
 					return
 			}
 		}
-	}
+	}*/
 
 	//Require the javascript file and add to _required_javascipts
 	var onamespace = namespace;
@@ -317,6 +342,26 @@ arbitrage2.require = function(namespace, opt_cb_load, opt_cb_error) {
 
 	})(onamespace, path, opt_cb_load, opt_cb_error);
 };
+
+/**
+	@description Method requires a list files and runs a callback on complete.
+*/
+arbitrage2.bulkRequire = function() {
+	var count = arguments.length-1;
+	var cb    = arguments[count];
+
+	function _cbReady() {
+		count--;
+
+		if(count === 0)
+			cb();
+	};
+
+	//Require the files
+	for(var i=0; i<count; i++)
+		arbitrage2.require(arguments[i], _cbReady, _cbReady);
+};
+
 
 /**
 	@description Exports a symbold to an already created object.
@@ -352,8 +397,9 @@ arbitrage2.getSymbol = function(namespace) {
 	namespace = namespace.split('.');
 	
 	var symbol = window;
-	for(var i=0; symbol=symbol[namespace[i]], i<namespace.length-1, symbol; i++);
-
+	for(var i=0; i<namespace.length && symbol; i++)
+		symbol=symbol[namespace[i]];
+	
 	return symbol;
 };
 
@@ -362,11 +408,10 @@ arbitrage2.getSymbol = function(namespace) {
 	@param cb_main The callback to call.
 */
 arbitrage2.main = function(cb_main) {
-	var self = this;
 
 	function _checkMainExists() {
 
-		if(self._loading > 0)
+		if(!arbitrage2.ready)
 		{
 			setTimeout(function() { _checkMainExists(cb_main); }, 300);
 			return;
@@ -401,10 +446,6 @@ arbitrage2.main = function(cb_main) {
 };
 
 //Include other base items
-arbitrage2.require('arbitrage2.base.utils');
-arbitrage2.require('arbitrage2.base.ajax');
-arbitrage2.require('arbitrage2.base.cache');
-arbitrage2.require('arbitrage2.base.dbus');
-arbitrage2.require('arbitrage2.base.mvc');
-arbitrage2.require('arbitrage2.base.gui');
-arbitrage2.require('arbitrage2.base.form');
+arbitrage2.bulkRequire('arbitrage2.base.utils', 'arbitrage2.base.ajax', 'arbitrage2.base.cache', 'arbitrage2.base.dbus', 'arbitrage2.base.mvc', 'arbitrage2.base.gui', 'arbitrage2.base.form', function() {
+	arbitrage2.ready = true;
+});
