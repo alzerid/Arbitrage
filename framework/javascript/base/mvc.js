@@ -8,7 +8,7 @@ arbitrage2.provide('_arbitrage2.base.mvc');
 _arbitrage2.base.mvc.Application = function(config) {
 	var self            = this;
 	self.config         = config || self.config;
-	self.routes         = self.config && (self.config.mvc.routing || { });
+	self.routing        = self.config.mvc.routing || { };
 	self.controllers    = { };
 	self.canvases       = { };
 	self.pageController = null;
@@ -68,16 +68,16 @@ _arbitrage2.base.mvc.Application = function(config) {
 	@description Default configuration
 	@static
 */
-_arbitrage2.base.mvc.Application.prototype.config = _arbitrage2.config;
+_arbitrage2.base.mvc.Application.prototype.config = arbitrage2.config;
 
-arbitrage2.config['mvc'] = {
+/*arbitrage2.config['mvc'] = {
 	serverCanvas: false,       //Determines if the server dictates where to draw returned HTML
 	autoRequire: false,        //Determines if Arbitrage should auto require javascript
 	controllerNamespace: '',   //The namespace to use when including controllers
 	canvases: { },             //Key value pair, where KEY is the name and value is the CSS selector
 	debug: false,              //Wether debug is toggled
 	routing: { }               //Routing rules
-};
+};*/
 
 /**
 	@description Global static instance of the application.
@@ -99,31 +99,39 @@ _arbitrage2.base.mvc.Application.prototype.requireController = function(namespac
 	namespace      = controller.splice(0, controller.length-1);
 
 	//Require
-	var require = controller.join('').replace(/controller$/i, '').match(/[A-Z][a-z]+/g).join('_').toLowerCase();
-	require     = namespace.join('.') + "." + require;
+	var require = namespace.join('.') + "." + controller.join('').replace(/controller$/i, '').match(/[A-Z][a-z]+/g).join('_').toLowerCase();
 	$l('mvc requiring ' + require, self.loadCount);
 
+	//Require namespace
+	arbitrage2.require(require, function() {
+		var symbol = arbitrage2.getSymbol(namespace.join('.') + '.' + controller);
+		require    = require.split('.');
+		controller = require[require.length-1];
+
+		//Add controller to application
+		self.controllers[controller] = new symbol(self);
+		self.loadCount--;
+
+		$l('mvc required ' + controller, self.loadCount);
+
+		//Callback
+		if(opt_cb_success)
+			opt_cb_success();
+	},
+
+	function() {
+		alert('error');
+	});
+
+
+
 	//Get script, call in closure for variable persistency
-	(function(require, controller, opt_cb_success, opt_cb_error) {
+	/*(function(require, controller, opt_cb_success, opt_cb_error) {
+
 		arbitrage2.require(require, function() {
-			var symbol = arbitrage2.getSymbol(namespace.join('.') + '.' + controller);
-			require    = require.split('.');
-			controller = require[require.length-1];
+		}, opt_cb_error);
 
-			//Add controller to application
-			self.controllers[controller] = new symbol(self);
-			self.loadCount--;
-
-			$l('mvc required ' + require, self.loadCount);
-
-			//Callback
-			if(opt_cb_success)
-				opt_cb_success();
-		}, function() {
-			if(opt_cb_error)
-				opt_cb_error(controller);
-		});
-	})(require, controller, opt_cb_success, opt_cb_error);
+	})(require, controller, opt_cb_success, opt_cb_error);*/
 };
 
 /**
@@ -206,12 +214,12 @@ _arbitrage2.base.mvc.Application.prototype.route = function(url) {
 		var action     = route[2] || "";
 
 		//If route has a different url, use it
-		for(var idx in self.routes)
+		for(var idx in self.routing)
 		{
 			if(idx == "_default")
 				continue;
 
-			var val = self.routes[idx];
+			var val = self.routing[idx];
 			var exp = new RegExp(idx);
 
 			if(exp.test(url))
@@ -237,7 +245,7 @@ _arbitrage2.base.mvc.Application.prototype.route = function(url) {
 		return { route: route.slice(1, 3), controller: controller, action: action, url: url, arguments: route.slice(3), parameters: params };
 	};
 
-	var route = _parseRoute(((url)? url : self.routes['_default']));
+	var route = _parseRoute(((url)? url : self.routing['_default']));
 
 	//Grab controller from controllers list
 	var controller = this.controllers[route.controller];
