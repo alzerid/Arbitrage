@@ -39,7 +39,7 @@ class CRouter
 		return $url;
 	}
 
-	static public function getController($route=NULL)
+	/*static public function getController($route=NULL)
 	{
 		$conf = Application::getConfig();
 
@@ -75,6 +75,6 @@ class CRouter
 		$controller->setAjax($ajax);
 
 		return $controller;
-	}
+	}*/
 }
 ?>

@@ -56,17 +56,15 @@ class CController extends CBaseController
 	}
 
 	/* HTML View Helper Methods */
-	public function includeJavaScriptController()
+	public function includeJavascriptLayout()
 	{
-		$controller = strtolower($this->_controller->getName());
-		$controller = preg_replace('/Controller$/i', '', $controller);
-
-		//Include controller if available
-		$path = CApplication::getConfig()->_internals->approotpath . "app/cjavascript/$controller.js";
+		$layout = $this->getLayout();
+		$config = CApplication::getInstance()->getConfig();
+		$path   = $config->_internals->approotpath . "public/javascript/{$config->client->mvc->rootNamespace}/layouts/$layout.js";
 		if(!file_exists($path))
 			return;
 
-		$this->addJavaScriptTag("/cjavascript/$controller.js");
+		$this->addJavaScriptTag("/javascript/{$config->client->mvc->rootNamespace}/layouts/$layout.js");
 	}
 
 	public function addJavaScriptTag($link)

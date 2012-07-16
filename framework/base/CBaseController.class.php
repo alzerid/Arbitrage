@@ -5,8 +5,6 @@
  * @version 2.0
  */
 
-//TODO: Possibly move _layout_path, _view_path, _default_layout to CController
-//TODO: Possibly move the rendering IFileRenerable implementation to the CController class
 abstract class CBaseController extends CViewFileRenderable implements IController
 {
 	//PHP Variables attatched to the session
@@ -24,6 +22,7 @@ abstract class CBaseController extends CViewFileRenderable implements IControlle
 	private $_renderer_type;
 	private $_ajax;
 	private $_action;
+	private $_layout;
 
 	public function __construct()
 	{
@@ -48,6 +47,7 @@ abstract class CBaseController extends CViewFileRenderable implements IControlle
 		$this->_ajax           = false;
 		$this->_renderer_type  = "view";
 		$this->_flash          = NULL;
+		$this->_layout         = 'default';
 	}
 
 	/**
@@ -135,6 +135,15 @@ abstract class CBaseController extends CViewFileRenderable implements IControlle
 	}
 
 	/**
+	 * Get current layout associated with controller.
+	 * @return Returns the layout.
+	 */
+	public function getLayout()
+	{
+		return $this->_layout;
+	}
+
+	/**
 	 * Redirect the browser to a specific location
 	 * @param $redirect The url, relative or absolute, to redirect to.
 	 */
@@ -150,15 +159,20 @@ abstract class CBaseController extends CViewFileRenderable implements IControlle
 	}
 
 	/**
+	 * Sets the controller as an AJAX controller.
+	 * @param ajax The state of the controller.
+	*/
+	public function setAjax($ajax)
+	{
+		$this->_ajax = $ajax;
+	}
+
+	/**
 	 * Determines if the controller is an Ajax controller.
 	 * @return boolean true if the controller is ajax else false.
 	 */
 	public function isAjax()
 	{
-		return preg_match('/Ajax$/', $this->getName());
-		//TODO: Get class name, if it has ajax in it then we can determine that it is indeed an ajax controller
-		var_dump($this);
-		die();
 		return $this->_ajax;
 	}
 
@@ -189,7 +203,10 @@ abstract class CBaseController extends CViewFileRenderable implements IControlle
 
 		//Set view variables
 		if($this->_renderer_type == "view" && isset($ret['variables']))
+		{
 			$this->_view_variables = array_merge($ret['variables'], $this->_view_variables);
+			$this->_layout         = $ret['layout'];
+		}
 
 		//Add flash variable to session
 		$this->_session['_flash'] = $this->_flash->toArray();

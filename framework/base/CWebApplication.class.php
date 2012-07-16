@@ -58,6 +58,26 @@ class CWebApplication extends CApplication
 		spl_autoload_register('CForm::autoLoad', true);
 	}
 
+	/** 
+	 * Initializes the web application by loading its config file
+	 * and determining which other framework classes to require.
+	 * @path string The path to the application configuration file.
+	 */
+	public function initialize($path="config/config.php")
+	{
+		//Parent initialize
+		parent::initialize();
+
+		//Load additional files for Client MVC if exists
+		$config = $this->getConfig();
+		if(isset($config->client) && isset($config->client->mvc) && $config->client->mvc->serverCanvas)
+		{
+			$this->requireFrameworkFile('base/renderables/CJSONClientMVCRenderable.class.php');
+			//$this->requireFrameworkFile('renderables/CXMLClientMVCRenderable.class.php'); //XML
+		}
+	}
+
+
 	/**
 	 * Abstract function that is overloaded in order to run
 	 * web applications.
@@ -98,10 +118,12 @@ class CWebApplication extends CApplication
 		$this->requireApplicationController($controller);
 
 		//Determine if we are an ajax call
+		$ajax = false;
 		if(isset($_GET['_ajax']) || isset($_POST['_ajax']))
 		{
 			$this->requireApplicationAjaxController($controller);
 			$controller = $controller . "AjaxController";
+			$ajax       = true;
 		}
 		else
 			$controller = $controller . "Controller";
@@ -110,6 +132,7 @@ class CWebApplication extends CApplication
 		$this->_controller = new $controller();
 		$this->_action     = new CAction($this->_controller, $route[1]);
 		$this->_controller->setAction($this->_action);
+		$this->_controller->setAjax($ajax);
 	}
 
 	/**
