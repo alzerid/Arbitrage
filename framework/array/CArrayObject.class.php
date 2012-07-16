@@ -1,5 +1,5 @@
 <?
-class CArrayObject implements Iterator
+class CArrayObject implements ArrayAccess, Iterator
 {
 	protected $_data;
 	private $_position;
@@ -12,17 +12,7 @@ class CArrayObject implements Iterator
 		$this->_keys     = array();
 	}
 
-	public function flatten($depth=-1)
-	{
-		$ret = self::flattenArray($this->_data, $depth);
-		return new CArrayObject($ret);
-	}
-
-	public function toArray()
-	{
-		return $this->_data;
-	}
-
+	/* Start Property Access Methods */
 	public function __get($name)
 	{
 		if(!array_key_exists($name, $this->_data) || $this->_data[$name] === NULL)
@@ -49,6 +39,44 @@ class CArrayObject implements Iterator
 	{
 		if(isset($this->_data[$name]))
 			unset($this->_data[$name]);
+	}
+	/* End Property Access Methods */
+
+	/* Array Access Methods */
+	public function offsetExists($offset)
+	{
+		return array_key_exists($offset, $this->_data);
+	}
+
+	public function offsetGet($offset)
+	{
+		$data = $this->_data[$offset];
+		if(is_array($data))
+			$data = new CArrayObject($data);
+
+		return $data;
+	}
+
+	public function offsetSet($offset, $val)
+	{
+		$this->_data[$offset] = $val;
+	}
+
+	public function offsetUnset($offset)
+	{
+		unset($this->_data[$offset]);
+	}
+	/* End Array Access Methods */
+
+	public function flatten($depth=-1)
+	{
+		$ret = self::flattenArray($this->_data, $depth);
+		return new CArrayObject($ret);
+	}
+
+	public function toArray()
+	{
+		return $this->_data;
 	}
 
 	public function push($new)
