@@ -11,6 +11,7 @@ _arbitrage2.base.mvc.Application = function(config) {
 	self.routing        = self.config.mvc.routing || { };
 	self.controllers    = { };
 	self.canvases       = { };
+	self.layouts        = { };
 	self.pageController = null;
 	self.loadCount      = 0;
 	self.needStart      = true;
@@ -86,6 +87,36 @@ _arbitrage2.base.mvc.Application.prototype.config = arbitrage2.config;
 _arbitrage2.base.mvc.Application.prototype._instance = undefined;
 
 /**
+	@description Requires a layout script.
+	@param layout The layout to require.
+	@param opt_cb The callback to call after the require is done.
+*/
+_arbitrage2.base.mvc.Application.prototype.requireLayout = function(layout, opt_cb) {
+	var self = this;
+
+	//Get Layout
+	var namespace = self.config.mvc.rootNamespace + ".layouts." + layout;
+	arbitrage2.require(namespace, function() {
+
+		//Normalize layout
+		var key = layout;
+		layout  = layout.replace(/_/g, ' ').toUpperCaseWords().replace(/ /g, '');
+
+		//Add layout to layouts
+		var symbol = arbitrage2.getSymbol(self.config.mvc.rootNamespace + ".layouts." + layout + "Layout");
+		self.layouts[key] = new symbol();
+		self.layouts[key].load();
+
+		//Callback
+		if(opt_cb)
+			opt_cb();
+	},
+	function() {
+		alert('invalid layout!');
+	});
+};
+
+/**
 	@description Requires a controller to this specific application instance.
 	@param namespace The fully qualified namespace.
 	@param opt_cb_success The optional callback to execute.
@@ -109,7 +140,7 @@ _arbitrage2.base.mvc.Application.prototype.requireController = function(namespac
 		controller = require[require.length-1];
 
 		//Add controller to application
-		self.controllers[controller] = new symbol(self);
+		self.controllers[controller] = new symbol();
 		self.loadCount--;
 
 		$l('mvc required ' + controller, self.loadCount);
@@ -122,16 +153,6 @@ _arbitrage2.base.mvc.Application.prototype.requireController = function(namespac
 	function() {
 		alert('error');
 	});
-
-
-
-	//Get script, call in closure for variable persistency
-	/*(function(require, controller, opt_cb_success, opt_cb_error) {
-
-		arbitrage2.require(require, function() {
-		}, opt_cb_error);
-
-	})(require, controller, opt_cb_success, opt_cb_error);*/
 };
 
 /**
@@ -267,6 +288,10 @@ _arbitrage2.base.mvc.Application.prototype.route = function(url) {
 		return false;
 	}
 
+	//Call load on the controller if it hasn't been loaded
+	/*if(!controller.loaded)
+		controller.load();*/
+
 	//Grab action and execute it
 	var action = controller.actions[route.action];
 	if(!action)
@@ -339,21 +364,39 @@ _arbitrage2.base.mvc.Application.prototype.execute = function(route, controller,
 
 			//Check return type
 			var returns = [ ];
-			if(ev.data.header && ev.data.header.type == "canvas")
+			if(ev.data.header && ev.data.header.type == "client")
 			{
-				for(var idx in ev.data.canvas)
-				{
-					var canvas = self.canvases[idx];
-					if(!canvas)
+				function _loadController() {
+					for(var idx in ev.data.client.canvas)
 					{
-						alert("Unable to paint on canvas '" + idx + "'. Is it registered?");
-						continue;
-					}
+						var canvas = self.canvases[idx];
+						if(!canvas)
+						{
+							alert("Unable to paint on canvas '" + idx + "'. Is it registered?");
+							continue;
+						}
 
-					//Add for caching
-					var data = { $obj: $(ev.data.canvas[idx]),  data: ev.data.canvas[idx], canvas: canvas };
-					returns.push(data);
-				}
+						//Add for caching
+						var data = { $obj: $(ev.data.client.canvas[idx]),  data: ev.data.client.canvas[idx], canvas: canvas };
+						returns.push(data);
+
+						//Add to cache
+						self.cache.add(key, { returns: returns, url: key, controller: controller, action: action, ev: ev });
+						cache = self.cache.get(key);
+
+						//Render It
+						_renderCache(cache);
+
+					}
+				};
+
+				//Check if layout exists, if not load it!
+				var layout = undefined;
+				if(!self.layouts[ev.data.client.layout])
+					self.requireLayout(ev.data.client.layout, _loadController);
+				else
+					_loadController();
+
 			}
 			else
 			{
@@ -361,12 +404,6 @@ _arbitrage2.base.mvc.Application.prototype.execute = function(route, controller,
 				console.log(ev);
 			}
 
-			//Add to cache
-			self.cache.add(key, { returns: returns, url: key, controller: controller, action: action, ev: ev });
-			cache = self.cache.get(key);
-
-			//Render It
-			_renderCache(cache);
 		});
 	}
 	else
@@ -583,19 +620,30 @@ _arbitrage2.base.mvc.Application.prototype.Ajax.prototype._escalate = function(m
 /**
 	@description Controller base class. Defines an arbitrage2 JS controller.
 	@constructor
-	@param <_arbitrage2.base.mvc.Application> application The application object the controller is tied to.
-	@param <_arbitrage2.base.mvc.Canvas> canvas The canvas to draw onto.
 */
-_arbitrage2.base.mvc.Controller = function(application, canvas) {
+_arbitrage2.base.mvc.Controller = function() {
 	var self = this;
-	self.application = application;
-	self.canvas      = canvas;
+	self.application = arbitrage2.mvc.Application.prototype._instance;
 	self.actions     = { };
+	self.loaded      = false;
 
 	//Create actions
 	for(var idx in self.Actions)
 		self.actions[idx] = new self.Actions[idx](self);
 };
+
+/**
+	@description Controller load method called when the controller is loaded.
+*/
+_arbitrage2.base.mvc.Controller.prototype.load = function () {
+	var self = this;
+	self.loaded = true;
+};
+
+/**
+	@description Controller unload method. Called when the page is unloading.
+*/
+_arbitrage2.base.mvc.Controller.prototype.unload = function() { };
 
 /**
  @description Returns a list of arguments to use for the AJAX call to the server.
@@ -702,9 +750,9 @@ _arbitrage2.base.mvc.Canvas.prototype.render = function($data) {
 
 
 /**
-  @description Page controller
+  @description Layout controller
 */
-_arbitrage2.base.mvc.PageController = function() {
+_arbitrage2.base.mvc.Layout = function() {
 	var self = this;
 	self.page = window.location.pathname;
 };
