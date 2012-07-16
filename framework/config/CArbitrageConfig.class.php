@@ -65,6 +65,11 @@ class CArbitrageConfig implements ISingleton
 		$loader->load($this->_variables);
 	}
 
+	public function __isset($name)
+	{
+		return array_key_exists($name, $this->_variables);
+	}
+
 	public function __get($name)
 	{
 		$prop = new CArbitrageConfigProperty($this->_variables);
@@ -76,8 +81,6 @@ class CArbitrageConfig implements ISingleton
 		$this->_variables[$name] = $val;
 	}
 }
-
-
 
 class CArbitrageConfigProperty extends CArrayObject
 {
@@ -99,6 +102,11 @@ class CArbitrageConfigProperty extends CArrayObject
 		$this->_key      = ((isset($this->_keys[$this->_position]))? $this->_keys[$this->_position] : NULL);
 	}
 
+	public function __isset($name)
+	{
+		return array_key_exists($name, $this->_config);
+	}
+
 	public function __get($name)
 	{
 		if(!array_key_exists($name, $this->_config))
@@ -110,14 +118,14 @@ class CArbitrageConfigProperty extends CArrayObject
 		return $this->_config[$name];
 	}
 
-	public function toArray()
-	{
-		return $this->_config;
-	}
-
 	public function __set($name, $val)
 	{
 		$this->_config[$name] = $val;
+	}
+
+	public function toArray()
+	{
+		return $this->_config;
 	}
 
 	/* Iterator Implementation */
