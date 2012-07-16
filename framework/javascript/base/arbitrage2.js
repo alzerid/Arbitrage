@@ -129,6 +129,8 @@ arbitrage2.RequiredFile.prototype.cbError = function(ev) {
 	for(var i=0; i<self.cb_error.length; i++)
 		self.cb_error[i].call(self);
 	
+	alert('error');
+	
 	//Remove callbacks
 	self.cb_load  = [ ];
 	self.cb_error = [ ];
