@@ -1,8 +1,10 @@
 <?
-class CDatabaseDriverFactory implements IModuleLoader
+namespace Arbitrage2\Database;
+
+class CDatabaseDriverFactory implements \IModuleLoader
 {
 	static private $_INSTANCE = NULL;
-	private $_databas_cfg;
+	private $_database_cfg;
 	private $_search_paths;
 	private $_path;
 	
@@ -11,7 +13,7 @@ class CDatabaseDriverFactory implements IModuleLoader
 		//Get path
 		$this->_path         = dirname(realpath(__FILE__));
 		$this->_search_paths = array($this->_path);
-		$this->_databas_cfg  = array();
+		$this->_database_cfg = array();
 
 		//Require each class
 		require_once($this->_path . "/EModelException.class.php");
@@ -51,7 +53,7 @@ class CDatabaseDriverFactory implements IModuleLoader
 			require_once($path . "/$driver/C{$ucase}ModelResults.class.php");
 
 			//Set database options
-			$this->_database_cfg[$driver] = $config;
+			$this->_database_cfg[$driver] = $config->toArray();
 			return;
 		}
 
@@ -61,17 +63,17 @@ class CDatabaseDriverFactory implements IModuleLoader
 
 	public function getHandle($driver, $config)
 	{
-		$driver = "C" . ucwords($type) . "Driver";
-		var_dump("GET Database", $driver, $config);
-		die();
-		$handle = $driver::getHandle($config);
+		if(!isset($this->_database_cfg[$driver]))
+			throw new CDatabaseDriverException('Unknown database configuration "' . $config . '".');
 
-		var_dump($handle);
-		die();
+		$dbconfig = array_values($this->_database_cfg[$driver]);
+		$driver   = "Arbitrage2\\Database\\C" . ucwords($driver) . "Driver";
+
+		//Get driver specific handle
+		$handle = $driver::getHandle($dbconfig);
 
 		return $handle;
 	}
-
 }
 
 abstract class CDatabaseDriver
@@ -82,5 +84,5 @@ abstract class CDatabaseDriver
 	}
 }
 
-class CDatabaseDriverException extends Exception { }
+class CDatabaseDriverException extends \Exception { }
 ?>
