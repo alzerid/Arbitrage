@@ -37,7 +37,7 @@ class CRemoteCacheFactory implements IModuleLoader
 		throw new CRemoteCacheException("Unable to load remote cache driver '$driver'.");
 	}
 
-	public function getHandle($driver, $opt)
+	public function getHandle($driver, $config)
 	{
 		throw new Exception("NOT IMPLEMENTED");
 	}

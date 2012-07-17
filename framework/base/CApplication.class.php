@@ -109,7 +109,7 @@ abstract class CApplication implements ISingleton, IErrorHandlerListener
 
 		//Load correct drivers
 		$databases = $config->server->databases;
-		$factory   = CDatabaseDriverFactory::getInstance();
+		$factory   = \Arbitrage2\Database\CDatabaseDriverFactory::getInstance();
 		if($databases)
 		{
 			foreach($databases as $database => $list)
