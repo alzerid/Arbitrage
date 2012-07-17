@@ -15,7 +15,7 @@ Class CRenderForm extends CForm implements IFileRenderable
 		parent::__construct($properties);
 	}
 
-	public function render()
+	public function render($data=NULL)
 	{
 		return $this->renderPartialFile($this->_file, $this->_vars);
 	}
