@@ -454,7 +454,9 @@ _arbitrage2.base.gui.SlideShow.prototype._defaultOptions = {
 */
 _arbitrage2.base.gui.SlideShow.prototype.start = function() {
 	var self =this;
-	self.timer = setTimeout(function() { self.next() }, self.options.interval);
+
+	if(!self.timer)
+		self.timer = setTimeout(function() { self.next() }, self.options.interval);
 };
 
 /**
