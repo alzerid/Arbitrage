@@ -23,7 +23,7 @@ class CController extends CBaseController
 	/* Bootstrap JS for arbitrage2.mvc */
 	public function bootstrapJSAction()
 	{
-		$this->setRendererType('renderable'); //Ensure we are in renderable render mode
+		$this->setRenderer('CJavascriptRenderable'); //Set Javascript Renderable mode
 
 		$config = CApplication::getConfig();
 		$routes = $config->client->mvc->routing->toArray();
@@ -50,9 +50,7 @@ class CController extends CBaseController
 		$config = json_encode($config);
 		$js     = "var arbitrage2 = { config: $config };";
 
-		//New JSON renderable
-		$json = new CJavascriptRenderable($js);
-		return $json;
+		return array('data' => $js);
 	}
 
 	/* HTML View Helper Methods */
