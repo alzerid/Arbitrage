@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\Model2;
+namespace Arbitrage2\Database;
 
 class CMongoModelQuery extends CModelQuery
 {
@@ -80,8 +80,9 @@ class CMongoModelQuery extends CModelQuery
 
 		//Query
 		//TODO: DB Factory
-		$handle = CDatabaseDriverFactory::getDatabase('mongo');
-		$handle = $handle->{$prop['database']}->{$prop['table']};
+		$dbconfig = ((isset($prop['config']))? $prop['config'] : '_default');
+		$handle   = CDatabaseDriverFactory::getInstance()->getHandle('mongo', $dbconfig);
+		$handle   = $handle->{$prop['database']}->{$prop['table']};
 
 		//Query
 		if(in_array($this->_cmd, array('find', 'findOne', 'count')))
