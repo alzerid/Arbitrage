@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\Model2;
+namespace Arbitrage2\Database;
 
 abstract class CModelBatch extends CModelQuery
 {

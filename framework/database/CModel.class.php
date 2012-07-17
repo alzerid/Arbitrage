@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\Model2;
+namespace Arbitrage2\Database;
 
 abstract class CModel extends CModelData
 {
@@ -62,7 +62,7 @@ abstract class CModel extends CModelData
 		$driver = $driver['driver'];
 
 		//Return Query Object
-		$class = 'Arbitrage2\Model2\C' . $driver . "ModelQuery";
+		$class = 'Arbitrage2\Database\C' . $driver . "ModelQuery";
 		if(!class_exists($class))
 			throw new EModelException("Unable to load query for '$driver'. Driver not loaded?");
 
@@ -79,7 +79,7 @@ abstract class CModel extends CModelData
 		$driver = $driver['driver'];
 
 		//Return Query Object
-		$class = 'Arbitrage2\Model2\C' . $driver . "ModelBatch";
+		$class = 'Arbitrage2\Database\C' . $driver . "ModelBatch";
 		$batch = new $class(get_called_class());
 
 		return $batch;
