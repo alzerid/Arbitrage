@@ -87,18 +87,46 @@ class CWebApplication extends CApplication
 		//Parse URL and grab correct route
 		$route = CRouter::route($_SERVER['REQUEST_URI']);
 
-		//Get API class from Router
-		$this->loadController($route);
+		//Get Controller class from Router
+		$this->loadController($route, isset($_REQUEST['_ajax']));
 			
 		//Execute the action
 		$this->_controller->execute();
 	}
 
 	/**
-	 * Method loads the controller into memory and the action into memory.
-	 * $param $controller The controller in route format to load.
+	 * Method that actually executes the action within the Controller context via a route rule.
+	 * param $forward The route to use to forward execution.
+	 * param $ajax Determine if we should load the ajax controller.
 	 */
-	public function loadController($route)
+	public function forward($forward, $ajax=false)
+	{
+		//Get old controller and action
+		$ocontroller = $this->_controller;
+		$oaction     = $this->_action;
+
+		//Get routing rules
+		$route = CRouter::route($forward);
+
+		//Get Controller Class
+		$this->loadController($route, $ajax);
+
+		//Execute the controller
+		$ret = $this->_controller->execute(false);
+
+		//Set back old action/controller
+		$this->_controller = $ocontroller;
+		$this->_action     = $oaction;
+
+		return $ret;
+	}
+
+	/**
+	 * Method loads the controller into memory and the action into memory.
+	 * param $controller The controller in route format to load.
+	 * param $ajax Determins if we should load the ajax controller.
+	 */
+	public function loadController($route, $ajax=false)
 	{
 		$route = explode("/", $route);
 
@@ -118,12 +146,10 @@ class CWebApplication extends CApplication
 		$this->requireApplicationController($controller);
 
 		//Determine if we are an ajax call
-		$ajax = false;
-		if(isset($_GET['_ajax']) || isset($_POST['_ajax']))
+		if($ajax)
 		{
 			$this->requireApplicationAjaxController($controller);
 			$controller = $controller . "AjaxController";
-			$ajax       = true;
 		}
 		else
 			$controller = $controller . "Controller";
