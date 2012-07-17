@@ -35,26 +35,6 @@ class CAction implements IAction
 		if(!is_array($ret) && !($ret instanceof IRenderable))
 			throw new EArbitrageException("Actions must return an array or of type IRenderable.");
 
-		if($this->_controller->getRendererType() === "view")
-		{
-			//Determine view, layouts, and data
-			if(!isset($ret['layout']))
-				$ret['layout'] = $this->_controller->getDefaultLayout();
-
-			if(!isset($ret['render']))
-			{
-				$render  = preg_replace('/Controller$/i', '', strtolower($this->_controller->getName()));
-				$render .= "/";
-				$render .= preg_replace('/Action$/i', '', strtolower($this->_name));
-				$ret['render'] = $render;
-			}
-
-			if(!isset($ret['variables']))
-				$ret['variables'] = array();
-			else if(isset($ret['variables']) && !is_array($ret['variables']))
-				throw new EArbitrageException("Variables field must be an associative array for '{$this->_controller->getName()} {$this->_name}'.");
-		}
-
 		return $ret;
 	}
 }
