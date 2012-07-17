@@ -40,7 +40,7 @@ interface IRenderer
  */
 interface IRenderable
 {
-	public function render();
+	public function render($data=NULL);
 }
 
 /**
