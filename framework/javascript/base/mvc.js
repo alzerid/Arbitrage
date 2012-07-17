@@ -156,23 +156,6 @@ _arbitrage2.base.mvc.Application.prototype.requireController = function(namespac
 };
 
 /**
-	@description Requires a page controller to this specific application instance.
-  @param page Registers a page controller and runs load/unload.
-*/
-_arbitrage2.base.mvc.Application.prototype.registerPageController = function(page) {
-	var proto = page.prototype;
-
-	//Inherit
-	arbitrage2.inherit(page, _arbitrage2.base.mvc.PageController);
-	page.prototype = proto;
-
-	//Set page controller
-	self.pageController = new page();
-	self.pageController.load();
-};
-
-
-/**
 	@description Requires a css stylesheet.
 	@param css The css filename to include.
 */
@@ -181,6 +164,9 @@ _arbitrage2.base.mvc.Application.prototype.requireCSS = function(css) {
 	//Check to see if css already included, if yes, don't include
 	var nodes = document.getElementsByTagName('link');
 	var path  = "/stylesheets/" + css;
+	if(path.search(/\.css$/i) < 0)
+		path += '.css';
+
 	for(var i=0, link; i<nodes.length, link=nodes[i]; i++)
 	{
 		if(link.href == path)
@@ -327,6 +313,7 @@ _arbitrage2.base.mvc.Application.prototype.execute = function(route, controller,
 			var canvas = cache.returns[idx].canvas;
 			var $obj   = cache.returns[idx].$obj;
 			canvas.render($obj);
+			canvas.$element.trigger('arbitrage2.mvc.change');
 		}
 
 		//Call initialize 
@@ -386,7 +373,6 @@ _arbitrage2.base.mvc.Application.prototype.execute = function(route, controller,
 
 						//Render It
 						_renderCache(cache);
-
 					}
 				};
 
@@ -670,7 +656,8 @@ _arbitrage2.base.mvc.Action = function(controller, args) {
 	@param opt_data Optional data that is passed (depending if ajax structured response).
 */
 _arbitrage2.base.mvc.Action.prototype.initialize = function(opt_data) { 
-	self.initialize = true;
+	var self = this;
+	self.initialized = true;
 };
 
 /**
