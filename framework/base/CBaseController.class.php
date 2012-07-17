@@ -19,10 +19,9 @@ abstract class CBaseController extends CViewFileRenderable implements IControlle
 
 	//Controller specifics
 	private $_filters;
-	private $_renderer_type;
+	private $_renderable;      //The renderer
 	private $_ajax;
 	private $_action;
-	private $_layout;
 
 	public function __construct()
 	{
@@ -44,10 +43,9 @@ abstract class CBaseController extends CViewFileRenderable implements IControlle
 		$this->_files = ((isset($_FILES))? $_FILES : array());
 
 		//Internal variables
-		$this->_ajax           = false;
-		$this->_renderer_type  = "view";
-		$this->_flash          = NULL;
-		$this->_layout         = 'default';
+		$this->_ajax     = false;
+		$this->_renderable = $this;
+		$this->_flash    = NULL;
 	}
 
 	/**
@@ -55,8 +53,12 @@ abstract class CBaseController extends CViewFileRenderable implements IControlle
 	 */
 	public function startSession()
 	{
-		session_start();
-		$this->_session =& $_SESSION;
+		//Ensure session has NOT started to start the session
+		if(!isset($_SESSION))
+		{
+			session_start();
+			$this->_session =& $_SESSION;
+		}
 	}
 
 	/**
@@ -116,31 +118,26 @@ abstract class CBaseController extends CViewFileRenderable implements IControlle
 	 * Set the default renderer type for this controller.
 	 * @param $type defines how the controller will render the view.
 	 */
-	public function setRendererType($type)
+	public function setRenderer($type)
 	{
-		static $types = array('view', 'renderable');
-		if(!in_array($type, $types))
+		//Check to see if type exists
+		if(!class_exists($type))
 			throw new EArbitrageException("Invalid renderer type '$type'.");
 
-		$this->_renderer_type = $type;
+		$this->_renderable = new $type;
+
+		//Make sure $this->_renderable is of IRenderable
+		if(!($this->_renderable instanceof IRenderable))
+			throw new EArbitrageException("Renderer class '$type' not of type IRenderable.");
 	}
 
 	/**
 	 * Get the view type.
 	 * @return the view type of the controller.
 	 */
-	public function getRendererType()
+	public function getRenderer()
 	{
-		return $this->_renderer_type;
-	}
-
-	/**
-	 * Get current layout associated with controller.
-	 * @return Returns the layout.
-	 */
-	public function getLayout()
-	{
-		return $this->_layout;
+		return $this->_renderable;
 	}
 
 	/**
@@ -184,10 +181,20 @@ abstract class CBaseController extends CViewFileRenderable implements IControlle
 		 return $this->_request;
 	 }
 
+	 /*
+	  * Method forwards the request to another controller and action.
+		*/
+	public function forward($forward)
+	{
+		//Load controller
+		return CApplication::getInstance()->forward($forward);
+	}
+
 	/**
 	 * Method that actually executes the action within the Controller context.
+	 * param $render Indicates if the results should be rendered by an IRenderable.
 	 */
-	public function execute()
+	public function execute($render=true)
 	{
 		//Get filters
 		$chain = new CFilterChain($this);
@@ -201,12 +208,12 @@ abstract class CBaseController extends CViewFileRenderable implements IControlle
 		//Call the action
 		$ret = $this->_action->execute();
 
+		if(!$render)
+			return $ret;
+
 		//Set view variables
-		if($this->_renderer_type == "view" && isset($ret['variables']))
-		{
-			$this->_view_variables = array_merge($ret['variables'], $this->_view_variables);
-			$this->_layout         = $ret['layout'];
-		}
+		$this->_view_variables = array_merge((isset($ret['variables'])? $ret['variables'] : array()), $this->_view_variables);
+		$ret['variables']      = $this->_view_variables;
 
 		//Add flash variable to session
 		$this->_session['_flash'] = $this->_flash->toArray();
@@ -216,30 +223,26 @@ abstract class CBaseController extends CViewFileRenderable implements IControlle
 
 		//TODO: Ensure PHP Exception is on
 		ob_start();
+
+		//Render the renderable content
 		$content = $this->renderContent($ret);
 		$content = $chain->runPostProcess($content);
 
 		echo $content;
 
-		//Flush output buffer
 		ob_end_flush();
 	}
 
-	public function renderContent($content)
+	public function renderContent($content=NULL)
 	{
 		$out = NULL;
-
-		//Default return type $ret['render'] etc...
-		if(is_array($content) && $this->_renderer_type === "view")
-		{
-			$this->_renderable = $content;
-			$out               = $this->render();
-		}
+		if(is_array($content))
+			$out = $this->_renderable->render($content);
 		elseif($content instanceof IRenderable)
 			$out = $content->render();
 
 		if($out === NULL)
-			throw new EArbitrageException("Content is NULL. Check your rendering type.");
+			throw new EArbitrageException("Content is NULL. Check your renderable type.");
 
 		return $out;
 	}
