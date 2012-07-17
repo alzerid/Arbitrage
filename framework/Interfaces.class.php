@@ -23,7 +23,7 @@ interface IModuleLoader extends ISingleton
 {
 	public function registerPath($path);
 	public function load($driver, $config);
-	public function getHandle($driver, $opt);
+	public function getHandle($driver, $config);
 }
 
 /**
