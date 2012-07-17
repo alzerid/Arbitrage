@@ -1,6 +1,7 @@
 <?
-class CJSONClientMVCRenderable extends CArrayObject implements IRenderable
+class CJSONClientMVCRenderable implements IRenderable
 {
+	private $_data;
 	public function __construct()
 	{
 		$arr = array('header' => array('type'    => 'client',
@@ -12,9 +13,8 @@ class CJSONClientMVCRenderable extends CArrayObject implements IRenderable
 								                   'layout' => 'default'),
 
 		             'user'   => array());
-	
-		//Call parent
-		parent::__construct($arr);
+
+		$this->_data = $arr;
 	}
 
 	public function setLayout($layout)
@@ -22,8 +22,9 @@ class CJSONClientMVCRenderable extends CArrayObject implements IRenderable
 		$this->client->layout = preg_replace('/\.php$/i', $layout, '');
 	}
 
-	public function render()
+	public function render($data=NULL)
 	{
+		die('in CJSONClientMVCRenderable');
 		//Get layout
 		$json = new CJSONRenderable($this->toArray());
 		return $json->render();

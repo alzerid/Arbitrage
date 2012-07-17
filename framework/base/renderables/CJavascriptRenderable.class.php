@@ -1,17 +1,15 @@
 <?
 class CJavascriptRenderable implements IRenderable
 {
-	private $_data;
-
-	public function __construct($data)
+	public function render($data=NULL)
 	{
-		$this->_data = $data;
-	}
-
-	public function render()
-	{
+		ob_start();
+		ob_implicit_flush(false);
 		header("Content-Type: application/javascript");
-		return $this->_data;
+
+		echo $data['data'];
+
+		return ob_get_clean();
 	}
 }
 ?>
