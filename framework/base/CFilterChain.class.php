@@ -26,7 +26,7 @@ class CFilterChain
 		}
 	}
 
-	public function runAfterFilterChain()
+	public function runAfterFilterChain(&$ret)
 	{
 		if(!array_key_exists('after_filter', $this->_filters))
 			return;
@@ -36,7 +36,7 @@ class CFilterChain
 		{
 			//Filter is a method within the controller
 			if(is_string($filter))
-				$this->_controller->$filter();
+				$this->_controller->$filter($ret);
 			elseif(is_object($filter) && get_parent_class($filter) === "IFilter")
 				$filter->execute();
 		}

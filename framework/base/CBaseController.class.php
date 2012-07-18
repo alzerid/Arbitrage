@@ -5,7 +5,7 @@
  * @version 2.0
  */
 
-abstract class CBaseController extends CViewFileRenderable implements IController
+abstract class CBaseController implements IController
 {
 	//PHP Variables attatched to the session
 	protected $_get;
@@ -18,15 +18,15 @@ abstract class CBaseController extends CViewFileRenderable implements IControlle
 	protected $_content;
 
 	//Controller specifics
+	private $_view_variables;
 	private $_filters;
 	private $_renderable;      //The renderer
+	private $_partial;
 	private $_ajax;
 	private $_action;
 
 	public function __construct()
 	{
-		parent::__construct();
-
 		//PHP variables
 		$this->_get = $_GET;
 		unset($this->_get['_route']);
@@ -43,9 +43,13 @@ abstract class CBaseController extends CViewFileRenderable implements IControlle
 		$this->_files = ((isset($_FILES))? $_FILES : array());
 
 		//Internal variables
-		$this->_ajax     = false;
-		$this->_renderable = $this;
-		$this->_flash    = NULL;
+		$this->_ajax       = false;
+		$this->_renderable = new CViewFileRenderable;
+		$this->_partial    = new CViewFilePartialRenderable;
+		$this->_flash      = NULL;
+
+		//View variables
+		$this->_view_variables = array();
 	}
 
 	/**
@@ -120,11 +124,17 @@ abstract class CBaseController extends CViewFileRenderable implements IControlle
 	 */
 	public function setRenderer($type)
 	{
-		//Check to see if type exists
-		if(!class_exists($type))
-			throw new EArbitrageException("Invalid renderer type '$type'.");
+		if(is_string($type))
+		{
+			//Check to see if type exists
+			if(!class_exists($type))
+				throw new EArbitrageException("Invalid renderer type '$type'.");
 
-		$this->_renderable = new $type;
+			//Set renderable
+			$this->_renderable = new $type;
+		}
+		elseif($type instanceof IRenderable)
+			$this->_renderable = $type;
 
 		//Make sure $this->_renderable is of IRenderable
 		if(!($this->_renderable instanceof IRenderable))
@@ -219,7 +229,7 @@ abstract class CBaseController extends CViewFileRenderable implements IControlle
 		$this->_session['_flash'] = $this->_flash->toArray();
 
 		//Run after filter
-		$chain->runAfterFilterChain();
+		$chain->runAfterFilterChain($ret);
 
 		//TODO: Ensure PHP Exception is on
 		ob_start();
@@ -231,6 +241,11 @@ abstract class CBaseController extends CViewFileRenderable implements IControlle
 		echo $content;
 
 		ob_end_flush();
+	}
+
+	public function renderPartial($file, $variables=NULL)
+	{
+		return $this->_partial->render(array('render' => $file, 'variables' => $variables));
 	}
 
 	public function renderContent($content=NULL)
