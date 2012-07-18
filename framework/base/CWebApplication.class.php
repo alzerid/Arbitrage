@@ -29,9 +29,12 @@ class CWebApplication extends CApplication
 
 		//Renderers and Renderables
 		$this->requireFrameworkFile('base/renderables/CHTMLRenderable.class.php');
-		$this->requireFrameworkFile('base/renderables/CJSONRenderable.class.php');
 		$this->requireFrameworkFile('base/renderables/CTextRenderable.class.php');
+		$this->requireFrameworkFile('base/renderables/CJSONRenderable.class.php');
+		$this->requireFrameworkFile('base/renderables/CJSONApplicationRenderable.class.php');
+		$this->requireFrameworkFile('base/renderables/CJSONClientMVCRenderable.class.php');
 		$this->requireFrameworkFile('base/renderables/CJavascriptRenderable.class.php');
+		$this->requireFrameworkFile('base/renderables/CViewFilePartialRenderable.class.php');
 		$this->requireFrameworkFile('base/renderables/CViewFileRenderable.class.php');
 
 		//Controller, Actions, etc...
@@ -101,9 +104,17 @@ class CWebApplication extends CApplication
 	 */
 	public function forward($forward, $ajax=false)
 	{
+		static $controllers = array();
+		static $actions     = array();
+		static $renderables = array();
+
 		//Get old controller and action
-		$ocontroller = $this->_controller;
-		$oaction     = $this->_action;
+		$controllers[] = $this->_controller;
+		$actions[]     = $this->_action;
+		$renderables[] = $this->_controller->getRenderer();
+
+		//New CViewFileRenderable
+		$this->_controller->setRenderer('CViewFileRenderable');
 
 		//Get routing rules
 		$route = CRouter::route($forward);
@@ -115,8 +126,9 @@ class CWebApplication extends CApplication
 		$ret = $this->_controller->execute(false);
 
 		//Set back old action/controller
-		$this->_controller = $ocontroller;
-		$this->_action     = $oaction;
+		$this->_controller = array_pop($controllers);
+		$this->_action     = array_pop($actions);
+		$this->_controller->setRenderer(array_pop($renderables));
 
 		return $ret;
 	}
