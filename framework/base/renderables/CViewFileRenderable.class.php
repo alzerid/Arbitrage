@@ -1,23 +1,19 @@
 <?
-class CViewFileRenderable implements IViewFileRenderable
+class CViewFileRenderable extends CViewFilePartialRenderable
 {
 	protected $_view_variables;
 	protected $_layout_paths;
-	protected $_view_paths;
 	protected $_layout;
 
 	public function __construct()
 	{
-		$this->_layout_paths = array();
-		$this->_view_paths   = array();
+		parent::__construct();
 
-		//setup view and layout paths
-		$this->addLayoutPath(CApplication::getConfig()->_internals->approotpath . "app/views/layout/");
-		$this->addViewPath(CApplication::getConfig()->_internals->approotpath . "app/views/");
-		$this->setLayout("default");
-
-		//$this->_renderable    = array();
+		$this->_layout_paths   = array();
 		$this->_view_variables = array();
+
+		$this->addLayoutPath(CApplication::getConfig()->_internals->approotpath . "app/views/layout/");
+		$this->setLayout("default");
 	}
 
 	public function setLayout($layout)
@@ -40,16 +36,6 @@ class CViewFileRenderable implements IViewFileRenderable
 		$this->_layout_paths[] = $path;
 	}
 
-	public function getViewPaths()
-	{
-		return $this->_view_paths;
-	}
-
-	public function addViewPath($path=NULL)
-	{
-		$this->_view_paths[] = $path;
-	}
-
 	public function render($data=NULL)
 	{
 		//Setup data
@@ -58,12 +44,12 @@ class CViewFileRenderable implements IViewFileRenderable
 		                 'variables' => array());
 
 		//Merge defaults with data
-		$default['render']    = ((isset($data['render']))? $data['render'] : $default['render']);
-		$default['layout']    = ((isset($data['layout']))? $data['layout'] : $default['layout']);
+		isset($data['render']) && $default['render'] = $data['render'];
+		isset($data['layout']) && $default['layout'] = $data['layout'];
 		$default['variables'] = array_merge($default['variables'], (isset($data['variables'])? $data['variables'] : array()));
 
-		//Get content from view
-		$content = $this->renderPartial($default['render'], $default['variables']);
+		//Call parent render
+		$content = parent::render($default);
 
 		//Now render layout
 		$layout = NULL;
@@ -80,7 +66,9 @@ class CViewFileRenderable implements IViewFileRenderable
 			throw new EArbitrageException("Layout does not exist '{$default['layout']}'.");
 
 		//Extract the variables
-		$_vars = $this->_view_variables;
+		$_vars = $default['variables'];
+		$_controller = CApplication::getInstance()->getController();
+		$_action     = CApplication::getInstance()->getController()->getAction();
 		extract($_vars);
 
 		//Require view
@@ -89,34 +77,6 @@ class CViewFileRenderable implements IViewFileRenderable
 		require_once($layout);
 
 		return ob_get_clean();
-	}
-
-	public function renderPartial($file, $variables=NULL)
-	{
-		$_vars = $variables;
-		if($_vars !== NULL)
-			extract($_vars);
-
-		//Get view file
-		$path = NULL;
-		foreach($this->_view_paths as $vp)
-		{
-			if(file_exists($vp . "/" . $file . ".php"))
-			{
-				$path = $vp . "/" . $file . ".php";
-				break;
-			}
-		}
-		
-		if($path == NULL)
-			throw new EArbitrageException("View file does not exist '$file'.");
-
-		ob_start();
-		ob_implicit_flush(false);
-		require($path);
-		$content = ob_get_clean();
-
-		return $content;
 	}
 }
 ?>

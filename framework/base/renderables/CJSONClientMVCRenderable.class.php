@@ -1,33 +1,43 @@
 <?
-class CJSONClientMVCRenderable implements IRenderable
+class CJSONClientMVCRenderable extends CJSONApplicationRenderable
 {
-	private $_data;
+	private $_layout;
 	public function __construct()
 	{
-		$arr = array('header' => array('type'    => 'client',
-		                               'scope'   => '',
-		                               'errno'   => 0,
-		                               'message' => 'success'),
-
-		             'client' => array('canvas' => array(),
-								                   'layout' => 'default'),
-
-		             'user'   => array());
-
-		$this->_data = $arr;
+		$this->_layout = 'default';
 	}
 
 	public function setLayout($layout)
 	{
-		$this->client->layout = preg_replace('/\.php$/i', $layout, '');
+		$this->_layout = $layout;
 	}
 
-	public function render($data=NULL)
+	public function renderJSON($json)
 	{
-		die('in CJSONClientMVCRenderable');
-		//Get layout
-		$json = new CJSONRenderable($this->toArray());
-		return $json->render();
+		static $default = array('header' => array('type' => 'client'), 'client' => array('canvas' => array()));
+
+		$ret = parent::renderJSON($json);
+		$ret['header']['type']   = 'client';
+		$ret['client']['layout'] = ((isset($json['layout']))? $json['layout'] : $this->_layout);
+
+		//Render canvases
+		$canvases = ((isset($json['client']) && isset($json['client']['canvas']))? $json['client']['canvas'] : array());
+		if(count($canvases))
+		{
+			$dcanvas = array('file' => CApplication::getInstance()->getController()->getName() . "/" . CApplication::getInstance()->getController()->getAction()->getName(), 'variables' => '');
+			$partial = new CViewFilePartialRenderable;
+
+			//Iterate through canvases
+			foreach($canvases as $canvas => $data)
+			{
+				!isset($data['file']) && $data['file'] = $dcanvas['file'];
+				!isset($data['variables']) && $data['variables'] = $dcanvas['variables'];
+
+				$ret['client']['canvas'][$canvas] = $partial->render($data);
+			}
+		}
+
+		return $ret;
 	}
 }
 ?>
