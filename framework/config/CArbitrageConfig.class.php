@@ -1,4 +1,10 @@
 <?
+namespace Arbitrage2\Config;
+
+use \Arbitrage2\Interfaces\ISingleton;
+
+use \Arbitrage2\Utils\CArrayObject;
+
 class CArbitrageConfig implements ISingleton
 {
 	static private $_instance = NULL;

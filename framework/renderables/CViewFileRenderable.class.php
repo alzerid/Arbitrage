@@ -1,4 +1,8 @@
 <?
+namespace Arbitrage2\Renderables;
+use \Arbitrage2\Renderables\CViewFilePartialRenderable;
+use \Arbitrage2\Base\CApplication;
+
 class CViewFileRenderable extends CViewFilePartialRenderable
 {
 	static protected $_LAYOUT_PATHS = array();

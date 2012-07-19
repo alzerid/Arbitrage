@@ -1,4 +1,7 @@
 <?
+namespace Arbitrage2\Base;
+use \Arbitrage2\Interfaces\IAction;
+
 class CAction implements IAction
 {
 	private $_controller;

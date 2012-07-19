@@ -31,8 +31,8 @@ class ExceptionHandler extends Controller
 		if($ex->getPrevious() != NULL)
 			$prev = $this->_walkExceptions($ex->getPrevious());
 
-		//If PHPException is there, ensure View render mode
-		if($ex instanceof PHPException)
+		//If EPHPException is there, ensure View render mode
+		if($ex instanceof EPHPException)
 			$this->setRenderMode("View");
 
 		//Get trace

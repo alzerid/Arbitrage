@@ -5,6 +5,14 @@
  * @version 2.0
  */
 
+namespace Arbitrage2\Base;
+use \Arbitrage2\Interfaces\IController;
+
+//Renderables
+use \Arbitrage2\Renderables\CViewFileRenderable;
+use \Arbitrage2\Renderables\CViewFilePartialRenderable;
+
+
 abstract class CBaseController implements IController
 {
 	//PHP Variables attatched to the session
@@ -274,28 +282,28 @@ abstract class CBaseController implements IController
 	 * Returns the view variable based on the key.
 	 * @return mixed Returns a mixed result based on the value.
 	 */
-	public function getViewVariable($key)
+	/*public function getViewVariable($key)
 	{
 		return ((isset($this->_view_variables[$key]))? $this->_view_variables[$key] : NULL);
-	}
+	}*/
 
 	/**
 	 * Returns the entire view variable array.
 	 * @return array view variables.
 	 */
-	public function getViewVariables()
+	/*public function getViewVariables()
 	{
 		return $this->_view_variables;
-	}
+	}*/
 
 	/**
 	 * Adds a view variable to the array.
 	 * @return mixed Adds a variable to the view variable array.
 	 */
-	public function addViewVariables($vars)
+	/*public function addViewVariables($vars)
 	{
 		$this->_view_variables = array_merge($this->_view_variables, $vars);
-	}
+	}*/
 
 	public function filters()
 	{

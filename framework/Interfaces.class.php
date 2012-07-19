@@ -1,4 +1,6 @@
 <?
+namespace Arbitrage2\Interfaces;
+
 /**
  * ISingleton interface
  */
@@ -145,8 +147,8 @@ interface IEventListener
  */
 interface IErrorHandlerListener extends IListener
 {
-	public function handleException(CExceptionEvent $event);
-	public function handleError(CErrorEvent $event);
+	public function handleException(IEvent $event);
+	public function handleError(IEvent $event);
 }
 
 /**

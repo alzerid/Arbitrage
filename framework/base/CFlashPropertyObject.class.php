@@ -1,4 +1,6 @@
 <?
+use Arbitrage2\Base;
+
 class CFlashPropertyObject /*implements Iterator*/
 {
 	protected $_flash;

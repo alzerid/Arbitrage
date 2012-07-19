@@ -1,4 +1,7 @@
 <?
+namespace Arbitrage2\Forms;
+use \Arbitrage2\HTML\CHTMLComponent;
+
 Class CForm extends CHTMLComponent
 {
 	protected $_values;

@@ -1,5 +1,13 @@
 <?
-class CErrorHandler implements IObserver, ISingleton
+namespace Arbitrage2\ErrorHandler;
+use \Arbitrage2\Interfaces\IObserver;
+use \Arbitrage2\Interfaces\IListener;
+use \Arbitrage2\Interfaces\ISingleton;
+
+use \Arbitrage2\Events\CErrorEvent;
+use \Arbitrage2\Events\CExceptionEvent;
+
+class CErrorHandlerObserver implements IObserver, ISingleton
 {
 	static private $_instance = NULL;
 	static private $_PHP_ERROR_TYPE = array(
@@ -27,7 +35,7 @@ class CErrorHandler implements IObserver, ISingleton
 	static public function getInstance()
 	{
 		if(self::$_instance === NULL)
-			self::$_instance = new CErrorHandler();
+			self::$_instance = new CErrorHandlerObserver();
 
 		return self::$_instance;
 	}
@@ -80,10 +88,10 @@ class CErrorHandler implements IObserver, ISingleton
 		$event = new CErrorEvent($errno, self::$_PHP_ERROR_TYPE[$errno], $errstr, $errfile, $errline);
 
 		//Send event to handleError listeners
-		$listeners = CErrorHandler::getInstance()->_listeners;
-		$return    = $event->triggerListeners($listeners);
+		$listeners = CErrorHandlerObserver::getInstance()->_listeners;
+		$default   = $event->triggerListeners($listeners);
 
-		return (($return == NULL)? false : $return);
+		return !$default;
 	}
 
 	/**
@@ -91,19 +99,25 @@ class CErrorHandler implements IObserver, ISingleton
 	 * in a try catch block.
 	 * @param $ex The exception that was thrown.
 	 */
-	static public function handleException(Exception $ex)
+	static public function handleException(\Exception $ex)
 	{
 		//TODO: Check for stop propagation from event
 
 		$event = new CExceptionEvent($ex);
 
 		//Send event to the listeners
-		$listeners = CErrorHandler::getInstance()->_listeners;
-		$event->triggerListeners($listeners);
+		$listeners = CErrorHandlerObserver::getInstance()->_listeners;
+		$default   = $event->triggerListeners($listeners);
+
+		if($default)
+		{
+			echo "Global Exception Caught:\n";
+			var_dump($ex);
+		}
 	}
 }
 
 //Set global exception handler and php error handler
-set_error_handler(array("CErrorHandler", "handleError"));
-set_exception_handler(array("CErrorHandler", "handleException"));
+set_error_handler(array("\\Arbitrage2\\ErrorHandler\\CErrorHandlerObserver", "handleError"));
+set_exception_handler(array("\\Arbitrage2\\ErrorHandler\\CErrorHandlerObserver", "handleException"));
 ?>

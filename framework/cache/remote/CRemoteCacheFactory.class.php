@@ -1,4 +1,8 @@
 <?
+namespace Arbitrage2\Cache\Remote;
+
+use \Arbitrage2\Interfaces\IModuleLoader;
+
 class CRemoteCacheFactory implements IModuleLoader
 {
 	static private $_INSTANCE = NULL;
@@ -39,9 +43,9 @@ class CRemoteCacheFactory implements IModuleLoader
 
 	public function getHandle($driver, $config)
 	{
-		throw new Exception("NOT IMPLEMENTED");
+		throw new CRemoteCacheException("NOT IMPLEMENTED");
 	}
 }
 
-class CRemoteCacheException extends Exception { }
+class CRemoteCacheException extends \Exception { }
 ?>

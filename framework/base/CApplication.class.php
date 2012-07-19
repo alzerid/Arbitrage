@@ -1,9 +1,18 @@
 <?
-use \Arbitrage2\Base\CFileSearchLoader;
+namespace Arbitrage2\Base;
+use \Arbitrage2\Interfaces\ISingleton;
+use \Arbitrage2\Interfaces\IErrorHandlerListener;
+
+use \Arbitrage2\Base\CWebApplication;
+use \Arbitrage2\DAtabase\CDatabaseDriverFActory;
+use \Arbitrage2\Config\CArbitrageConfig;
+use \Arbitrage2\Utils\CFileSearchLoader;
+use \Arbitrage2\Exceptions\EArbitrageException;
 
 abstract class CApplication implements ISingleton, IErrorHandlerListener
 {
 	static private $_VERSION = "2.0.0";
+	static private $_FS_DELIMETER = "/";
 	static protected $_instance = NULL;    //Instance of CApplication
 
 	protected $_model_search;
@@ -55,53 +64,32 @@ abstract class CApplication implements ISingleton, IErrorHandlerListener
 			die("Framework path is not defined in environment variable ARBITRAGE2_FW_PATH");
 
 		//Load base required framework files
-		$this->requireFrameworkFile('Exceptions.class.php');                        //File full of base exception classes
-		$this->requireFrameworkFile('Events.class.php');                            //Events
-
-		//What do I do with these?
-		$this->requireFrameworkFile('base/CErrorHandler.class.php');                //Exception handler and PHP error handler
-		$this->requireFrameworkFile('base/CPropertyObject.class.php');              //Property Object class
-
-		//Utils (array manipulator)
-		$this->requireFrameworkFile('utils/CArrayManipulator.class.php');           //Array Manipulator
-		$this->requireFrameworkFile('utils/CTemporaryCache.class.php');             //Property Object class
-		$this->requireFrameworkFile('utils/CStringFormatter.class.php');            //String formatter
-
-		//Helper
-		$this->requireFrameworkFile('helper/Months.class.php');                     //Months formatter
-		$this->requireFrameworkFile('helper/States.class.php');                     //States formatter
-
-		//Templates
-		$this->requireFrameworkFile('template/CTemplate.class.php');                //Template Class
-		$this->requireFrameworkFile('template/CTemplateFile.class.php');            //Template File Class
+		$this->requireFramework('Exceptions');                           //File full of base exception classes
+		$this->requireFramework('Events');                               //Events
+		$this->requireFramework('ErrorHandler.CErrorHandlerObserver');   //Error Handler Observer
 		
 		//Array Object
-		$this->requireFrameWorkFile('array/CArrayObject.class.php');                //Array Object
+		$this->requireFrameWork('Utils.CArrayObject');                //Array Object
 
 		//Extended framework files
-		$this->requireFrameworkFile('config/CArbitrageConfigLoader.class.php');     //Arbitrage config class
-		$this->requireFrameworkFile('config/CArbitrageConfig.class.php');           //Arbitrage config class
+		$this->requireFramework('Config.CArbitrageConfigLoader');
+		$this->requireFramework('Config.CArbitrageConfig');
+
+		//Templates
+		//$this->requireFrameworkFile('template/CTemplate.class.php');                //Template Class
+		//$this->requireFrameworkFile('template/CTemplateFile.class.php');            //Template File Class
 
 		//Communication classes
-		$this->requireFrameworkFile("communication/CEmailCommunication.class.php"); //Email communication class
+		//$this->requireFrameworkFile("communication/CEmailCommunication.class.php"); //Email communication class
 
-		//Register exception handler
-		CErrorHandler::getInstance()->addListener($this);
 
-		//Database classes
-		$this->requireFrameworkFile('database/CDatabaseDriverFactory.class.php');     //Require the Driver Factory
-
-		//Remote cache
-		$this->requireFrameworkFile("cache/remote/CRemoteCacheFactory.class.php");    //Remote cache factory (memcache, redis)
-
-		//Get FileSearchLoader
-		$this->requireFrameworkFile("base/CFileSearchLoader.class.php");
+		$this->requireFramework('Database.CDatabaseDriverFactory');                   //Require the Driver Factory
+		$this->requireFramework("Cache.Remote.CRemoteCacheFactory");                  //Remote cache factory (memcache, redis)
+		$this->requireFramework("Utils.CFileSearchLoader");                           //File loader
+		$this->requireFramework("Base.CExtension");                                   //Load the extension class
 
 		//Autoload model handler
-		spl_autoload_register('CApplication::modelAutoLoad', true, true);
-
-		//Include extension base class
-		$this->requireFrameworkFile('base/CExtension.class.php');
+		spl_autoload_register(__NAMESPACE__ . '\CApplication::modelAutoLoad', true, true);
 	}
 
 	/** 
@@ -122,7 +110,7 @@ abstract class CApplication implements ISingleton, IErrorHandlerListener
 
 		//Load correct drivers
 		$databases = $config->server->databases;
-		$factory   = \Arbitrage2\Database\CDatabaseDriverFactory::getInstance();
+		$factory   = CDatabaseDriverFactory::getInstance();
 		if($databases)
 		{
 			foreach($databases as $database => $list)
@@ -130,7 +118,7 @@ abstract class CApplication implements ISingleton, IErrorHandlerListener
 		}
 
 		//Add to application model path
-		$this->addModelSearchPath(CArbitrageConfig::getInstance()->_internals->approotpath . "app/models/");
+		$this->addModelSearchPath(CArbitrageConfig::getInstance()->_internals->approotpath . "application/models/");
 		
 		//Remote cache
 		$remotes = $config->server->remoteCache;
@@ -195,6 +183,27 @@ abstract class CApplication implements ISingleton, IErrorHandlerListener
 			throw new EArbitrageException("Unable to load application configuration file.");
 	}
 
+	static public function requireFramework($namespace)
+	{
+		$path = ARBITRAGE2_FW_PATH . "/framework";
+
+		//Convert namespace
+		$ns   = explode('.', $namespace);
+		$file = array_splice($ns, count($ns)-1);
+		$file = $file[0];
+
+		//Convert namespace to directory formatting
+		$ns   = implode('/', $ns);
+		$ns   = preg_replace('/([a-z0-9])([A-Z])/', '$1 $2', $ns);
+		$ns   = strtolower(preg_replace('/ /', '_', $ns));
+		$path = "$path/$ns/$file.class.php";
+
+		if(!file_exists($path))
+			throw new EArbitrageException("Unable to require namespace '$namespace'.");
+
+		require_once($path);
+	}
+
 	static public function requireFrameworkFile($file)
 	{
 		require_once(ARBITRAGE2_FW_PATH . "framework/$file");
@@ -229,9 +238,9 @@ abstract class CApplication implements ISingleton, IErrorHandlerListener
 	{
 		$path = preg_replace('/([a-z0-9])([A-Z])/', '$1 $2', $namespace);
 		$path = preg_replace('/ /', '_', $path);
-		$path = preg_replace('/\./', '/', $path);
+		$path = preg_replace('/\./', self::$_FS_DELIMETER, $path);
 
-		return strtolower($path);
+		return $path;
 	}
 
 	static public function convertNamespaceToPHP($namespace)

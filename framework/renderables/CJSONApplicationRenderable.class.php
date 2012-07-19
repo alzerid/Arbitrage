@@ -1,4 +1,7 @@
 <?
+namespace Arbitrage2\Renderables;
+use \Arbitrage2\Renderables\CJSONRenderable;
+
 class CJSONApplicationRenderable extends CJSONRenderable
 {
 	public function render($data=NULL)

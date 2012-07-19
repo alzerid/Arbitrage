@@ -1,4 +1,7 @@
 <?
+namespace Arbitrage2\Base;
+use \Arbitrage2\Base\CBaseController;
+
 class CFrameworkController extends CBaseController
 {
 	public function renderContent($file, $_vars=NULL)

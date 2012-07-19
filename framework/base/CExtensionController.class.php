@@ -1,7 +1,8 @@
 <?
 namespace Arbitrage2\Base;
+use \Arbitrage2\Base\CController;
 
-class CExtensionController extends \CController
+class CExtensionController extends CController
 {
 	public function addJavaScriptTag($tag)
 	{

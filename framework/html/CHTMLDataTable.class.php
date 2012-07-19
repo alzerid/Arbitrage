@@ -1,4 +1,7 @@
 <?
+namespace Arbitrage2\HTML;
+use \Arbitrage2\Interfaces\IHTMLDataTable;
+
 class CHTMLDataTable implements IHTMLDataTable
 {
 	protected $_headers;

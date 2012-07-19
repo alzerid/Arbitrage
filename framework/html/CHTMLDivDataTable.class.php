@@ -1,4 +1,7 @@
 <?
+namespace Arbitrage2\HTML;
+use \Arbitrage2\HTML\CHTMLDataTable;
+
 class CHTMLDivDataTable extends CHTMLDataTable
 {
 	public function __construct($id, $headers, $data, $attrs=array())

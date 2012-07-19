@@ -1,4 +1,7 @@
 <?
+namespace Arbitrage2\Forms;
+use \Arbitrage2\Forms\CForm;
+
 class CSubmittedForm
 {
 	private $form;

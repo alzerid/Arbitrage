@@ -1,5 +1,6 @@
 <?
-namespace Arbitrage2\Base;
+namespace Arbitrage2\Utils;
+use \Arbitrage2\Exceptions\EArbitrageException;
 
 class CFileSearchLoader
 {
@@ -15,7 +16,7 @@ class CFileSearchLoader
 		if(!file_exists($path))
 		{
 			if($throw)
-				throw new \EArbitrageException("Search path '$path' does not exist!");
+				throw new EArbitrageException("Search path '$path' does not exist!");
 
 			return false;
 		}
@@ -39,7 +40,7 @@ class CFileSearchLoader
 		}
 
 		if($throw)
-			throw new \EArbitrageException("Unable to load file '$file'.");
+			throw new EArbitrageException("Unable to load file '$file'.");
 
 		return false;
 	}

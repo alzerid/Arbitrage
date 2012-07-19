@@ -1,5 +1,7 @@
 <?
-class CArrayObject implements ArrayAccess, Iterator
+namespace Arbitrage2\Utils;
+
+class CArrayObject implements \ArrayAccess, \Iterator
 {
 	protected $_data;
 	private $_position;

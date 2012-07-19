@@ -1,4 +1,6 @@
 <?
+namespace Arbitrage2\Config;
+
 abstract class CArbitrageConfigLoader
 {
 	protected $_file;

@@ -1,5 +1,7 @@
 <?
-class CHTMLComponent /*extends Component*/
+namespace Arbitrage2\HTML;
+
+class CHTMLComponent
 {
 	public static function label($tag, $attribs=array())
 	{

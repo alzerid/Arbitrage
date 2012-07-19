@@ -1,5 +1,13 @@
 <?
-use \Arbitrage2\Base\CFileSearchLoader;
+namespace Arbitrage2\Base;
+use \Arbitrage2\Interfaces\IEvent;
+
+use \Arbitrage2\Base\CApplication;
+use \Arbitrage2\Base\CAction;
+use \Arbitrage2\Base\CController;
+
+use \Arbitrage2\Utils\CFileSearchLoader;
+use \Arbitrage2\ErrorHandler\CErrorHandlerObserver;
 
 class CWebApplication extends CApplication
 {
@@ -35,38 +43,42 @@ class CWebApplication extends CApplication
 		parent::bootstrap();
 
 		//Renderers and Renderables
-		$this->requireFrameworkFile('base/renderables/CHTMLRenderable.class.php');
-		$this->requireFrameworkFile('base/renderables/CTextRenderable.class.php');
-		$this->requireFrameworkFile('base/renderables/CJSONRenderable.class.php');
-		$this->requireFrameworkFile('base/renderables/CJSONApplicationRenderable.class.php');
-		$this->requireFrameworkFile('base/renderables/CJSONClientMVCRenderable.class.php');
-		$this->requireFrameworkFile('base/renderables/CJavascriptRenderable.class.php');
-		$this->requireFrameworkFile('base/renderables/CViewFilePartialRenderable.class.php');
-		$this->requireFrameworkFile('base/renderables/CViewFileRenderable.class.php');
+		$this->requireFramework('Renderables.CHTMLRenderable');
+		$this->requireFramework('Renderables.CTextRenderable');
+		$this->requireFramework('Renderables.CJSONRenderable');
+		$this->requireFramework('Renderables.CJSONApplicationRenderable');
+		$this->requireFramework('Renderables.CJSONClientMVCRenderable');
+		$this->requireFramework('Renderables.CJavascriptRenderable');
+		$this->requireFramework('Renderables.CViewFilePartialRenderable');
+		$this->requireFramework('Renderables.CViewFileRenderable');
 
 		//Controller, Actions, etc...
-		$this->requireFrameworkFile('base/CBaseController.class.php');             //Base controller class
-		$this->requireFrameworkFile('base/CController.class.php');                 //Controller class
-		$this->requireFrameworkFile('base/CExtensionController.class.php');        //Controller class
-		$this->requireFrameworkFile('base/CAction.class.php');                     //Action class
-		$this->requireFrameworkFile('base/CFilterChain.class.php');                //Filter chain for CBaseControllers
-		$this->requireFrameworkFile('base/CRouter.class.php');                     //Router handler
-		$this->requireFrameworkFile('base/CFlashPropertyObject.class.php');        //Flash Property Object class
+		$this->requireFramework('Base.CBaseController');             //Base controller class
+		$this->requireFramework('Base.CController');                 //Controller class
+		$this->requireFramework('Base.CExtensionController');        //Controller class
+		$this->requireFramework('Base.CAction');                     //Action class
+		$this->requireFramework('Base.CFilterChain');                //Filter chain for CBaseControllers
+		$this->requireFramework('Base.CRouter');                     //Router handler
+		$this->requireFramework('Base.CFlashPropertyObject');        //Flash Property Object class
 
-		//HTML
-		$this->requireFrameworkFile('html/CHTMLComponent.class.php');
-		$this->requireFrameworkFile('form/CForm.class.php');
-		$this->requireFrameworkFile('form/CSubmittedForm.class.php');
-		$this->requireFrameworkFile('form/CRendererForm.class.php');
+		//HTML Classes
+		$this->requireFramework('HTML.CHTMLComponent');
+		$this->requireFramework('HTML.CHTMLDataTable');
+		$this->requireFramework('HTML.CHTMLDataTableModel');
+		//$this->requireFramework('HTML/dataentry/CHTMLImageDataEntry.class.php');
+		//$this->requireFramework('html/CHTMLDivDataTable.class.php');
 
-		//HTML Data Table
-		//$this->requireFrameworkFile('html/CHTMLDivDataTable.class.php');
-		$this->requireFrameworkFile('html/CHTMLDataTable.class.php');
-		$this->requireFrameworkFile('html/CHTMLDataTableModel.class.php');
-		$this->requireFrameworkFile('html/dataentry/CHTMLImageDataEntry.class.php');
+
+		//Form classes
+		$this->requireFramework('Form.CForm');
+		$this->requireFramework('Form.CSubmittedForm');
+		$this->requireFramework('Form.CRendererForm');
+
+		//Register error handling
+		CErrorHandlerObserver::getInstance()->addListener($this);
 
 		//Autoload model handler
-		spl_autoload_register('CForm::autoLoad', true);
+		spl_autoload_register('\Arbitrage2\Forms\CForm::autoLoad', true);
 	}
 
 	/** 
@@ -296,7 +308,7 @@ class CWebApplication extends CApplication
 	}
 
 	/* IErrorHandlerListener  Methods */
-	public function handleError(CErrorEvent $event)
+	public function handleError(IEvent $event)
 	{
 		//TODO: If debug is on, render
 		$debug = CApplication::getConfig()->server->debugMode;
@@ -306,7 +318,8 @@ class CWebApplication extends CApplication
 			@ob_end_clean();
 
 			//Render error
-			$this->requireFrameworkFile('base/CFrameworkController.class.php');
+			//TODO: Consolidate this! --EMJ
+			$this->requireFramework('Base.CFrameworkController');
 			$controller = new CFrameworkController();
 			$content    = $controller->renderContent('errors/exception', array('event' => $event));
 
@@ -316,7 +329,7 @@ class CWebApplication extends CApplication
 		}
 	}
 
-	public function handleException(CExceptionEvent $event)
+	public function handleException(IEvent $event)
 	{
 		$debug = CApplication::getConfig()->server->debugMode;
 		if($debug === true)

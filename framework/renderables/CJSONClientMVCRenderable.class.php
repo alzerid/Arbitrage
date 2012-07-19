@@ -1,4 +1,7 @@
 <?
+namespace Arbitrage2\Renderables;
+use \Arbitrage2\Renderables\CJSONApplicationRenderable;
+
 class CJSONClientMVCRenderable extends CJSONApplicationRenderable
 {
 	private $_layout;

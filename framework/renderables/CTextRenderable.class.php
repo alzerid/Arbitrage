@@ -1,4 +1,7 @@
 <?
+namespace Arbitrage2\Renderables;
+use \Arbitrage2\Interfaces\IRenderable;
+
 class CTextRenderable implements IRenderable
 {
 	public function render($data=NULL)

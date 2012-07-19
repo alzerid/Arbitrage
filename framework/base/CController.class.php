@@ -4,6 +4,8 @@
  * @author Eric M. Janik
  * @version 2.0
  */
+namespace Arbitrage2\Base;
+use \Arbitrage2\Base\CBaseController;
 
 class CController extends CBaseController
 {

@@ -1,4 +1,7 @@
 <?
+namespace Arbitrage2\Forms;
+use \Arbitrage2\Interfaces\IFileRenderable;
+
 Class CRenderForm extends CForm implements IFileRenderable
 {
 	private $_file;

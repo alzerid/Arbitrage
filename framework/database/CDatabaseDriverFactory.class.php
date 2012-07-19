@@ -1,7 +1,9 @@
 <?
 namespace Arbitrage2\Database;
 
-class CDatabaseDriverFactory implements \IModuleLoader
+use \Arbitrage2\Interfaces\IModuleLoader;
+
+class CDatabaseDriverFactory implements IModuleLoader
 {
 	static private $_INSTANCE = NULL;
 	private $_database_cfg;

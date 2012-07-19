@@ -1,5 +1,7 @@
 <?
-class EArbitrageException extends Exception
+namespace Arbitrage2\Exceptions;
+
+class EArbitrageException extends \Exception
 {
 	public function __construct($message="", $code=0, $previous=NULL)
 	{
@@ -7,7 +9,7 @@ class EArbitrageException extends Exception
 	}
 }
 
-final class PHPException extends EArbitrageException
+final class EPHPException extends EArbitrageException
 {
 	public function __construct($message, $code, $file, $line, $previous=NULL)
 	{
@@ -70,7 +72,7 @@ final class EHTTPException extends EArbitrageException
 	}
 }
 
-final class EPHPApplicationException extends Exception
+final class EPHPApplicationException extends \Exception
 {
 }
 

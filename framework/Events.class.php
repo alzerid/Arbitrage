@@ -1,7 +1,11 @@
 <?
+namespace Arbitrage2\Events;
+use Arbitrage2\Interfaces\IEvent;
+
 class CEvent implements IEvent
 {
 	private $_propagate = true;
+	private $_default   = true;
 	protected $_method  = NULL;
 
 	public function stopPropagation()
@@ -14,6 +18,16 @@ class CEvent implements IEvent
 		return $this->_propagate;
 	}
 
+	public function preventDefault()
+	{
+		$this->_default = false;
+	}
+
+	public function getDefault()
+	{
+		return $this->_default;
+	}
+
 	public function triggerListeners(array $listeners)
 	{
 		$ret = NULL;
@@ -23,7 +37,7 @@ class CEvent implements IEvent
 			foreach($listeners as $l)
 			{
 				if($l instanceof IEventListener)
-					$ret = $l->handleEvent($this);
+					$l->handleEvent($this);
 
 				$ret = $l->$method($this);
 				if($this->_propagate === false)
@@ -31,7 +45,7 @@ class CEvent implements IEvent
 			}
 		}
 
-		return $ret;
+		return $this->getDefault();
 	}
 }
 
@@ -112,7 +126,7 @@ class CExceptionEvent extends CErrorEvent
 {
 	public $exception;
 
-	public function __construct(Exception $ex)
+	public function __construct(\Exception $ex)
 	{
 		$this->_method   = 'handleException';
 		$this->exception = $ex;

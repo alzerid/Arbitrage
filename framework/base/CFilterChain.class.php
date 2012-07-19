@@ -1,4 +1,6 @@
 <?
+namespace CArbitrage2\Base;
+
 class CFilterChain
 {
 	private $_filters;

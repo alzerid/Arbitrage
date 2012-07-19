@@ -1,4 +1,7 @@
 <?
+namespace Arbitrage2\Base;
+use \Arbitrage2\Base\CController;
+
 class CErrorController extends CController
 {
 	private $_err_vars;
@@ -35,5 +38,4 @@ class CErrorController extends CController
 		return array('render' => "errors/$file", 'variables' => $this->_err_vars);
 	}
 }
-
 ?>

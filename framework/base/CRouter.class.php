@@ -1,4 +1,6 @@
 <?
+namespace Arbitrage2\Base;
+
 class CRouter
 {
 	static public function route($url)

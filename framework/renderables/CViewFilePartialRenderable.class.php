@@ -1,4 +1,8 @@
 <?
+namespace Arbitrage2\Renderables;
+use \Arbitrage2\Interfaces\IViewFileRenderable;
+use \Arbitrage2\Base\CApplication;
+
 class CViewFilePartialRenderable implements IViewFileRenderable
 {
 	static protected $_VIEW_PATHS = array();
