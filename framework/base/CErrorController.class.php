@@ -16,16 +16,19 @@ class CErrorController extends CController
 		if($this->_err_vars === NULL)
 			$this->_err_vars = array();
 
+		//Ensure CViewFileRenderable is our renderable
+		$this->setRenderer('CViewFileRenderable');
+
 		//Check for application files
 		$file = $this->_err_file;
 		$path = CApplication::getConfig()->_internals->approotpath . "app/views/_internal/errors/$file.php";
 		if(!file_exists($path))  //set viewpath to framework
-			$this->setViewPath(CApplication::getConfig()->_internals->fwrootpath . "framework/views/");
+			$this->getRenderer()->setViewPath(CApplication::getConfig()->_internals->fwrootpath . "framework/views/");
 		else
 		{
-			$this->setViewPath(CApplication::getConfig()->_internals->approotpath . "app/views/_internal/");
-			$this->setLayoutPath(CApplication::getConfig()->_internals->approotpath . "app/views/_internal/errors/");
-			$this->setDefaultLayout('layout');
+			$this->getRenderer()->setViewPath(CApplication::getConfig()->_internals->approotpath . "app/views/_internal/");
+			$this->getRenderer()->setLayoutPath(CApplication::getConfig()->_internals->approotpath . "app/views/_internal/errors/");
+			$this->getRenderer()->setLayout('layout');
 		}
 
 
