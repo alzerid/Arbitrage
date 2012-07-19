@@ -1,6 +1,11 @@
 <?
+use \Arbitrage2\Base\CFileSearchLoader;
+
 class CWebApplication extends CApplication
 {
+	private $_controller_search;  //The paths where the controllers reside
+	private $_ajax_search;        //The paths where the ajax controllers reside
+
 	private $_controller;         //The controller object that was requested
 	private $_action;             //The action object that was requested
 
@@ -8,8 +13,10 @@ class CWebApplication extends CApplication
 	{
 		parent::__construct();
 
-		$this->_controller = NULL;
-		$this->_action     = NULL;
+		$this->_controller        = NULL;
+		$this->_action            = NULL;
+		$this->_controller_search = NULL;
+		$this->_ajax_search       = NULL;
 	}
 
 	static public function getInstance()
@@ -40,6 +47,7 @@ class CWebApplication extends CApplication
 		//Controller, Actions, etc...
 		$this->requireFrameworkFile('base/CBaseController.class.php');             //Base controller class
 		$this->requireFrameworkFile('base/CController.class.php');                 //Controller class
+		$this->requireFrameworkFile('base/CExtensionController.class.php');        //Controller class
 		$this->requireFrameworkFile('base/CAction.class.php');                     //Action class
 		$this->requireFrameworkFile('base/CFilterChain.class.php');                //Filter chain for CBaseControllers
 		$this->requireFrameworkFile('base/CRouter.class.php');                     //Router handler
@@ -68,18 +76,27 @@ class CWebApplication extends CApplication
 	 */
 	public function initialize($path="config/config.php")
 	{
+		//Create search path
+		$this->_controller_search = new CFileSearchLoader;
+		$this->_ajax_search       = new CFileSearchLoader;
+
 		//Parent initialize
 		parent::initialize();
 
-		//Load additional files for Client MVC if exists
+		//Get config
 		$config = $this->getConfig();
+
+		//Load additional files for Client MVC if exists
 		if(isset($config->client) && isset($config->client->mvc) && $config->client->mvc->serverCanvas)
 		{
 			$this->requireFrameworkFile('base/renderables/CJSONClientMVCRenderable.class.php');
 			//$this->requireFrameworkFile('renderables/CXMLClientMVCRenderable.class.php'); //XML
 		}
-	}
 
+		//Add to controller paths
+		$this->addControllerSearchPath($this->getConfig()->_internals->approotpath . "app/controllers/");
+		$this->addAjaxControllerSearchPath($this->getConfig()->_internals->approotpath . "app/ajax/");
+	}
 
 	/**
 	 * Abstract function that is overloaded in order to run
@@ -125,10 +142,22 @@ class CWebApplication extends CApplication
 		//Execute the controller
 		$ret = $this->_controller->execute(false);
 
+		//Grab stylesheets and javascripts and append to self
+		$js  = $this->_controller->getJavaScriptTags();
+		$css = $this->_controller->getStyleSheetTags();
+
 		//Set back old action/controller
 		$this->_controller = array_pop($controllers);
 		$this->_action     = array_pop($actions);
 		$this->_controller->setRenderer(array_pop($renderables));
+
+		//Add javascript tag to controller
+		foreach($js as $j)
+			$this->_controller->addJavaScriptTag($j);
+
+		//Add css tag to controller
+		foreach($css as $c)
+			$this->_controller->addStyleSheetTag($c);
 
 		return $ret;
 	}
@@ -166,6 +195,28 @@ class CWebApplication extends CApplication
 		else
 			$controller = $controller . "Controller";
 
+		//Check if class exists
+		if(!class_exists($controller))
+		{
+			//Look from extension
+			$namespace = NULL;
+			foreach($this->_extensions as $key => $ext)
+			{
+				$ns = "\\" . preg_replace('/\./', '\\', $ext->getConfig()->namespace) . "\\Controllers\\{$controller}";
+				if(class_exists($ns))
+				{
+					$namespace = $ns;
+					break;
+				}
+			}
+
+			if($namespace == NULL)
+				throw new EArbitrageException("Unable to load controller '$controller'.");
+
+			//Set namespace
+			$controller = $namespace;
+		}
+
 		//Set Application controller to the new controller
 		$this->_controller = new $controller();
 		$this->_action     = new CAction($this->_controller, $route[1]);
@@ -178,17 +229,16 @@ class CWebApplication extends CApplication
 	 */
 	public function requireApplicationController($controller)
 	{
-		//Load controller into memory
-		$path = CArbitrageConfig::getInstance()->_internals->approotpath . "app/controllers/" . $controller . ".php";
-		if(!file_exists($path))
+		$ret = $this->_controller_search->loadFile($controller . ".php", false);
+
+		//Check path
+		if(!$ret)
 		{
 			if(CApplication::getConfig()->server->debugMode)
 				throw new EArbitrageException("Unable to load controller '$controller' because it does not exist.");
 			else
 				throw new EHTTPException(EHTTPException::$HTTP_NOT_FOUND);
 		}
-
-		require_once($path);
 	}
 
 	/**
@@ -196,12 +246,45 @@ class CWebApplication extends CApplication
 	 */
 	public function requireApplicationAjaxController($controller)
 	{
-		//Load controller into memory
-		$path = CArbitrageConfig::getInstance()->_internals->approotpath . "app/ajax/" . $controller . ".php";
-		if(!file_exists($path))
-			throw new EArbitrageException("Unable to load ajax controller '$controller' because it does not exist.");
+		$ret = $this->_ajax_search->loadFile($controller . ".php", false);
 
-		require_once($path);
+		//Check path
+		if(!$ret)
+		{
+			if(CApplication::getConfig()->server->debugMode)
+				throw new EArbitrageException("Unable to load ajax controller '$controller' because it does not exist.");
+			else
+				throw new EHTTPException(EHTTPException::$HTTP_NOT_FOUND);
+		}
+	}
+
+	/**
+	 * Method adds to the controller search path.
+	 */
+	public function addControllerSearchPath($path)
+	{
+		//Add controller
+		$ret = $this->_controller_search->addPath($path, false);
+		if(!$ret)
+			throw new EArbitrageException("Invalid controller path '$path'.");
+	}
+
+	/**
+	 * Method adds to the ajax controller search path.
+	 */
+	public function addAjaxControllerSearchPath($path)
+	{
+		$ret = $this->_ajax_search->addPath($path, false);
+		if(!$ret)
+			throw new EArbitrageException("Invalid ajax controller path '$path'.");
+	}
+
+	/**
+	 * Add a view path
+	 */
+	public function addViewSearchPath($path)
+	{
+		CViewFilePartialRenderable::addViewPath($path);
 	}
 
 	/**
