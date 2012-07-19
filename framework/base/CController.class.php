@@ -70,6 +70,11 @@ class CController extends CBaseController
 		$this->_javascripts[] = $link;
 	}
 
+	public function getJavaScriptTags()
+	{
+		return $this->_javascripts;
+	}
+
 	public function generateJavaScriptTag($link)
 	{
 		return '<script type="text/javascript" language="JavaScript" src="' . $link . '"></script>' . "\n";
@@ -95,6 +100,11 @@ class CController extends CBaseController
 	public function generateStyleSheetTag($link)
 	{
 		return '<link type="text/css" rel="stylesheet" href="' . $link . '" />' . "\n";
+	}
+
+	public function getStyleSheetTags()
+	{
+		return $this->_stylesheets;
 	}
 
 	public function populateStyleSheetTags()
