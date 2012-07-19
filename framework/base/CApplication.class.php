@@ -1,13 +1,17 @@
 <?
+use \Arbitrage2\Base\CFileSearchLoader;
+
 abstract class CApplication implements ISingleton, IErrorHandlerListener
 {
 	static private $_VERSION = "2.0.0";
 	static protected $_instance = NULL;    //Instance of CApplication
-	protected $_model_path;
+
+	protected $_model_search;
+	protected $_extensions;
 
 	protected function __construct()
 	{
-		$this->_model_path = array();
+		$this->_extensions   = array();
 	}
 
 	static public function getInstance()
@@ -89,9 +93,15 @@ abstract class CApplication implements ISingleton, IErrorHandlerListener
 
 		//Remote cache
 		$this->requireFrameworkFile("cache/remote/CRemoteCacheFactory.class.php");    //Remote cache factory (memcache, redis)
-		
+
+		//Get FileSearchLoader
+		$this->requireFrameworkFile("base/CFileSearchLoader.class.php");
+
 		//Autoload model handler
 		spl_autoload_register('CApplication::modelAutoLoad', true, true);
+
+		//Include extension base class
+		$this->requireFrameworkFile('base/CExtension.class.php');
 	}
 
 	/** 
@@ -103,6 +113,9 @@ abstract class CApplication implements ISingleton, IErrorHandlerListener
 	{
 		//Load application config
 		$this->loadApplicationConfig($path);
+
+		//Setup search paths
+		$this->_model_search = new CFileSearchLoader;
 
 		//Get config
 		$config = CArbitrageConfig::getInstance();
@@ -140,25 +153,24 @@ abstract class CApplication implements ISingleton, IErrorHandlerListener
 	/*
 	 * Load extension
 	 */
-	public function loadExtension($dir)
+	public function loadExtension($namespace)
 	{
-		$path = realpath(ARBITRAGE2_FW_PATH . "/$dir");
+		if(isset($this->_extensions[$namespace]))
+			return;
+
+		//Setup path
+		$path = $this->convertNamespaceToPath($namespace);
+		$path = realpath($this->getConfig()->_internals->approotpath . "/app/extensions/$path");
 		if($path === false)
-			throw new EArbitrageException("Unable to load extension '$dir'.");
+			throw new EArbitrageException("Unable to load extension '$namespace'.");
 
-		//Get load order
-		if(!file_exists("$path/.loadorder"))
-			throw new EArbitrageException("Unable to find .loadorder config file for '$dir'.");
+		//Require the extension file
+		require_once("$path/extension.php");
 
-		$files = file_get_contents("$path/.loadorder");
-		$files = explode(PHP_EOL, trim($files));
-		foreach($files as $file)
-		{
-			if(!file_exists("$path/$file"))
-				throw new EArbitrageException("Unable to load '$file' for extension '$dir'.");
-
-			require_once("$path/$file");
-		}
+		//Load extension
+		$class = $this->convertNamespaceToPHP($namespace) . "\\Extension";
+		$this->_extensions[$namespace] = new $class($path, $namespace);
+		$this->_extensions[$namespace]->initialize();
 	}
 	
 	/*
@@ -190,17 +202,7 @@ abstract class CApplication implements ISingleton, IErrorHandlerListener
 
 	public function requireApplicationModel($model)
 	{
-		foreach($this->_model_path as $path)
-		{
-			$path .= "$model.php";
-			if(file_exists($path))
-			{
-				require_once($path);
-				return;
-			}
-		}
-
-		throw new EArbitrageException("Model '$model' does not exist.");
+		$this->_model_search->loadFile("$model.php");
 	}
 
 	public function requireApplicationLibrary($lib)
@@ -215,11 +217,35 @@ abstract class CApplication implements ISingleton, IErrorHandlerListener
 
 	public function addModelSearchPath($path)
 	{
-		if(!file_exists($path))
-			throw new EArbitrageException("Model path '$path' does not exist!");
+		$this->_model_search->addPath($path);
+	}
 
-		$path = realpath($path) . '/';
-		$this->_model_path[] = $path ;
+	public function addViewSearchPath($path)
+	{
+		CViewFilePartialRenderable::addViewPath($path);
+	}
+
+	static public function convertNamespaceToPath($namespace)
+	{
+		$path = preg_replace('/([a-z0-9])([A-Z])/', '$1 $2', $namespace);
+		$path = preg_replace('/ /', '_', $path);
+		$path = preg_replace('/\./', '/', $path);
+
+		return strtolower($path);
+	}
+
+	static public function convertNamespaceToPHP($namespace)
+	{
+		return "\\" . preg_replace('/\./', '\\', $namespace);
+	}
+
+	static public function convertPHPNamespaceToPath($namespace)
+	{
+		$path = preg_replace('/([a-z0-9])([A-Z])/', '$1 $2', $namespace);
+		$path = preg_replace('/ /', '_', $path);
+		$path = preg_replace('/\\\/', '/', $path);
+
+		return strtolower($path);
 	}
 
 	static public function getConfig()
@@ -231,7 +257,8 @@ abstract class CApplication implements ISingleton, IErrorHandlerListener
 	{
 		if(preg_match('/Model$/', $class_name))
 		{
-			$class = strtolower(str_replace("Model", "", $class_name));
+			$class = preg_replace('/Model$/', '', $class_name);
+			$class = self::convertPHPNamespaceToPath($class);
 			CApplication::getInstance()->requireApplicationModel($class);
 		}
 	}
