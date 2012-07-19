@@ -1,15 +1,13 @@
 <?
 class CViewFileRenderable extends CViewFilePartialRenderable
 {
+	static protected $_LAYOUT_PATHS = array();
 	protected $_view_variables;
-	protected $_layout_paths;
 	protected $_layout;
 
 	public function __construct()
 	{
 		parent::__construct();
-
-		$this->_layout_paths   = array();
 		$this->_view_variables = array();
 
 		$this->addLayoutPath(CApplication::getConfig()->_internals->approotpath . "app/views/layout/");
@@ -26,14 +24,19 @@ class CViewFileRenderable extends CViewFilePartialRenderable
 		return $this->_layout;
 	}
 
-	public function getLayoutPath()
+	static public function getLayoutPaths()
 	{
-		return $this->_layout_paths;
+		return self::$_LAYOUT_PATHS;
 	}
 
-	public function addLayoutPath($path)
+	static public function addLayoutPath($path)
 	{
-		$this->_layout_paths[] = $path;
+		self::$_LAYOUT_PATHS[] = $path;
+	}
+
+	static public function setLayoutPath($path)
+	{
+		self::$_LAYOUT_PATHS = array($path);
 	}
 
 	public function render($data=NULL)
@@ -53,7 +56,7 @@ class CViewFileRenderable extends CViewFilePartialRenderable
 
 		//Now render layout
 		$layout = NULL;
-		foreach($this->_layout_paths as $lp)
+		foreach(self::$_LAYOUT_PATHS as $lp)
 		{
 			if(file_exists($lp . "/" . $default['layout'] . ".php"))
 			{

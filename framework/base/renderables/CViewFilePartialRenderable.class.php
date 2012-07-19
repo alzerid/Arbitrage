@@ -1,22 +1,26 @@
 <?
 class CViewFilePartialRenderable implements IViewFileRenderable
 {
-	protected $_view_paths;
+	static protected $_VIEW_PATHS = array();
 
 	public function __construct()
 	{
-		$this->_view_paths = array();
 		$this->addViewPath(CApplication::getConfig()->_internals->approotpath . "app/views/");
 	}
 
-	public function getViewPaths()
+	static public function getViewPaths()
 	{
-		return $this->_view_paths;
+		return self::$_VIEW_PATHS;
 	}
 
-	public function addViewPath($path=NULL)
+	static public function addViewPath($path)
 	{
-		$this->_view_paths[] = $path;
+		self::$_VIEW_PATHS[] = $path;
+	}
+
+	static public function setViewPath($path)
+	{
+		self::$_VIEW_PATHS = array($path);
 	}
 
 	public function render($data=NULL)
@@ -44,7 +48,7 @@ class CViewFilePartialRenderable implements IViewFileRenderable
 
 		//Get view file
 		$path = NULL;
-		foreach($this->_view_paths as $vp)
+		foreach(self::$_VIEW_PATHS as $vp)
 		{
 			if(file_exists($vp . "/" . $file . ".php"))
 			{
@@ -54,7 +58,10 @@ class CViewFilePartialRenderable implements IViewFileRenderable
 		}
 		
 		if($path == NULL)
+		{
+			die();
 			throw new EArbitrageException("View file does not exist '$file'.");
+		}
 
 		ob_start();
 		ob_implicit_flush(false);
