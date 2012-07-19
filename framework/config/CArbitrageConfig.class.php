@@ -19,7 +19,7 @@ class CArbitrageConfig implements ISingleton
 		return self::$_instance;
 	}
 
-	public function initialize($root, $env)
+	public function initialize($root, $env="")
 	{
 		$this->_root = $root . "/$env";
 		$this->_env  = $env;
@@ -65,6 +65,26 @@ class CArbitrageConfig implements ISingleton
 		$loader->load($this->_variables);
 	}
 
+	public function merge(array $config)
+	{
+		//merge the two configs into $this
+		foreach($config as $key=>$val)
+		{
+			if($key == "_internals")
+				continue;
+
+			if(isset($this->$key))
+			{
+				if($this->$key instanceof CArbitrageConfigProperty)
+					$this->$key->merge($val);
+				else
+					$this->$key = $val;
+			}
+			else
+				$this->$key = $val;
+		}
+	}
+
 	public function __isset($name)
 	{
 		return array_key_exists($name, $this->_variables);
@@ -79,6 +99,33 @@ class CArbitrageConfig implements ISingleton
 	public function __set($name, $val)
 	{
 		$this->_variables[$name] = $val;
+	}
+}
+
+class CArbitrageExtensionConfig extends CArbitrageConfig
+{
+	public function initialize($root, $env="")
+	{
+		$this->_root = $root . "/$env";
+		$this->_env  = $env;
+
+		//Setup _internals
+		$this->_variables['_internals']                  = array();
+		$this->_variables['_internals']['fwrootpath']    = ARBITRAGE2_FW_PATH;
+		$this->_variables['_internals']['approotpath']   = realpath("$root/../") . "/";
+		$this->_variables['_internals']['appconfigpath'] = realpath("$root/../") . "/";
+
+
+		//Setup view and layout path
+		$this->_variables['_internals']['viewpath']   = realpath($this->_variables['_internals']['approotpath'] . "app/views/") . "/";
+		$this->_variables['_internals']['layoutpath'] = realpath($this->_variables['_internals']['approotpath'] . "app/views/layout/") . "/";
+
+		//Setup arbitrage
+		$this->_variables['server'] = array();
+
+		//Setup extension
+		$this->_variables['extension']              =  array();
+		$this->_variables['extension']['namespace'] =  '';
 	}
 }
 
@@ -121,6 +168,22 @@ class CArbitrageConfigProperty extends CArrayObject
 	public function __set($name, $val)
 	{
 		$this->_config[$name] = $val;
+	}
+
+	public function merge(array $config)
+	{
+		foreach($config as $key=>$val)
+		{
+			if(isset($this->$key))
+			{
+				if($this->$key instanceof CArbitrageConfigProperty)
+					$this->$key->merge($val);
+				else
+					$this->$key = $val;
+			}
+			else
+				$this->$key = $val;
+		}
 	}
 
 	public function toArray()
