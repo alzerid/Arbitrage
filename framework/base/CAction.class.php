@@ -12,7 +12,7 @@ class CAction implements IAction
 		//Ensure controller has action name
 		if(!method_exists($controller, $this->_name))
 		{
-			if(CApplication::getConfig()->arbitrage->debugMode)
+			if(CWebApplication::getConfig()->server->debugMode)
 				throw new EArbitrageException("Action '{$this->_name}' does not exist for controller '{$this->_controller->getName()}'.");
 			else
 				throw new EHTTPException(EHTTPException::$HTTP_BAD_REQUEST);
