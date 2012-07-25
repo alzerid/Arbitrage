@@ -34,7 +34,7 @@ interface IModuleLoader extends ISingleton
  */
 interface IRenderer
 {
-	public function renderContent($content);
+	public function render($content);
 }
 
 /*
@@ -42,7 +42,15 @@ interface IRenderer
  */
 interface IRenderable
 {
-	public function render($data=NULL);
+	public function render();
+}
+
+/**
+ * Content Renderable Interface
+ */
+interface IContentRenderable extends IRenderable
+{
+	public function initialize($content);
 }
 
 /**
@@ -50,7 +58,17 @@ interface IRenderable
  */
 interface IViewFileRenderable extends IRenderable
 {
+	public function initialize($application, $content);
 	public function renderPartial($file, $vars);
+}
+
+/**
+ * ILayoutRenderable interface
+ */
+interface ILayoutRenderable
+{
+	public function setLayout($layout);
+	public function getLayout();
 }
 
 /**
@@ -179,5 +197,12 @@ interface IHTMLDataTableEntry
 }
 
 /** END HTML Interfaces **/
+
+/** Service Interfaces **/
+interface IErrorHandlerService
+{
+	public function handleEvent(IEvent $event);
+}
+/** End Service Interfaces **/
 
 ?>
