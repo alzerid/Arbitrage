@@ -1,6 +1,5 @@
 <?
 namespace Arbitrage2\Database;
-
 use \Arbitrage2\Interfaces\IModuleLoader;
 
 class CDatabaseDriverFactory implements IModuleLoader
@@ -60,13 +59,13 @@ class CDatabaseDriverFactory implements IModuleLoader
 		}
 
 		//Throw error that we could not find the driver
-		throw new CDatabaseDriverException("Unknown driver '$driver'.");
+		throw new EDatabaseDriverException("Unknown driver '$driver'.");
 	}
 
 	public function getHandle($driver, $config)
 	{
 		if(!isset($this->_database_cfg[$driver]))
-			throw new CDatabaseDriverException('Unknown database configuration "' . $config . '".');
+			throw new EDatabaseDriverException('Unknown database configuration "' . $config . '".');
 
 		$dbconfig = array_values($this->_database_cfg[$driver]);
 		$driver   = "Arbitrage2\\Database\\C" . ucwords($driver) . "Driver";
@@ -82,9 +81,9 @@ abstract class CDatabaseDriver
 {
 	static public function getHandle($config)
 	{
-		throw new CDatabaseDriverException("Your driver must implement ::getHandle.");
+		throw new EDatabaseDriverException("Your driver must implement ::getHandle.");
 	}
 }
 
-class CDatabaseDriverException extends \Exception { }
+class EDatabaseDriverException extends \Exception { }
 ?>

@@ -1,380 +1,268 @@
 <?
 namespace Arbitrage2\Base;
-use \Arbitrage2\Interfaces\IEvent;
-
-use \Arbitrage2\Base\CApplication;
-use \Arbitrage2\Base\CAction;
-use \Arbitrage2\Base\CController;
-
-use \Arbitrage2\Utils\CFileSearchLoader;
-use \Arbitrage2\ErrorHandler\CErrorHandlerObserver;
+use \Arbitrage2\Exceptions\EWebApplicationException;
 
 class CWebApplication extends CApplication
 {
-	private $_controller_search;  //The paths where the controllers reside
-	private $_ajax_search;        //The paths where the ajax controllers reside
+	private $_renderable_paths;    //Paths where the renderables exist
+	private $_controller_queue;    //Controller queue
+	private $_packages;            //A list of packages
+	private $_router;              //Router instance
 
-	private $_controller;         //The controller object that was requested
-	private $_action;             //The action object that was requested
-
-	protected function __construct()
+	/**
+	 * Initialize the Web Application.
+	 */
+	public function __construct()
 	{
-		parent::__construct();
-
-		$this->_controller        = NULL;
-		$this->_action            = NULL;
-		$this->_controller_search = NULL;
-		$this->_ajax_search       = NULL;
-	}
-
-	static public function getInstance()
-	{
-		if(self::$_instance == NULL)
-			self::$_instance = new CWebApplication();
-
-		return self::$_instance;
+		parent::__construct($this);
+		$this->_renderable_paths = array();
+		$this->_controller_queue = array();
+		$this->_packages         = array();
+		$this->_router           = NULL;
 	}
 
 	/**
-	 * Loads all the required files for the framework.
+	 * Initializes the arbitrage application, loads the application config.
+	 * @param string $path The path where the application resides in.
+	 * @param string $namespace The namespace associated with the object.
 	 */
-	public function bootstrap()
+	public function initialize($path, $namespace)
 	{
-		parent::bootstrap();
+		//Call parent
+		parent::initialize($path, $namespace);
 
-		//Renderers and Renderables
-		$this->requireFramework('Renderables.CHTMLRenderable');
-		$this->requireFramework('Renderables.CTextRenderable');
-		$this->requireFramework('Renderables.CJSONRenderable');
-		$this->requireFramework('Renderables.CJSONApplicationRenderable');
-		$this->requireFramework('Renderables.CJSONClientMVCRenderable');
-		$this->requireFramework('Renderables.CJavascriptRenderable');
-		$this->requireFramework('Renderables.CViewFilePartialRenderable');
-		$this->requireFramework('Renderables.CViewFileRenderable');
+		//Require framework files
+		CKernel::getInstance()->requireFrameworkFile("Base.CController");
+		CKernel::getInstance()->requireFrameworkFile("Base.CAction");
+		CKernel::getInstance()->requireFrameworkFile('Base.CRouter');
+		CKernel::getInstance()->requireFrameworkFile('Base.CFilterChain');
+		CKernel::getInstance()->requireFrameworkFile('Utils.CFlashPropertyObject');
 
-		//Controller, Actions, etc...
-		$this->requireFramework('Base.CBaseController');             //Base controller class
-		$this->requireFramework('Base.CController');                 //Controller class
-		$this->requireFramework('Base.CExtensionController');        //Controller class
-		$this->requireFramework('Base.CAction');                     //Action class
-		$this->requireFramework('Base.CFilterChain');                //Filter chain for CBaseControllers
-		$this->requireFramework('Base.CRouter');                     //Router handler
-		$this->requireFramework('Base.CFlashPropertyObject');        //Flash Property Object class
+		//Create relavent services
+		$this->_initializeServices();
 
-		//HTML Classes
-		$this->requireFramework('HTML.CHTMLComponent');
-		$this->requireFramework('HTML.CHTMLDataTable');
-		$this->requireFramework('HTML.CHTMLDataTableModel');
-		//$this->requireFramework('HTML/dataentry/CHTMLImageDataEntry.class.php');
-		//$this->requireFramework('html/CHTMLDivDataTable.class.php');
-
-
-		//Form classes
-		$this->requireFramework('Form.CForm');
-		$this->requireFramework('Form.CSubmittedForm');
-		$this->requireFramework('Form.CRendererForm');
-
-		//Register error handling
-		CErrorHandlerObserver::getInstance()->addListener($this);
-
-		//Autoload model handler
-		spl_autoload_register('\Arbitrage2\Forms\CForm::autoLoad', true);
+		//Create router instance
+		$this->_router = new CRouter($this->getConfig()->webApplication->routes);
 	}
 
 	/** 
-	 * Initializes the web application by loading its config file
-	 * and determining which other framework classes to require.
-	 * @path string The path to the application configuration file.
-	 */
-	public function initialize($path="config/config.php")
-	{
-		//Create search path
-		$this->_controller_search = new CFileSearchLoader;
-		$this->_ajax_search       = new CFileSearchLoader;
-
-		//Parent initialize
-		parent::initialize();
-
-		//Get config
-		$config = $this->getConfig();
-
-		//Load additional files for Client MVC if exists
-		if(isset($config->client) && isset($config->client->mvc) && $config->client->mvc->serverCanvas)
-		{
-			$this->requireFrameworkFile('base/renderables/CJSONClientMVCRenderable.class.php');
-			//$this->requireFrameworkFile('renderables/CXMLClientMVCRenderable.class.php'); //XML
-		}
-
-		//Add to controller paths
-		$this->addControllerSearchPath($this->getConfig()->_internals->approotpath . "app/controllers/");
-		$this->addAjaxControllerSearchPath($this->getConfig()->_internals->approotpath . "app/ajax/");
-	}
-
-	/**
-	 * Abstract function that is overloaded in order to run
-	 * web applications.
+	 * Method runs the Web Application
 	 */
 	public function run()
 	{
-		//Parse URL and grab correct route
-		$route = CRouter::route($_SERVER['REQUEST_URI']);
+		//Get route
+		$route = $this->_router->route($_SERVER['REQUEST_URI']);
 
-		//Get Controller class from Router
-		$this->loadController($route, isset($_REQUEST['_ajax']));
-			
+		//Load the controller
+		$controller = $this->loadController($route, isset($_REQUEST['_ajax']));
+
 		//Execute the action
-		$this->_controller->execute();
+		$ret = $controller->execute();
+		die('run CWeb');
 	}
 
 	/**
-	 * Method that actually executes the action within the Controller context via a route rule.
-	 * param $forward The route to use to forward execution.
-	 * param $ajax Determine if we should load the ajax controller.
-	 */
-	public function forward($forward, $ajax=false)
-	{
-		static $controllers = array();
-		static $actions     = array();
-		static $renderables = array();
-
-		//Get old controller and action
-		$controllers[] = $this->_controller;
-		$actions[]     = $this->_action;
-		$renderables[] = $this->_controller->getRenderer();
-
-		//New CViewFileRenderable
-		$this->_controller->setRenderer('CViewFileRenderable');
-
-		//Get routing rules
-		$route = CRouter::route($forward);
-
-		//Get Controller Class
-		$this->loadController($route, $ajax);
-
-		//Execute the controller
-		$ret = $this->_controller->execute(false);
-
-		//Grab stylesheets and javascripts and append to self
-		$js  = $this->_controller->getJavaScriptTags();
-		$css = $this->_controller->getStyleSheetTags();
-
-		//Set back old action/controller
-		$this->_controller = array_pop($controllers);
-		$this->_action     = array_pop($actions);
-		$this->_controller->setRenderer(array_pop($renderables));
-
-		//Add javascript tag to controller
-		foreach($js as $j)
-			$this->_controller->addJavaScriptTag($j);
-
-		//Add css tag to controller
-		foreach($css as $c)
-			$this->_controller->addStyleSheetTag($c);
-
-		return $ret;
-	}
-
-	/**
-	 * Method loads the controller into memory and the action into memory.
-	 * param $controller The controller in route format to load.
-	 * param $ajax Determins if we should load the ajax controller.
-	 */
+	 * Method loads the controller.
+	 * @param string $route URL formatted route that specifies the controller.
+	 * @param boolean $ajax Determines if the controller is an AJAX controller.
+	 * @return Returns the controller.
+	*/
 	public function loadController($route, $ajax=false)
 	{
-		$route = explode("/", $route);
+		//Add the Controllers namespace
+		$url    = explode('/', $route);
+		$action = preg_replace('/\?.*$/', '', $url[count($url)-1]);
+		$route  = implode('/', array_slice($url, 0, 1)) . "/controllers/" . implode('/', array_slice($url, 1, count($url)-2));
 
-		//Throw error if route is malformed
-		if(count($route) < 2)
-		{
-			if(CApplication::getConfig()->server->debugMode)
-				throw new EArbitrageException("Unable to load controller because route is malformed '" . implode('/', $route) . "'.");
-			else
-				throw new EHTTPException(EHTTPException::$HTTP_BAD_REQUEST);
-		}
+		//Transforms the route from URL format to FileSystem format
+		$namespace = CKernel::getInstance()->convertURLNamespaceToArbitrage($route);
+		$this->requireController($namespace);
 
-		$controller = strtolower($route[0]);
-		$action     = strtolower($route[1]);
+		//Create an instance of the controller
+		$class = CKernel::getInstance()->convertArbitrageNamespaceToPHP($namespace) . "Controller";
+		if(!class_exists($class))
+			throw new EWebApplicationException("Controller '$class' does not exists.");
 
-		//Require controller
-		$this->requireApplicationController($controller);
+		//Create controller
+		$controller                = $class::createController($this);
+		$this->_controller_queue[] = $controller;
 
-		//Determine if we are an ajax call
-		if($ajax)
-		{
-			$this->requireApplicationAjaxController($controller);
-			$controller = $controller . "AjaxController";
-		}
+		//Set action for controller
+		$action = new CAction($controller, $action);
+		$controller->setAction($action);
+
+		return $controller;
+	}
+
+	/**
+	 * Method requires the controller.
+	 * @param string $namespace The arbitrage namespace where the controller resides.
+	 * @throws \Arbitrage2\Exceptions\EWebApplicationException
+	 */
+	public function requireController($namespace)
+	{
+		//Get namespace
+		$namespace = explode('.', $namespace);
+		$count     = count($namespace);
+
+		//Lowercase
+		$namespace[$count-1] = preg_replace('/Controller$/i', '', $namespace[$count-1]);
+		$namespace[$count-1] = strtolower($namespace[$count-1]);
+		$namespace           = implode('.', $namespace);
+		$ret = CKernel::getInstance()->requireFile($namespace, true, array('_application' => $this));
+
+		if(!$ret)
+			throw new EWebApplicationException("Unable to load controller '$namespace'.");
+	}
+
+	/**
+	 * Method requires a renderable object.
+	 * @param string $namespace The arbitrage namespace where the renderable object resides.
+	 * @throws \Arbitrage2\Exceptions\EWebApplicationException
+	 */
+	public function requireRenderable($namespace)
+	{
+		//Require the file
+		$variables = array('_application' => $this);
+		if(preg_match('/^Arbitrage2\./', $namespace))
+			CKernel::getInstance()->requireFrameworkFile(preg_replace('/^Arbitrage2\./', 'Framework.', $namespace), true, $variables);
 		else
-			$controller = $controller . "Controller";
+			CKernel::getInstance()->requireFile($namespace, true, $variables);
+	}
 
-		//Check if class exists
-		if(!class_exists($controller))
+	/**
+	 * Method forwards execution to another controller specified by Arbitrage namespace.
+	 * @param string $namespace The namespace of the Controller/Action to forward the execution to.
+	 * @param array $opt_variables The variables to pass to the constructor.
+	 */
+	public function forward($namespace, $opt_variables)
+	{
+		static $request = array();
+
+		//Take out action from namespace
+		$action     = explode('.', $namespace);
+		$controller = implode('.', array_slice($action, 0, -1));
+		$action     = $action[count($action)-1];
+
+		$class = CKernel::getInstance()->convertArbitrageNamespaceToPHP($controller);
+		if(!class_exists($class))
+			throw new EWebApplicationException("Unable to forward to '$namespace' because it does not exist!");
+
+		//Update opt_variables and set them into _REQUEST
+		if(count($opt_variables))
 		{
-			//Look from extension
-			$namespace = NULL;
-			foreach($this->_extensions as $key => $ext)
-			{
-				$ns = "\\" . preg_replace('/\./', '\\', $ext->getConfig()->namespace) . "\\Controllers\\{$controller}";
-				if(class_exists($ns))
-				{
-					$namespace = $ns;
-					break;
-				}
-			}
-
-			if($namespace == NULL)
-				throw new EArbitrageException("Unable to load controller '$controller'.");
-
-			//Set namespace
-			$controller = $namespace;
+			$request[] = $_REQUEST;
+			$_REQUEST = $opt_variables;
 		}
 
-		//Set Application controller to the new controller
-		$this->_controller = new $controller();
-		$this->_action     = new CAction($this->_controller, $route[1]);
-		$this->_controller->setAction($this->_action);
-		$this->_controller->setAjax($ajax);
+
+		//Push variables
+		$controller = $class::createController($this);
+		$this->_controller_queue[] = $controller;
+
+		//Set action
+		$action = new CAction($controller, $action);
+		$controller->setAction($action);
+
+		//Execute controller and return raw results
+		$controller->execute();
+
+		//Pop variables
+		array_pop($this->_controller_queue);
+		if(count($request))
+			$_REQUEST = array_pop($request);
 	}
+
+	/** Overloaded Error Handling Methods **/
 
 	/**
-	 * Method that requires a controller.
+	 * Method handles errors.
 	 */
-	public function requireApplicationController($controller)
+	public function handleError(\Arbitrage2\Interfaces\IEvent $event)
 	{
-		$ret = $this->_controller_search->loadFile($controller . ".php", false);
+		//TODO: Handle Debug Mode Exceptions
 
-		//Check path
-		if(!$ret)
-		{
-			if(CApplication::getConfig()->server->debugMode)
-				throw new EArbitrageException("Unable to load controller '$controller' because it does not exist.");
-			else
-				throw new EHTTPException(EHTTPException::$HTTP_NOT_FOUND);
-		}
-	}
+		$config = $this->getConfig();
+		$debug  = ((isset($config->arbitrage2->debugMode))? $config->arbitrage2->debugMode : false);
 
-	/**
-	 * Method that requires the AJAX controller.
-	 */
-	public function requireApplicationAjaxController($controller)
-	{
-		$ret = $this->_ajax_search->loadFile($controller . ".php", false);
+		$this->handleException($event);
 
-		//Check path
-		if(!$ret)
-		{
-			if(CApplication::getConfig()->server->debugMode)
-				throw new EArbitrageException("Unable to load ajax controller '$controller' because it does not exist.");
-			else
-				throw new EHTTPException(EHTTPException::$HTTP_NOT_FOUND);
-		}
-	}
+		return;
 
-	/**
-	 * Method adds to the controller search path.
-	 */
-	public function addControllerSearchPath($path)
-	{
-		//Add controller
-		$ret = $this->_controller_search->addPath($path, false);
-		if(!$ret)
-			throw new EArbitrageException("Invalid controller path '$path'.");
-	}
-
-	/**
-	 * Method adds to the ajax controller search path.
-	 */
-	public function addAjaxControllerSearchPath($path)
-	{
-		$ret = $this->_ajax_search->addPath($path, false);
-		if(!$ret)
-			throw new EArbitrageException("Invalid ajax controller path '$path'.");
-	}
-
-	/**
-	 * Add a view path
-	 */
-	public function addViewSearchPath($path)
-	{
-		CViewFilePartialRenderable::addViewPath($path);
-	}
-
-	/**
-	 * Returns the current controller.
-	 */
-	public function getController()
-	{
-		return $this->_controller;
-	}
-
-	/* IErrorHandlerListener  Methods */
-	public function handleError(IEvent $event)
-	{
-		//TODO: If debug is on, render
-		$debug = CApplication::getConfig()->server->debugMode;
 		if($debug === true)
 		{
-			//Flush output buffer
-			@ob_end_clean();
-
-			//Render error
-			//TODO: Consolidate this! --EMJ
-			$this->requireFramework('Base.CFrameworkController');
-			$controller = new CFrameworkController();
-			$content    = $controller->renderContent('errors/exception', array('event' => $event));
-
-			//echo out the content
-			echo $content;
-			die();
+			//$this->_forwardError($event);
+			//Grab error handler controller
+			//TODO: Render error
+			var_dump($event);
+			die("ERROR");
 		}
-	}
-
-	public function handleException(IEvent $event)
-	{
-		$debug = CApplication::getConfig()->server->debugMode;
-		if($debug === true)
+		elseif($event->exception instanceof \Arbitrage2\Exceptions\EHTTPException)
 		{
-			//Flush output buffer
-			@ob_end_clean();
-
-			//Render error
-			$this->requireFrameworkFile('base/CFrameworkController.class.php');
-			$controller = new CFrameworkController();
-			$content    = $controller->renderContent('errors/exception', array('event' => $event));
-
-			//echo out the content
-			echo $content;
-			die();
-		}
-		elseif($event->exception instanceof EHTTPException)
-		{
-			//Flush output buffer
-			@ob_end_clean();
-
-			//Check to see which view we should show, arbitrage view or application views
-			$this->requireFrameworkFile('base/CErrorController.class.php');
-			$this->_controller = new CErrorController('http_' . $event->exception->getCode(), array('event' => $event));
-			$this->_action     = new CAction($this->_controller, 'process');
-			$this->_controller->setAction($this->_action);
-			$this->_controller->execute();
-
-			die();
+			die("HTTP Exception!");
 		}
 		else
 		{
-			//Flush output buffer
-			@ob_end_clean();
-
-			//Check to see which view we should show, arbitrage view or application views
-			$this->requireFrameworkFile('base/CErrorController.class.php');
-			$this->_controller = new CErrorController('http_500', array('event' => $event));
-			$this->_action     = new CAction($this->_controller, 'process');
-			$this->_controller->setAction($this->_action);
-			$this->_controller->execute();
-
-			die();
+			//Show http_500
+			die("show http500");
 		}
+
+		$event->stopPropagation();
+		$event->preventDefault();
 	}
-	/* End Exception Listner Methods */
+
+	/**
+	 * Method intializes services specified in the application configuration file.
+	 */
+	public function handleException(\Arbitrage2\Interfaces\IEvent $event)
+	{
+		//TODO: Handle HTTP Exceptions
+		//TODO: Handle Debug Mode Exceptions
+		$service = CKernel::getInstance()->getService($this, 'errorHandler');
+		if($service !== NULL)
+			$service->handleEvent($event);
+		else
+			$this->_printEvent($event);
+
+		$event->stopPropagation();
+		$event->preventDefault();
+	}
+	/** End Overloaded Error Handling Methods **/
+
+	/**
+	 * Method that initializes services.
+	 */
+	protected function _initializeServices()
+	{
+		//Ensure error_handler service is defined
+		$services = $this->getConfig()->arbitrage2->services;
+		if(!isset($services->errorHandler))
+			$services->errorHandler = array('Arbitrage2.ErrorHandler.CErrorHandlerService' => array('debugMode' => $this->getConfig()->arbitrage2->debugMode));
+
+		//Call parent initialize services
+		CKernel::getInstance()->initializeServices($this);
+	}
+
+	/**
+	 * Method prints out in HTML format the error or exception event.
+	 * @param \Arbitrage2\Interfaces\IEvent $event The event to print out.
+	 */
+	private function _printEvent(\Arbitrage2\Interfaces\IEvent $event)
+	{
+		echo '<style type="text/css"> h3 { border-bottom: 1px solid black; } div.title { font-weight: bold; float: left; width: 100px; } div.value { float: left; } div.tracenumber { float: left; width: 100px; } div.tracefile { float: left; }</style>';
+		echo '<h1>Arbitrage2: Global Exception Caught</h1><br />';
+		echo '<h3>Exception</h3>';
+		echo '<div class="title">Message:</div><div class="message">' . $event->message . '</div><div style="clear: both;"></div>';
+		echo '<div class="title">Code:</div><div class="message">' . ((string) $event->code) . '</div><div style="clear: both;"></div>';
+		echo '<div class="title">File:</div><div class="message">' . $event->file . '</div><div style="clear: both;"></div>';
+		echo '<div class="title">Line:</div><div class="message">' . $event->line . '</div><div style="clear: both;"></div>';
+		
+		//Trace
+		echo '<h3>Trace</h3>';
+		$cnt = count($event->trace)-1;
+		echo '<div class="title tracenumber">Trace</div><div class="title tracefile">File (line)</div><div style="clear: both;"></div>';
+		for($i=0; $i<$cnt; $i++)
+			echo '<div class="tracenumber">' . $i . '</div><div class="tracefile">' . $event->trace[$i]['file'] . ' (' . $event->trace[$i]['line'] . ')</div><div style="clear: both;"></div>';
+	}
 }
 ?>

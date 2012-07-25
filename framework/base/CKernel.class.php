@@ -1,0 +1,358 @@
+<?
+namespace Arbitrage2\Base;
+use \Arbitrage2\Interfaces\ISingleton;
+use \Arbitrage2\Exceptions\EArbitrageKernelException;
+
+class CKernel implements ISingleton
+{
+	static private $_VERION     = "2.0.0";
+	static protected $_INSTANCE = NULL;
+	
+	private $_package_paths;
+	private $_service_paths;
+	private $_applications;
+	private $_services;
+	private $_path;
+
+	protected function __construct()
+	{
+		$this->_package_paths = array();
+		$this->_service_paths = array();
+		$this->_applications  = array();
+		$this->_services      = array();
+		$this->_path          = '';
+	}
+
+	static public function getInstance()
+	{
+		if(self::$_INSTANCE == NULL)
+			self::$_INSTANCE = new CKernel;
+
+		return self::$_INSTANCE;
+	}
+
+	/**
+	 * Setups up the kernel through a bootstrap process.
+	 */
+	public function bootstrap()
+	{
+		//Ensure ARBITRAGE2_FW_PATH exists
+		if(!file_exists(ARBITRAGE2_FW_PATH))
+			die("Framework path is not defined in environment variable ARBITRAGE2_FW_PATH");
+
+		//Set path
+		$this->_path            = ARBITRAGE2_FW_PATH;
+		$this->_service_paths[] = $this->_path;
+
+		//Require needed files
+		$ret = $this->requireFrameworkFile('Exceptions', false);                    //File full of base exception classes
+		if(!$ret)
+			die("Unable to include Exceptions file!");
+
+		$this->requireFrameworkFile('Events');                               //Events
+		$this->requireFrameworkFile('ErrorHandler.CErrorHandlerObserver');   //Error Handler Observer
+		$this->requireFrameworkFile('Utils.CArrayObject');                   //Array object used by most Arbitrage classes
+		$this->requireFrameworkFile('Base.CService');                        //Base service class
+		$this->requireFrameworkFile('Base.CServiceContainer');               //Service container class
+		$this->requireFrameworkFile('Base.CExtension');                      //Extension class
+		$this->requireFrameworkFile('Base.CPackage');                        //Package class
+		$this->requireFrameworkFile('Base.CApplication');                    //Application class
+		$this->requireFrameworkFile('Base.CWebApplication');                 //Web application class
+		$this->requireFrameworkFile('Config.CArbitrageConfig');              //Configuration object
+		$this->requireFrameworkFile('Config.CArbitrageConfigLoader');        //Configuration loader
+	}
+
+	/**
+	 * Requires a file by using namespace resolution.
+	 * @param $namespace The namespace to convert to a file name.
+	 * @param $opt_throw Optional parameter that specifies if we should throw an error.
+	 * @param $opt_variables Optional parameter that pases variables into the required file.
+	 * @throws \Arbitrage2\Exceptions\EArbitrageKernelException
+	 * @return boolean Returns true if the file was included else false.
+	 */
+	public function requireFile($namespace, $opt_throw=true, $opt_variables=array())
+	{
+		//Iterate through and find file
+		$file = $this->convertArbitrageNamespaceToPath($namespace);
+
+		//Extract opt_variables
+		if(count($opt_variables))
+			extract($opt_variables);
+
+		//Find the file in _package_paths
+		foreach($this->_package_paths as $path)
+		{
+			$path .= "/$file";
+			if(file_exists("$path.php"))
+			{
+				require_once("$path.php");
+				return true;
+			}
+			elseif(file_exists("$path.class.php"))
+			{
+				require_once("$path.php");
+				return true;
+			}
+		}
+
+		//Check if we should throw an exception
+		if($opt_throw)
+			throw new EArbitrageKernelException("Unable to require '$namespace' ($path).");
+
+		return false;
+	}
+
+	/**
+	 * Method requires a framework file.
+	 * @param string $namespace The Arbitrage namespace to include.
+	 * @param $opt_throw Optional parameter that specifies if we should throw an error.
+	 * @param $opt_variables Optional parameter that pases variables into the required file.
+	 * @throws \Arbitrage2\Exceptions\EArbitrageKernelException
+	 * @return boolean Returns true if the file was included else false.
+	 */
+	public function requireFrameworkFile($namespace, $opt_throw=true, $opt_variables=array())
+	{
+		$namespace = preg_replace('/^(framework|arbitrage2)\./i', '', $namespace);
+		$namespace = "Framework.$namespace";
+		$path      = $this->_path . "/" . $this->convertArbitrageNamespaceToPath($namespace). ".class.php";
+
+		//Extract variables
+		if(count($opt_variables))
+			extract($opt_variables);
+
+		//Check if exists
+		if(!file_exists($path))
+		{
+			if($opt_throw)
+				throw new EArbitrageKernelException("Unable to require '$namespace' ($path).");
+
+			return false;
+		}
+
+		//Require the file
+		require_once($path);
+
+		return true;
+	}
+
+	/**
+	 * Adds a path to the package search path.
+	 * @param sring $path The path to add for the application search path.
+	 * @throws \Arbitrage2\Exceptions\EArbitrageKernelException
+	 */
+	public function registerPackagePath($path)
+	{
+		$this->_package_paths[] = $path;
+	}
+
+	/**
+	 * Method returns the registered package paths.
+	 * @return array The regsitered package paths.
+	 */
+	public function getPackagePaths()
+	{
+		return $this->_package_paths;
+	}
+
+	/**
+	 * Returns the framework filesystem path.
+	 * @returns string Returns the absolute filesystem path to the framework.
+	 */
+	public function getPath()
+	{
+		return $this->_path;
+	}
+
+	/**
+	 * Adds a service path when searching for services.
+	 * param string $path The path to register in the search service paths.
+	 */
+	public function registerServicePath($path)
+	{
+		$this->_service_paths[] = $path;
+	}
+
+	/**
+	 * Method returns the registered service paths.
+	 * @return array The regsitered service paths.
+	 */
+	public function getServicePaths()
+	{
+		return $this->_service_paths;
+	}
+
+	/**
+	 * Creates and returns a Web Application.
+	 * @namespace The root namespace the application resides on.
+	 * @return \Arbitrage2\Base\CWebApplication Returns a web application.
+	 */
+	public function createWebApplication($namespace)
+	{
+		//Convert namespace to path
+		$apath = $this->convertArbitrageNamespaceToPath("$namespace.null");
+		$apath = preg_replace('/\/null$/', '', $apath);
+
+		//Search through application paths
+		foreach($this->_package_paths as $path)
+		{
+			$cpath = "$path/$apath";
+			if(file_exists($cpath))
+			{
+				$application = new CWebApplication();
+				$application->initialize($path, $namespace);
+
+				return $application;
+			}
+		}
+
+		throw new EArbitrageKernelException("Unable to load Web Application '$namespace'.");
+	}
+
+	/**
+	 * Creates and returns a CLI Application.
+	 * @return Returns a CLI Application.
+	 */
+	public function createCLIApplication()
+	{
+		die('code createCLIApplication');
+	}
+
+	/**
+	 * Initialize services via configuration object.
+	 * param \Arbitrage2\Base\CApplication $application The application object.
+	 */
+	public function initializeServices($application)
+	{
+		//Get arbitrage2 config
+		$config = $application->getConfig();
+		if($config->arbitrage2 && $config->arbitrage2->services)
+		{
+			$services = $config->arbitrage2->services;
+			foreach($services as $service => $value)
+			{
+				foreach($value as $namespace => $lconfig)
+					$this->createService($application, $service, $namespace, $lconfig);  //Create service with configuration
+			}
+		}
+	}
+
+	/**
+	 * Method returns a CService.
+	 * @param \Arbitrage2\Base\CApplication $application The application object.
+	 * @param string $service_type The type of service to fetch.
+	 * @return \Arbitrage2\Base\CService Returns a CService instance or NULL.
+	 */
+	public function getService($application, $service_type)
+	{
+		if(!isset($this->_services[$service_type]))
+			return NULL;
+
+		return $this->_services[$service_type]->getService($application);
+	}
+
+	/**
+	 * Creates a service and regsisters it into the kernel.
+	 * @param \Arbitrage2\Base\CApplication $application The application object.
+	 * @param string $service The service namespace to register to.
+	 * @param string $namespace The namespace to load.
+	 * @param \Arbitrage2\Config\CArbitrageConfig $config Configuration object to tie to the serivce.
+	 */
+	public function createService($application, $service, $namespace, $config)
+	{
+		//TODO: Ensure service is not already loaded
+
+		//If Arbitrage2.* exists, replace
+		$ns = preg_replace('/^Arbitrage2\./i', 'Framework.', $namespace);
+
+		//Require service
+		$file = $this->convertArbitrageNamespaceToPath($ns) . ".class.php";
+		foreach($this->_service_paths as $path)
+		{
+			$path .= $file;
+			if(file_exists($path))
+			{
+				require_once($path);
+
+				//TODO: Load service in global space but only provide them to applications that request it.
+				
+				//Create Service
+				$class = $this->convertArbitrageNamespaceToPHP($namespace);
+				if(!class_exists($class))
+					throw new EArbitrageKernelException("Service '$namespace' does not exist!");
+
+				//Create a new service container
+				if(!isset($this->_services[$service]))
+					$this->_services[$service] = new CServiceContainer($service);
+
+				//Add application/config to service container
+				$this->_services[$service]->registerApplicationToService($application, dirname($path), $class, $config);
+
+				return;
+			}
+		}
+
+		throw new EArbitrageKernelException("Unable to load '$namespace' for service '$service'.");
+	}
+
+	/**
+	 * Converts an Arbitrage namespace to the equivalent path.
+	 * @param $namespace The namespace to conver to a path.
+	 * @return Returns the path from the namespace.
+	*/
+	public function convertArbitrageNamespaceToPath($namespace)
+	{
+		//Seperate file from the rest
+		$path = explode('.', $namespace);
+		$file = array_splice($path, -1);
+
+		//Normalize path
+		$path = implode('/', $path);
+		$path = preg_replace('/([a-z0-9])([A-Z])/', '$1 $2', $path);
+		$path = preg_replace('/ /', '_', $path);
+		$path = strtolower(preg_replace('/\./', DIRECTORY_SEPARATOR, $path));
+
+		//Normalize File
+		$file = $file[0];
+
+		return $path . DIRECTORY_SEPARATOR . $file;
+	}
+
+	/**
+	 * Method converts an Arbitrage namespace string to the equivalent PHP namespace.
+	 * @param string $namespace The namespace to convert.
+	 * @return Returns the PHP namespace.
+	 */
+	public function convertArbitrageNamespaceToPHP($namespace)
+	{
+		$namespace = preg_replace('/\./', '\\', $namespace);
+		return "\\$namespace";
+	}
+
+	/**
+	 * Method converts a PHP namespace to the equivalent Arbitrage namespace.
+	 * @param string $namespace The PHP namesace to convert.
+	 * @return string Returns the Arbitrage namespace.
+	 */
+	public function convertPHPNamespaceToArbitrage($namespace)
+	{
+		$namespace = preg_replace('/\\\/', '.', $namespace);
+		$namespace = preg_replace('/^\./', '', $namespace);
+		return $namespace;
+	}
+
+	/**
+	 * Method converts a URL formatted string to an arbitrage namespace.
+	 * @param string $url The URL to convert to an arbitrage namespace.
+	 * @return Returns an arbitrage namespace.
+	 */
+	public function convertURLNamespaceToArbitrage($url)
+	{
+		$namespace = ucwords(preg_replace('/\//', ' ', $url));
+		$namespace = preg_replace('/ /', '.', $namespace);
+		$namespace = ucwords(preg_replace('/_/', ' ', $namespace));
+		$namespace = preg_replace('/ /', '', $namespace);
+
+		return $namespace;
+	}
+}
+?>

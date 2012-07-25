@@ -1,6 +1,5 @@
 <?
 namespace Arbitrage2\Cache\Remote;
-
 use \Arbitrage2\Interfaces\IModuleLoader;
 
 class CRemoteCacheFactory implements IModuleLoader

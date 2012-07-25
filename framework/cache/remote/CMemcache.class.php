@@ -1,4 +1,8 @@
 <?
+namespace Arbitrage2\Cache\Remote;
+use \Arbitrage2\Interfaces\IRemoteCache;
+use \Arbitrage2\Exceptions\EArbitrageRemoteCacheException;
+
 class CMemcache implements IRemoteCache
 {
 	static private $_instance = NULL;

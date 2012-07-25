@@ -1,4 +1,8 @@
 <?
+namespace Arbitrage2\Cache\Remote;
+use \Arbitrage2\Interfaces\IRemoteCache;
+use \Arbitrage2\Exceptions\EArbitrageRemoteCacheException;
+
 class CRedis implements IRemoteCache
 {
 	static private $_instance = NULL;

@@ -1,59 +1,53 @@
 <?
-namespace CArbitrage2\Base;
+namespace Arbitrage2\Base;
+use \Arbitrage2\Base\Controller;
 
 class CFilterChain
 {
 	private $_filters;
 	private $_controller;
+	private $_propagate;
 
-	public function __construct(CBaseController $controller)
+	public function __construct(CController $controller)
 	{
 		$this->_controller = $controller;
 		$this->_filters    = $this->_controller->filters();
+		$this->_propagate  = true;
 	}
 
-	public function runBeforeFilterChain()
+	/**
+	 * Method runs the filter based on filter_type.
+	 * @param string $filter_type The filter type to execute.
+	 * @param array $args The argument array list to pass to the filter method/object.
+	 */
+	public function runFilter($filter_type, &$args=NULL)
 	{
-		if(!array_key_exists('before_filter', $this->_filters))
+		if(!array_key_exists($filter_type, $this->_filters))
 			return;
 
-		$filters = $this->_filters['before_filter'];
+		//Execute the filters
+		$filters = $this->_filters[$filter_type];
 		foreach($filters as $filter)
 		{
-			//Filter is a method within the controller
+			if(!$this->_propagate)
+				break;
+
 			if(is_string($filter))
-				$this->_controller->$filter();
-			elseif(is_object($filter) && get_parent_class($filter) === "IFilter")
-				$filter->execute();
+				$this->_controller->$filter($args);
+			elseif(is_object($filter) && $filter instanceof IFilter)
+				$filter->execute($args);
 		}
+
+		//Reset propagate
+		$this->_propagate = true;
 	}
 
-	public function runAfterFilterChain(&$ret)
+	/**
+	 * Method stops the filter chain propagation.
+	 */
+	public function stopPropagation()
 	{
-		if(!array_key_exists('after_filter', $this->_filters))
-			return;
-
-		$filters = $this->_filters['after_filter'];
-		foreach($filters as $filter)
-		{
-			//Filter is a method within the controller
-			if(is_string($filter))
-				$this->_controller->$filter($ret);
-			elseif(is_object($filter) && get_parent_class($filter) === "IFilter")
-				$filter->execute();
-		}
-	}
-
-	public function runPostProcess($content)
-	{
-		if(!array_key_exists('post_process', $this->_filters))
-			return $content;
-
-		$filters = $this->_filters['post_process'];
-		foreach($filters as $filter)
-			$content = $this->_controller->$filter($content);
-
-		return $content;
+		$this->_propagate = false;
 	}
 }
 ?>

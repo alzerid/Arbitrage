@@ -1,6 +1,8 @@
 <?
 namespace Arbitrage2\Base;
 use \Arbitrage2\Interfaces\IAction;
+use \Arbitrage2\Exceptions\EWebApplicationException;
+use \Arbitrage2\Exceptions\EHTTPException;
 
 class CAction implements IAction
 {
@@ -16,7 +18,7 @@ class CAction implements IAction
 		if(!method_exists($controller, $this->_name))
 		{
 			if(CWebApplication::getConfig()->server->debugMode)
-				throw new EArbitrageException("Action '{$this->_name}' does not exist for controller '{$this->_controller->getName()}'.");
+				throw new EWebApplicationException("Action '{$this->_name}' does not exist for controller '{$this->_controller->getName()}'.");
 			else
 				throw new EHTTPException(EHTTPException::$HTTP_BAD_REQUEST);
 		}
@@ -35,8 +37,8 @@ class CAction implements IAction
 		if($ret === NULL)
 			$ret = array();
 
-		if(!is_array($ret) && !($ret instanceof IRenderable))
-			throw new EArbitrageException("Actions must return an array or of type IRenderable.");
+		if(!is_array($ret) && !($ret instanceof \Arbitrage2\Interfaces\IRenderable))
+			throw new EWebApplicationException("Actions must return an array or of type IRenderable.");
 
 		return $ret;
 	}

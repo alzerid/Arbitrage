@@ -29,7 +29,7 @@ foreach($event->trace as $entry)
 
 -->
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title></title>
+	<title>Arbitrage2 Error</title>
 
 	<style type="text/css">
 		body {

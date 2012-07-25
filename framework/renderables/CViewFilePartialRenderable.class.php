@@ -1,41 +1,32 @@
 <?
 namespace Arbitrage2\Renderables;
-use \Arbitrage2\Interfaces\IViewFileRenderable;
-use \Arbitrage2\Base\CApplication;
+use \Arbitrage2\Exceptions\EArbitrageRenderableException;
+use \Arbitrage2\Base\CWebApplication;
 
-class CViewFilePartialRenderable implements IViewFileRenderable
+class CViewFilePartialRenderable implements \Arbitrage2\Interfaces\IViewFileRenderable
 {
-	static protected $_VIEW_PATHS = array();
+	protected $_path;
+	protected $_content;
 
-	public function __construct()
+	/**
+	 * Method initializes the CViewFilePartialRenderable.
+	 * @param string $path The path to the view files.
+	 * @param array $content The content to render.
+	 */
+	public function initialize($path, $content)
 	{
-		$this->addViewPath(CApplication::getConfig()->_internals->approotpath . "app/views/");
+		$this->_path    = $path;
+		$this->_content = $content;
 	}
 
-	static public function getViewPaths()
-	{
-		return self::$_VIEW_PATHS;
-	}
-
-	static public function addViewPath($path)
-	{
-		self::$_VIEW_PATHS[] = $path;
-	}
-
-	static public function setViewPath($path)
-	{
-		self::$_VIEW_PATHS = array($path);
-	}
-
-	public function render($data=NULL)
+	public function render()
 	{
 		//Setup data
-		$default = array('render'    => CApplication::getInstance()->getController()->getName() . "/" . CApplication::getInstance()->getController()->getAction()->getName(),
-		                 'variables' => array());
+		$default = array('variables' => array());
 
 		//Merge defaults with data
-		$default['render']    = ((isset($data['render']))? $data['render'] : $default['render']);
-		$default['variables'] = array_merge($default['variables'], (isset($data['variables'])? $data['variables'] : array()));
+		$default['render']    = ((isset($this->_content['render']))? $this->_content['render'] : $default['render']);
+		$default['variables'] = array_merge($default['variables'], (isset($this->_content['variables'])? $this->_content['variables'] : array()));
 
 		//Get content from view
 		return $this->renderPartial($default['render'], $default['variables']);
@@ -46,26 +37,11 @@ class CViewFilePartialRenderable implements IViewFileRenderable
 		$_vars = $variables;
 		if($_vars !== NULL)
 			extract($_vars);
-
-		$_controller = CApplication::getInstance()->getController();
-		$_action     = CApplication::getInstance()->getController()->getAction();
-
-		//Get view file
-		$path = NULL;
-		foreach(self::$_VIEW_PATHS as $vp)
-		{
-			if(file_exists($vp . "/" . $file . ".php"))
-			{
-				$path = $vp . "/" . $file . ".php";
-				break;
-			}
-		}
 		
-		if($path == NULL)
-		{
-			die();
-			throw new EArbitrageException("View file does not exist '$file'.");
-		}
+		//Get view file
+		$path = $this->_path . "/$file.php";
+		if(!file_exists($path))
+			throw new EArbitrageRenderableException("Unable to load view file ($path).");
 
 		ob_start();
 		ob_implicit_flush(false);

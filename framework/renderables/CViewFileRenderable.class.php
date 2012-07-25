@@ -1,22 +1,11 @@
 <?
 namespace Arbitrage2\Renderables;
-use \Arbitrage2\Renderables\CViewFilePartialRenderable;
-use \Arbitrage2\Base\CApplication;
+use \Arbitrage2\Exceptions\EArbitrageRenderableException;
+$_application->requireRenderable('Arbitrage2.Renderables.CViewFilePartialRenderable');
 
-class CViewFileRenderable extends CViewFilePartialRenderable
+class CViewFileRenderable extends \Arbitrage2\Renderables\CViewFilePartialRenderable implements \Arbitrage2\Interfaces\ILayoutRenderable
 {
-	static protected $_LAYOUT_PATHS = array();
-	protected $_view_variables;
 	protected $_layout;
-
-	public function __construct()
-	{
-		parent::__construct();
-		$this->_view_variables = array();
-
-		$this->addLayoutPath(CApplication::getConfig()->_internals->approotpath . "app/views/layout/");
-		$this->setLayout("default");
-	}
 
 	public function setLayout($layout)
 	{
@@ -28,54 +17,28 @@ class CViewFileRenderable extends CViewFilePartialRenderable
 		return $this->_layout;
 	}
 
-	static public function getLayoutPaths()
-	{
-		return self::$_LAYOUT_PATHS;
-	}
-
-	static public function addLayoutPath($path)
-	{
-		self::$_LAYOUT_PATHS[] = $path;
-	}
-
-	static public function setLayoutPath($path)
-	{
-		self::$_LAYOUT_PATHS = array($path);
-	}
-
-	public function render($data=NULL)
+	public function render()
 	{
 		//Setup data
-		$default = array('render'    => CApplication::getInstance()->getController()->getName() . "/" . CApplication::getInstance()->getController()->getAction()->getName(),
-		                 'layout'    => $this->_layout,
+		$default = array('layout'    => $this->_layout,
 		                 'variables' => array());
-
+	
 		//Merge defaults with data
-		isset($data['render']) && $default['render'] = $data['render'];
-		isset($data['layout']) && $default['layout'] = $data['layout'];
-		$default['variables'] = array_merge($default['variables'], (isset($data['variables'])? $data['variables'] : array()));
+		isset($this->_content['render']) && $default['render'] = $this->_content['render'];
+		isset($this->_content['layout']) && $default['layout'] = $this->_content['layout'];
+		$default['variables'] = array_merge($default['variables'], (isset($this->_content['variables'])? $this->_content['variables'] : array()));
 
 		//Call parent render
+		$this->_content['render'] = "/{$this->_content['render']}";
 		$content = parent::render($default);
 
 		//Now render layout
-		$layout = NULL;
-		foreach(self::$_LAYOUT_PATHS as $lp)
-		{
-			if(file_exists($lp . "/" . $default['layout'] . ".php"))
-			{
-				$layout = $lp . "/" . $default['layout'] . ".php";
-				break;
-			}
-		}
-
+		$layout = $this->_path . "/layout/{$this->_layout}.php";
 		if(!file_exists($layout))
-			throw new EArbitrageException("Layout does not exist '{$default['layout']}'.");
+			throw new EArbitrageRenderableException("Layout does not exist '($layout).");
 
 		//Extract the variables
 		$_vars = $default['variables'];
-		$_controller = CApplication::getInstance()->getController();
-		$_action     = CApplication::getInstance()->getController()->getAction();
 		extract($_vars);
 
 		//Require view
@@ -84,6 +47,24 @@ class CViewFileRenderable extends CViewFilePartialRenderable
 		require_once($layout);
 
 		return ob_get_clean();
+	}
+
+	public function renderPartial($file, $variables=NULL)
+	{
+		//Ensure _controller and _application is sent to the view file
+		if($variables == NULL)
+			$variables = array();
+
+		//Get controller
+		if(isset($this->_content['variables']['_controller']))
+			$variables['_controller'] = $this->_content['variables']['_controller'];
+
+		//Get application
+		if(isset($this->_content['variables']['_application']))
+			$variables['_application'] = $this->_content['variables']['_application'];
+
+		//Call parent
+		return parent::renderPartial($file, $variables);
 	}
 }
 ?>

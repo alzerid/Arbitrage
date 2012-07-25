@@ -1,17 +1,36 @@
 <?
-namespace Arbitrage2\Base;
-use \Arbitrage2\Base\CController;
+namespace Arbitrage2\ErrorHandler;
 
-class CErrorController extends CController
+class CErrorHandlerController extends \Arbitrage2\Base\CController
 {
 	private $_err_vars;
 	private $_err_file;
 
-	public function __construct($file, $_vars=array())
+	public function handleAction()
 	{
-		parent::__construct();
-		$this->_err_vars = $_vars;
-		$this->_err_file = $file;
+		@ob_end_clean();
+		//Unserialize event
+		$event = unserialize($this->_request['event']);
+
+		//Check if debug is on
+		$config = $this->_application->getConfig();
+		if($config->arbitrage2->debugMode)
+		{
+			//Use internal view
+			$fwpath  = \Arbitrage2\Base\CKernel::getInstance()->getPath() . "/framework/views/";
+
+			//Setup content
+			$content = array();
+			$content['render']    = 'errors/exception';
+			$content['variables'] = array('event' => $event);
+
+			//Setup renderable
+			$renderable = new \Arbitrage2\Renderables\CViewFilePartialRenderable;
+			$renderable->initialize($fwpath, $content);
+			return $renderable;
+		}
+
+		die('CErrorHandlerController::handleAction');
 	}
 
 	public function processAction()
@@ -33,7 +52,6 @@ class CErrorController extends CController
 			$this->getRenderer()->setLayoutPath(CApplication::getConfig()->_internals->approotpath . "app/views/_internal/errors/");
 			$this->getRenderer()->setLayout('layout');
 		}
-
 
 		return array('render' => "errors/$file", 'variables' => $this->_err_vars);
 	}

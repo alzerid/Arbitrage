@@ -1,7 +1,8 @@
 <?
-use Arbitrage2\Base;
+namespace Arbitrage2\Utils;
+use \Arbitrage2\Utils\CArrayObject;
 
-class CFlashPropertyObject /*implements Iterator*/
+class CFlashPropertyObject
 {
 	protected $_flash;
 	protected $_new;
@@ -14,8 +15,8 @@ class CFlashPropertyObject /*implements Iterator*/
 		else if(!isset($_SESSION))
 			$_SESSION = array('_flash' => array());
 
-		$this->_old = new CPropertyObject($_SESSION['_flash']);
-		$this->_new = new CPropertyObject();
+		$this->_old = new CArrayObject($_SESSION['_flash']);
+		$this->_new = new CArrayObject();
 	}
 
 	public function __destruct()
@@ -39,6 +40,11 @@ class CFlashPropertyObject /*implements Iterator*/
 	public function __set($name, $val)
 	{
 		$this->_new->$name = $val;
+	}
+
+	public function update()
+	{
+		$_SESSION['_flash'] = $this->toArray();
 	}
 
 	public function toArray()

@@ -17,6 +17,26 @@ class CArrayObject implements \ArrayAccess, \Iterator
 	/* Start Property Access Methods */
 	public function __get($name)
 	{
+		return $this->_get($name);
+	}
+
+	public function __set($name, $value)
+	{
+		$this->_set($name, $value);
+	}
+
+	public function __isset($name)
+	{
+		return $this->_isset($name);
+	}
+
+	public function __unset($name)
+	{
+		$this->_unset($name);
+	}
+
+	protected function _get($name)
+	{
 		if(!array_key_exists($name, $this->_data) || $this->_data[$name] === NULL)
 			return NULL;
 
@@ -27,17 +47,17 @@ class CArrayObject implements \ArrayAccess, \Iterator
 		return $this->_data[$name];
 	}
 
-	public function __set($name, $value)
+	protected function _set($name, $value)
 	{
 		$this->_data[$name] = $value;
 	}
 
-	public function __isset($name)
+	protected function _isset($name)
 	{
-		return isset($this->_data[$name]);
+		return array_key_exists($name, $this->_data);
 	}
 
-	public function __unset($name)
+	protected function _unset($name)
 	{
 		if(isset($this->_data[$name]))
 			unset($this->_data[$name]);
@@ -69,6 +89,36 @@ class CArrayObject implements \ArrayAccess, \Iterator
 		unset($this->_data[$offset]);
 	}
 	/* End Array Access Methods */
+
+	/* Iterator Implementation */
+	public function rewind()
+	{
+		$this->_position = -1;
+	}
+
+	public function current()
+	{
+		return $this->_data[$this->_keys[$this->_position]];
+	}
+
+	public function key()
+	{
+		return $this->_keys[$this->_position];
+	}
+
+	public function next()
+	{
+		++$this->_position;
+	}
+
+	public function valid()
+	{
+		if($this->_position == -1)
+			$this->_setupIterator();
+
+		return isset($this->_keys[$this->_position]);
+	}
+	/* End Iterator Implementation */
 
 	public function flatten($depth=-1)
 	{
@@ -121,33 +171,9 @@ class CArrayObject implements \ArrayAccess, \Iterator
 		return $ret;
 	}
 
-	/* Iterator Implementation */
-	public function rewind()
+	protected function _isAssoc($arr)
 	{
-		$this->_position = -1;
-	}
-
-	public function current()
-	{
-		return $this->_data[$this->_keys[$this->_position]];
-	}
-
-	public function key()
-	{
-		return $this->_keys[$this-_position];
-	}
-
-	public function next()
-	{
-		++$this->_position;
-	}
-
-	public function valid()
-	{
-		if($this->_position == -1)
-			$this->_setupIterator();
-
-		return isset($this->_keys[$this->_position]);
+		return array_keys($arr) !== range(0, count($arr) - 1);
 	}
 
 	private function _setupIterator()
@@ -155,7 +181,6 @@ class CArrayObject implements \ArrayAccess, \Iterator
 		$this->_keys     = array_keys($this->_data);
 		$this->_position = 0;
 	}
-	/* END Iterator Implementation */
 
 	static public function flattenArray(array &$arr, $depth=-1, $pre="")
 	{
