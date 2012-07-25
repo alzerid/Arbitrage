@@ -37,6 +37,7 @@ class CWebApplication extends CApplication
 		CKernel::getInstance()->requireFrameworkFile('Base.CRouter');
 		CKernel::getInstance()->requireFrameworkFile('Base.CFilterChain');
 		CKernel::getInstance()->requireFrameworkFile('Utils.CFlashPropertyObject');
+		CKernel::getInstance()->requireFrameworkFile('DOM.CDOMGenerator');
 
 		//Create relavent services
 		$this->_initializeServices();
@@ -57,8 +58,7 @@ class CWebApplication extends CApplication
 		$controller = $this->loadController($route, isset($_REQUEST['_ajax']));
 
 		//Execute the action
-		$ret = $controller->execute();
-		die('run CWeb');
+		$controller->execute();
 	}
 
 	/**
