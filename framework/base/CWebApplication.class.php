@@ -25,6 +25,7 @@ class CWebApplication extends CApplication
 
 		//Require framework files
 		CKernel::getInstance()->requireFrameworkFile("Base.CController");
+		CKernel::getInstance()->requireFrameworkFile("Base.CJavascriptController");
 		CKernel::getInstance()->requireFrameworkFile("Base.CAction");
 		CKernel::getInstance()->requireFrameworkFile('Base.CRouter');
 		CKernel::getInstance()->requireFrameworkFile('Base.CFilterChain');
