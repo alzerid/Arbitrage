@@ -25,6 +25,7 @@ class CErrorHandlerController extends \Arbitrage2\Base\CController
 			$content['variables'] = array('event' => $event);
 
 			//Setup renderable
+			$this->requireRenderable('Arbitrage2.Renderables.CViewFilePartialRenderable');
 			$renderable = new \Arbitrage2\Renderables\CViewFilePartialRenderable;
 			$renderable->initialize($fwpath, $content);
 			return $renderable;
