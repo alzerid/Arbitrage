@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\Database;
+namespace Framework\Database;
 use \Arbitrage2\Interfaces\IModuleLoader;
 
 class CDatabaseDriverFactory implements IModuleLoader

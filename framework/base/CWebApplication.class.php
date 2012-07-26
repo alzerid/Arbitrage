@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\Base;
+namespace Framework\Base;
 use \Arbitrage2\Exceptions\EWebApplicationException;
 
 class CWebApplication extends CApplication

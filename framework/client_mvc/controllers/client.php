@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\ClientMVC\Controllers;
+namespace Framework\ClientMVC\Controllers;
 
 class ClientController extends \Arbitrage2\Base\CJavascriptController
 {

@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\Database;
+namespace Framework\Database;
 use \Arbitrage2\Base\CService;
 
 class CDatabaseService extends CService

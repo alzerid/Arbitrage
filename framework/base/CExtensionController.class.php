@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\Base;
+namespace Framework\Base;
 use \Arbitrage2\Base\CController;
 
 class CExtensionController extends CController

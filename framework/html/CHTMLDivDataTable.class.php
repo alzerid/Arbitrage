@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\HTML;
+namespace Framework\HTML;
 use \Arbitrage2\HTML\CHTMLDataTable;
 
 class CHTMLDivDataTable extends CHTMLDataTable

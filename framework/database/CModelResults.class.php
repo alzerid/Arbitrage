@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\Database;
+namespace Framework\Database;
 
 /* Base DB Classes */
 abstract class CModelResults implements \ArrayAccess, \Iterator

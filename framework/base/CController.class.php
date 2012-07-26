@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\Base;
+namespace Framework\Base;
 use \Arbitrage2\Interfaces\IController;
 use \Arbitrage2\Utils\CArrayObject;
 use \Arbitrage2\Utils\CFlashPropertyObject;

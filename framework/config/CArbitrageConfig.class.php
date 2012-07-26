@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\Config;
+namespace Framework\Config;
 use \Arbitrage2\Utils\CArrayObject;
 
 class CArbitrageConfig extends CArbitrageConfigProperty

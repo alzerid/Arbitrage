@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\Config;
+namespace Framework\Config;
 
 abstract class CArbitrageConfigLoader
 {

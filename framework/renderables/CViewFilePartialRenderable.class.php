@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\Renderables;
+namespace Framework\Renderables;
 use \Arbitrage2\Exceptions\EArbitrageRenderableException;
 use \Arbitrage2\Base\CWebApplication;
 

@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\Forms;
+namespace Framework\Forms;
 use \Arbitrage2\Interfaces\IFileRenderable;
 
 Class CRenderForm extends CForm implements IFileRenderable

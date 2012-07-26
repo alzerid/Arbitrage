@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\Base;
+namespace Framework\Base;
 use \Arbitrage2\Interfaces\ISingleton;
 use \Arbitrage2\Exceptions\EArbitrageKernelException;
 

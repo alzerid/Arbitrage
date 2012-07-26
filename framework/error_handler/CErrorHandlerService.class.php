@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\ErrorHandler;
+namespace Framework\ErrorHandler;
 
 class CErrorHandlerService extends \Arbitrage2\Base\CService implements \Arbitrage2\Interfaces\IErrorHandlerService
 {

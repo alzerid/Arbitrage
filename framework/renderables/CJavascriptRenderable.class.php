@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\Renderables;
+namespace Framework\Renderables;
 
 class CJavascriptRenderable implements \Arbitrage2\Interfaces\IContentRenderable
 {

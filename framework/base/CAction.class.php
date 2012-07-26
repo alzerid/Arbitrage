@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\Base;
+namespace Framework\Base;
 use \Arbitrage2\Interfaces\IAction;
 use \Arbitrage2\Exceptions\EWebApplicationException;
 use \Arbitrage2\Exceptions\EHTTPException;

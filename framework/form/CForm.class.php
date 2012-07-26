@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\Forms;
+namespace Framework\Forms;
 use \Arbitrage2\HTML\CHTMLComponent;
 
 Class CForm extends CHTMLComponent

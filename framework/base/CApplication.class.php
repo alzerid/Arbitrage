@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\Base;
+namespace Framework\Base;
 
 abstract class CApplication extends CPackage implements \Arbitrage2\Interfaces\IErrorHandlerListener
 {

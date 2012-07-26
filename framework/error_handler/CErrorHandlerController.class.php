@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\ErrorHandler;
+namespace Framework\ErrorHandler;
 
 class CErrorHandlerController extends \Arbitrage2\Base\CController
 {

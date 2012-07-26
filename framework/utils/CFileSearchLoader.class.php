@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\Utils;
+namespace Framework\Utils;
 use \Arbitrage2\Exceptions\EArbitrageException;
 
 class CFileSearchLoader

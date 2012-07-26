@@ -1,6 +1,6 @@
 <?
-namespace Arbitrage2\Renderables;
-use Arbitrage2\Interfaces\IRenderable;
+namespace Framework\Renderables;
+use Framework\Interfaces\IRenderable;
 
 class CHTMLRenderable implements IRenderable
 {

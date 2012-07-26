@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\Database;
+namespace Framework\Database;
 
 class CMongoModelBatch extends CMongoModelQuery
 {

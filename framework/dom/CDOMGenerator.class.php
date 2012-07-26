@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\DOM;
+namespace Framework\DOM;
 
 class CDOMGenerator
 {

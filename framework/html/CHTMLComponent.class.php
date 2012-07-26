@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\HTML;
+namespace Framework\HTML;
 
 class CHTMLComponent
 {

@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\HTML;
+namespace Framework\HTML;
 use \Arbitrage2\Interfaces\IHTMLDataTable;
 
 class CHTMLDataTable implements IHTMLDataTable

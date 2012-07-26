@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\ClientMVC;
+namespace Framework\ClientMVC;
 
 class CClientMVCPackage extends \Arbitrage2\Base\CPackage
 {

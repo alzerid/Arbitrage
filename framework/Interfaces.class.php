@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\Interfaces;
+namespace Framework\Interfaces;
 
 /**
  * ISingleton interface

@@ -1,6 +1,6 @@
 <?
-namespace Arbitrage2\Events;
-use Arbitrage2\Interfaces\IEvent;
+namespace Framework\Events;
+use Framework\Interfaces\IEvent;
 
 class CEvent implements IEvent
 {

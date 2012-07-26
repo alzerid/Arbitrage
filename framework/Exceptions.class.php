@@ -1,5 +1,5 @@
 <?
-namespace Arbitrage2\Exceptions;
+namespace Framework\Exceptions;
 
 class EArbitrageException extends \Exception
 {
