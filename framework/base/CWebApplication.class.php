@@ -6,30 +6,22 @@ class CWebApplication extends CApplication
 {
 	private $_renderable_paths;    //Paths where the renderables exist
 	private $_controller_queue;    //Controller queue
-	private $_packages;            //A list of packages
 	private $_router;              //Router instance
-
-	/**
-	 * Initialize the Web Application.
-	 */
-	public function __construct()
-	{
-		parent::__construct($this);
-		$this->_renderable_paths = array();
-		$this->_controller_queue = array();
-		$this->_packages         = array();
-		$this->_router           = NULL;
-	}
 
 	/**
 	 * Initializes the arbitrage application, loads the application config.
 	 * @param string $path The path where the application resides in.
 	 * @param string $namespace The namespace associated with the object.
 	 */
-	public function initialize($path, $namespace)
+	public function initialize()
 	{
+		//Setup variables
+		$this->_renderable_paths = array();
+		$this->_controller_queue = array();
+		$this->_router           = NULL;
+
 		//Call parent
-		parent::initialize($path, $namespace);
+		parent::initialize();
 
 		//Require framework files
 		CKernel::getInstance()->requireFrameworkFile("Base.CController");
@@ -41,6 +33,9 @@ class CWebApplication extends CApplication
 
 		//Create relavent services
 		$this->_initializeServices();
+
+		//Initialize Packages
+		$this->_initializePackages();
 
 		//Create router instance
 		$this->_router = new CRouter($this->getConfig()->webApplication->routes);
@@ -79,8 +74,9 @@ class CWebApplication extends CApplication
 	public function loadController($route, $ajax=false)
 	{
 		//Add the Controllers namespace
-		$url    = explode('/', $route);
-		$action = preg_replace('/\?.*$/', '', $url[count($url)-1]);
+		$url    = explode('/', preg_replace('/\?.*$/', '', $route));
+		$action = $url[count($url)-1];
+		$query  = preg_replace('/\?(.*)$/', '$1', $route);
 		$route  = implode('/', array_slice($url, 0, -2)) . "/controllers/" . implode('/', array_splice($url, -2, -1));
 
 		//Transforms the route from URL format to FileSystem format
@@ -93,7 +89,8 @@ class CWebApplication extends CApplication
 			throw new EWebApplicationException("Controller '$class' does not exists.");
 
 		//Create controller
-		$controller                = $class::createController($this);
+		$package                   = $this->getPackage(preg_replace('/\.Controller.*$/i', '', $namespace));
+		$controller                = $class::createController($this, (($package)? $package : $this));
 		$this->_controller_queue[] = $controller;
 
 		//Set action for controller
@@ -164,9 +161,9 @@ class CWebApplication extends CApplication
 			$_REQUEST = $opt_variables;
 		}
 
-
 		//Push variables
-		$controller = $class::createController($this);
+		$package    = $this->getPackage(preg_replace('/\.[^\.]+Controller\.[^\.]+$/', '', $namespace));
+		$controller = $class::createController($this, $package);
 		$this->_controller_queue[] = $controller;
 
 		//Set action
@@ -248,8 +245,7 @@ class CWebApplication extends CApplication
 		if(!isset($services->errorHandler))
 			$services->errorHandler = array('Arbitrage2.ErrorHandler.CErrorHandlerService' => array('debugMode' => $this->getConfig()->arbitrage2->debugMode));
 
-		//Call parent initialize services
-		CKernel::getInstance()->initializeServices($this);
+		parent::_initializeServices();
 	}
 
 	/**

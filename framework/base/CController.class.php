@@ -17,6 +17,7 @@ abstract class CController implements IController
 	protected $_flash;            //Flash variables
 	protected $_view_variables;   //View variables that will passed into the view
 	protected $_application;      //The application the controller belongs to
+	protected $_package;          //The package the controller belongs to
 
 	private $_ajax;         //Flag that checks if the controller is ajax
 	private $_action;       //The action object that executes the action within this controller
@@ -53,16 +54,18 @@ abstract class CController implements IController
 
 	/**
 	 * Static method creates a CController and assigns an application to it.
-	 * @param \CArbitrage\Base\CApplication $application The application to assign this controller with.
-	 * @return \CArbitrage\Base\CController An instance of CController.
+	 * @param \Arbitrage2\Base\CApplication $application The application to assign this controller with.
+	 * @param \Arbitrage2\Base\CPackage $package The package to assign this controller with.
+	 * @return \Arbitrage2\Base\CController An instance of CController.
 	 */
-	static public function createController(\Arbitrage2\Base\CApplication $application)
+	static public function createController(\Arbitrage2\Base\CApplication $application, \Arbitrage2\Base\CPackage $package=NULL)
 	{
 		$class      = get_called_class();
 		$controller = new $class;
 
 		//Initialize
 		$controller->_application = $application;
+		$controller->_package     = $package;
 		$controller->initialize();
 
 		return $controller;
@@ -215,6 +218,23 @@ abstract class CController implements IController
 		return $this->_action;
 	}
 
+	/**
+	 * Method returns the package assigned to the controller.
+	 * @return \Arbitrage2\Base\CPackage Returns the package the controller is associated with.
+	 */
+	public function getPackage()
+	{
+		return $this->_package;
+	}
+
+	/**
+	 * Method returns the application assigned to the controller.
+	 * @return \Arbitrage2\Base\CApplication Returns the application the controller is associated with.
+	 */
+	public function getApplication()
+	{
+		return $this->_application;
+	}
 	/**
 	 * Renders a partial using a view file.
 	 * @param string $file The view file to render
