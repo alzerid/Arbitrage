@@ -93,7 +93,6 @@ class CKernel implements ISingleton
 	 */
 	public function requireFrameworkFile($namespace, $opt_throw=true, $opt_variables=array())
 	{
-		$namespace = preg_replace('/^(framework|arbitrage2)\./i', '', $namespace);
 		$namespace = "Framework.$namespace";
 		$path      = $this->_path . "/" . $this->convertArbitrageNamespaceToPath($namespace). ".class.php";
 
@@ -247,11 +246,8 @@ class CKernel implements ISingleton
 	{
 		//TODO: Ensure service is not already loaded
 
-		//If Arbitrage2.* exists, replace
-		$ns = preg_replace('/^Arbitrage2\./i', 'Framework.', $namespace);
-
 		//Require service
-		$file = $this->convertArbitrageNamespaceToPath($ns) . ".class.php";
+		$file = $this->convertArbitrageNamespaceToPath($namespace) . ".class.php";
 		foreach($this->_service_paths as $path)
 		{
 			$path .= $file;
@@ -349,8 +345,7 @@ class CKernel implements ISingleton
 	 */
 	private function _requireFile($namespace, $opt_variables=array())
 	{
-		$namespace = preg_replace('/^Arbitrage2\./', 'Framework.', $namespace);
-		$ret       = NULL;
+		$ret = NULL;
 
 		//Iterate through and find file
 		$file = $this->convertArbitrageNamespaceToPath($namespace);
