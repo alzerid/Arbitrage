@@ -9,24 +9,26 @@ class CPackage
 	private $_config;     //The configuration object
 	private $_parent;     //The parent package that loaded this package
 
-	public function __construct($parent=NULL)
+	/**
+	 * Constructor initializes the CPackace instance.
+	 * @param string $path The path where the package resides in.
+	 * @param string $namespace The namespace associated with the object.
+	 * @param \Arbitrage2\Base\CPackage $parent The parent of this package.
+	 * @param \Arbitrage2\Config\CArbitrageConfigProperty $config The configuration to merge with.
+	 */
+	public function __construct($path, $namespace, $parent=NULL, \Arbitrage2\Config\CArbitrageConfigProperty $config=NULL)
 	{
-		$this->_path      = '';
-		$this->_namespace = '';
-		$this->_config    = NULL;
+		$this->_path      = $path;
+		$this->_namespace = $namespace;
+		$this->_config    = $config;
 		$this->_parent    = $parent;
 	}
 
 	/**
 	 * Initializes the package.
-	 * @param string $path The path where the package resides in.
-	 * @param string $namespace The namespace associated with the object.
 	 */
-	public function initialize($path, $namespace)
+	public function initialize()
 	{
-		$this->_path      = $path;
-		$this->_namespace = $namespace;
-
 		//Load the config
 		$this->_loadConfiguration();
 	}
@@ -50,12 +52,37 @@ class CPackage
 	}
 
 	/**
+	 * Method gets the root parent.
+	 * @return \CArbitrage\Base\CPackage Returns the parent most package.
+	 */
+	public function getRootParent()
+	{
+		$current = $this;
+		do
+		{
+			$prev    = $current;
+			$current = $prev->getParent();
+		} while($current);
+
+		return $prev;
+	}
+
+	/**
 	 * Method returns the file system path of where the package is located.
 	 * @return string Returns the file system path.
 	 */
 	public function getPath()
 	{
 		return $this->_path;
+	}
+
+	/**
+	 * Method returns the namespace of this package.
+	 * @return string Returns the namespace of this package.
+	 */
+	public function getNamespace()
+	{
+		return $this->_namespace;
 	}
 
 	/**
@@ -68,14 +95,20 @@ class CPackage
 		$cpath  = $this->_path . "/" . CKernel::getInstance()->convertArbitrageNamespaceToPath($this->_namespace . ".config");
 		$file   = $cpath . "/config"  . '.php';
 
-		//Create config object
-		$this->_config = new CArbitrageConfig($cpath, $env);
-
 		//Require file
 		if(file_exists($file))
 		{
+			$old_config = $this->_config;
+			$this->_config = new CArbitrageConfig($cpath, $env);
 			$config = $this->_config;
 			require_once($file);
+
+			//Merge old and new config
+			if($old_config)
+			{
+				var_dump($old_config);
+				$this->_config->merge($old_config);
+			}
 		}
 	}
 }
