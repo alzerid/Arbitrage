@@ -3,13 +3,14 @@ namespace Arbitrage2\ClientMVC\Controllers;
 
 class ClientController extends \Arbitrage2\Base\CController
 {
+	public function initialize()
+	{
+		$this->setRenderable('Arbitrage2.Renderables.CJavascriptRenderable');
+	}
+
 	public function bootstrapAction()
 	{
-		//Set Javascript Renderable mode
-		$this->setRenderable('Arbitrage2.Renderables.CJavascriptRenderable');
-
-		$config = $this->_application->getConfig()->arbitrage2->services->clientMVC['Arbitrage2.ClientMVC.CClientMVCService'];
-		$routes = $config->routes->toArray();
+		$routes = $this->getPackage()->getConfig()->routes->toArray();
 		$global = $routes['_global'];
 		unset($routes['_global']);
 
@@ -27,7 +28,7 @@ class ClientController extends \Arbitrage2\Base\CController
 		}
 
 		//Return config
-		$config = $config->toArray();
+		$config = $this->getPackage()->getConfig()->toArray();
 		unset($config['routes']);
 		$config = array_merge($config, array('debug' => $this->_application->getConfig()->arbitrage2->debugMode));
 		$config['mvc']['routing'] = $global;
@@ -37,6 +38,18 @@ class ClientController extends \Arbitrage2\Base\CController
 		$js     = "var arbitrage2 = { config: $config };";
 
 		return array('render' => $js);
+	}
+
+	public function javascriptAction()
+	{
+		$path = $this->getPackage()->getPath() . "/" . \Arbitrage2\Base\CKernel::getInstance()->convertArbitrageNamespaceToPath($this->getPackage()->getNamespace() . '.null');
+		$path = preg_replace('/.null/', '', $path) . preg_replace('/\/client_mvc/i', '', $_SERVER['REQUEST_URI']);
+
+		//Check if exists
+		if(!file_exists($path))
+			throw new \Arbitrage2\Exceptions\EHTTPException(\Arbitrage2\Exceptions\EHTTPException::$HTTP_BAD_REQUEST);
+
+		return array('render' => file_get_contents($path));
 	}
 }
 ?>
