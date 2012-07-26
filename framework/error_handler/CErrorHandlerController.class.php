@@ -1,7 +1,7 @@
 <?
 namespace Framework\ErrorHandler;
 
-class CErrorHandlerController extends \Arbitrage2\Base\CController
+class CErrorHandlerController extends \Framework\Base\CController
 {
 	private $_err_vars;
 	private $_err_file;
@@ -17,7 +17,7 @@ class CErrorHandlerController extends \Arbitrage2\Base\CController
 		if($config->arbitrage2->debugMode)
 		{
 			//Use internal view
-			$fwpath  = \Arbitrage2\Base\CKernel::getInstance()->getPath() . "/framework/views/";
+			$fwpath  = \Framework\Base\CKernel::getInstance()->getPath() . "/framework/views/";
 
 			//Setup content
 			$content = array();
@@ -26,7 +26,7 @@ class CErrorHandlerController extends \Arbitrage2\Base\CController
 
 			//Setup renderable
 			$this->requireRenderable('Arbitrage2.Renderables.CViewFilePartialRenderable');
-			$renderable = new \Arbitrage2\Renderables\CViewFilePartialRenderable;
+			$renderable = new \Framework\Renderables\CViewFilePartialRenderable;
 			$renderable->initialize($fwpath, $content);
 			return $renderable;
 		}

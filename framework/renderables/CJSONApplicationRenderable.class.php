@@ -1,6 +1,6 @@
 <?
 namespace Framework\Renderables;
-use \Arbitrage2\Renderables\CJSONRenderable;
+use \Framework\Renderables\CJSONRenderable;
 
 class CJSONApplicationRenderable extends CJSONRenderable
 {

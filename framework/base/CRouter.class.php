@@ -1,7 +1,7 @@
 <?
 namespace Framework\Base;
-use \Arbitrage2\Config\CArbitrageConfig;
-use \Arbitrage2\Config\CArbitrageConfigProperty;
+use \Framework\Config\CArbitrageConfig;
+use \Framework\Config\CArbitrageConfigProperty;
 
 class CRouter
 {

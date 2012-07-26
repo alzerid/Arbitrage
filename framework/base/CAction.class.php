@@ -1,8 +1,8 @@
 <?
 namespace Framework\Base;
-use \Arbitrage2\Interfaces\IAction;
-use \Arbitrage2\Exceptions\EWebApplicationException;
-use \Arbitrage2\Exceptions\EHTTPException;
+use \Framework\Interfaces\IAction;
+use \Framework\Exceptions\EWebApplicationException;
+use \Framework\Exceptions\EHTTPException;
 
 class CAction implements IAction
 {
@@ -37,7 +37,7 @@ class CAction implements IAction
 		if($ret === NULL)
 			$ret = array();
 
-		if(!is_array($ret) && !($ret instanceof \Arbitrage2\Interfaces\IRenderable))
+		if(!is_array($ret) && !($ret instanceof \Framework\Interfaces\IRenderable))
 			throw new EWebApplicationException("Actions must return an array or of type IRenderable.");
 
 		return $ret;

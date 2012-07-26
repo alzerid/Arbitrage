@@ -1,6 +1,6 @@
 <?
 namespace Framework\Base;
-use \Arbitrage2\Base\CController;
+use \Framework\Base\CController;
 
 class CExtensionController extends CController
 {

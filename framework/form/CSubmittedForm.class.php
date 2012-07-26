@@ -1,6 +1,6 @@
 <?
 namespace Framework\Forms;
-use \Arbitrage2\Forms\CForm;
+use \Framework\Forms\CForm;
 
 class CSubmittedForm
 {

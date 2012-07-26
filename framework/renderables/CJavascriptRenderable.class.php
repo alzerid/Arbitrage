@@ -1,7 +1,7 @@
 <?
 namespace Framework\Renderables;
 
-class CJavascriptRenderable implements \Arbitrage2\Interfaces\IContentRenderable
+class CJavascriptRenderable implements \Framework\Interfaces\IContentRenderable
 {
 	protected $_content;
 

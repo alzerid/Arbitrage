@@ -1,6 +1,6 @@
 <?
 namespace Framework\Base;
-use \Arbitrage2\Exceptions\EArbitrageServiceException;
+use \Framework\Exceptions\EArbitrageServiceException;
 
 abstract class CService
 {
@@ -11,11 +11,11 @@ abstract class CService
 	private $_fs_path;        //Filesystem path
 
 	/**
-	 * Constructor for \Arbitrage2\Base\CService.
-	 * @param \Arbitrage2\Base\CApplication $application The application this service is tied to.
+	 * Constructor for \Framework\Base\CService.
+	 * @param \Framework\Base\CApplication $application The application this service is tied to.
 	 * @param string $type The type of service being instantiated.
 	 * @param string $path The path of where the service is located on the File System.
-	 * @param \Arbitrage2\Config\CArbitrageConfig $config The configuration associated with the service.
+	 * @param \Framework\Config\CArbitrageConfig $config The configuration associated with the service.
 	 */
 	public function __construct($application, $path, $config)
 	{
@@ -48,7 +48,7 @@ abstract class CService
 
 	/**
 	 * Method returns the application this service is tied to.
-	 * @return \Arbitrage2\Base\CApplication The application returned.
+	 * @return \Framework\Base\CApplication The application returned.
 	 */
 	public function getApplication()
 	{

@@ -1,6 +1,6 @@
 <?
 namespace Framework\Utils;
-use \Arbitrage2\Utils\CArrayObject;
+use \Framework\Utils\CArrayObject;
 
 class CFlashPropertyObject
 {

@@ -1,6 +1,6 @@
 <?
 namespace Framework\Base;
-use \Arbitrage2\Base\CBaseController;
+use \Framework\Base\CBaseController;
 
 class CFrameworkController extends CBaseController
 {

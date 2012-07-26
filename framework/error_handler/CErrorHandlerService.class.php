@@ -1,7 +1,7 @@
 <?
 namespace Framework\ErrorHandler;
 
-class CErrorHandlerService extends \Arbitrage2\Base\CService implements \Arbitrage2\Interfaces\IErrorHandlerService
+class CErrorHandlerService extends \Framework\Base\CService implements \Framework\Interfaces\IErrorHandlerService
 {
 	static protected $_SERVICE_TYPE = "errorHandler";
 
@@ -13,9 +13,9 @@ class CErrorHandlerService extends \Arbitrage2\Base\CService implements \Arbitra
 
 	/**
 	 * Method handles the event in an appropriate manner.
-	 * @param \Arbitrage2\Interfaces\IEvent $event The event to handle
+	 * @param \Framework\Interfaces\IEvent $event The event to handle
 	 */
-	public function handleEvent(\Arbitrage2\Interfaces\IEvent $event)
+	public function handleEvent(\Framework\Interfaces\IEvent $event)
 	{
 		//Forward event
 		$application = $this->getApplication();

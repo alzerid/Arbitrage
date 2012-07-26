@@ -1,6 +1,6 @@
 <?
 namespace Framework\Renderables;
-use \Arbitrage2\Interfaces\IRenderable;
+use \Framework\Interfaces\IRenderable;
 
 class CTextRenderable implements IRenderable
 {

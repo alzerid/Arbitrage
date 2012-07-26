@@ -1,6 +1,6 @@
 <?
 namespace Framework\Utils;
-use \Arbitrage2\Exceptions\EArbitrageException;
+use \Framework\Exceptions\EArbitrageException;
 
 class CFileSearchLoader
 {

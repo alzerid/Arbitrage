@@ -1,6 +1,6 @@
 <?
 namespace Framework\Renderables;
-use \Arbitrage2\Renderables\CJSONApplicationRenderable;
+use \Framework\Renderables\CJSONApplicationRenderable;
 
 class CJSONClientMVCRenderable extends CJSONApplicationRenderable
 {

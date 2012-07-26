@@ -1,6 +1,6 @@
 <?
 namespace Framework\Forms;
-use \Arbitrage2\Interfaces\IFileRenderable;
+use \Framework\Interfaces\IFileRenderable;
 
 Class CRenderForm extends CForm implements IFileRenderable
 {

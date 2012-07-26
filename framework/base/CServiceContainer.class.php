@@ -1,7 +1,7 @@
 <?
 namespace Framework\Base;
-use \Arbitrage2\Utils\CArrayObject;
-use \Arbitrage2\Exceptions\EArbitrageServiceException;
+use \Framework\Utils\CArrayObject;
+use \Framework\Exceptions\EArbitrageServiceException;
 
 class CServiceContainer
 {
@@ -29,10 +29,10 @@ class CServiceContainer
 
 	/**
 	 * Method returnst he service associated with the application.
-	 * @param \Arbitrage2\Base\CApplication $application The application the service is registered to.
-	 * @return \Arbitrage2\Base\CService Returns the appropriate service or NULL.
+	 * @param \Framework\Base\CApplication $application The application the service is registered to.
+	 * @return \Framework\Base\CService Returns the appropriate service or NULL.
 	 */
-	public function getService(\Arbitrage2\Base\CApplication $application)
+	public function getService(\Framework\Base\CApplication $application)
 	{
 		foreach($this->_services as $service)
 		{
@@ -45,13 +45,13 @@ class CServiceContainer
 
 	/**
 	 * Registers an application to this service.
-	 * @param \Arbitrage2\Base\CApplication $application The application to register
+	 * @param \Framework\Base\CApplication $application The application to register
 	 * @param string $path The filesystem path of the service.
 	 * @param string $class The service object to use.
-	 * @param \Arbitrage2\Config\CArbitrageConfig $config The config to use for this service and application combination.
+	 * @param \Framework\Config\CArbitrageConfig $config The config to use for this service and application combination.
 	 * @return boolean Returns false if application already registered or true.
 	 */
-	public function registerApplicationToService(\Arbitrage2\Base\CApplication $application, $path, $class, $config)
+	public function registerApplicationToService(\Framework\Base\CApplication $application, $path, $class, $config)
 	{
 		//Find if applicatoin already registered
 		foreach($this->_services as $obj)

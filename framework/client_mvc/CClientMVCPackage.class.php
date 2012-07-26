@@ -1,7 +1,7 @@
 <?
 namespace Framework\ClientMVC;
 
-class CClientMVCPackage extends \Arbitrage2\Base\CPackage
+class CClientMVCPackage extends \Framework\Base\CPackage
 {
 	public function initialize()
 	{
@@ -20,12 +20,12 @@ class CClientMVCPackage extends \Arbitrage2\Base\CPackage
 
 
 		//Add bootstrap.js and arbitrage javascript tags
-		\Arbitrage2\DOM\CDOMGenerator::addJavascriptTag(array('src' => '/bootstrap.js?action=' . $this->getRootParent()->getURI()));
-		\Arbitrage2\DOM\CDOMGenerator::addJavascriptTag(array('src' => '/client_mvc/javascript/base/arbitrage2.js'));
+		\Framework\DOM\CDOMGenerator::addJavascriptTag(array('src' => '/bootstrap.js?action=' . $this->getRootParent()->getURI()));
+		\Framework\DOM\CDOMGenerator::addJavascriptTag(array('src' => '/client_mvc/javascript/base/arbitrage2.js'));
 
 		//require javascript file defined by user
 		if(isset($this->getConfig()->applicationScript))
-			\Arbitrage2\DOM\CDOMGenerator::addJavascriptTag(array('src' => $this->getConfig()->applicationScript));
+			\Framework\DOM\CDOMGenerator::addJavascriptTag(array('src' => $this->getConfig()->applicationScript));
 	}
 }
 

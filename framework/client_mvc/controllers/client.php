@@ -1,7 +1,7 @@
 <?
 namespace Framework\ClientMVC\Controllers;
 
-class ClientController extends \Arbitrage2\Base\CJavascriptController
+class ClientController extends \Framework\Base\CJavascriptController
 {
 	public function bootstrapAction()
 	{
@@ -37,12 +37,12 @@ class ClientController extends \Arbitrage2\Base\CJavascriptController
 
 	public function javascriptAction()
 	{
-		$path = $this->getPackage()->getPath() . "/" . \Arbitrage2\Base\CKernel::getInstance()->convertArbitrageNamespaceToPath($this->getPackage()->getNamespace() . '.null');
+		$path = $this->getPackage()->getPath() . "/" . \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPath($this->getPackage()->getNamespace() . '.null');
 		$path = preg_replace('/.null/', '', $path) . preg_replace('/\/client_mvc/i', '', $_SERVER['REQUEST_URI']);
 
 		//Check if exists
 		if(!file_exists($path))
-			throw new \Arbitrage2\Exceptions\EHTTPException(\Arbitrage2\Exceptions\EHTTPException::$HTTP_BAD_REQUEST);
+			throw new \Framework\Exceptions\EHTTPException(\Framework\Exceptions\EHTTPException::$HTTP_BAD_REQUEST);
 
 		return array('render' => file_get_contents($path));
 	}

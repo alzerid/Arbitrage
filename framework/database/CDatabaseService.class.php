@@ -1,6 +1,6 @@
 <?
 namespace Framework\Database;
-use \Arbitrage2\Base\CService;
+use \Framework\Base\CService;
 
 class CDatabaseService extends CService
 {

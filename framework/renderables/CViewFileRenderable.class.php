@@ -1,9 +1,9 @@
 <?
 namespace Framework\Renderables;
-use \Arbitrage2\Exceptions\EArbitrageRenderableException;
+use \Framework\Exceptions\EArbitrageRenderableException;
 $_application->requireRenderable('Arbitrage2.Renderables.CViewFilePartialRenderable');
 
-class CViewFileRenderable extends \Arbitrage2\Renderables\CViewFilePartialRenderable implements \Arbitrage2\Interfaces\ILayoutRenderable
+class CViewFileRenderable extends \Framework\Renderables\CViewFilePartialRenderable implements \Framework\Interfaces\ILayoutRenderable
 {
 	protected $_layout;
 

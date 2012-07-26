@@ -1,9 +1,9 @@
 <?
 namespace Framework\Renderables;
-use \Arbitrage2\Exceptions\EArbitrageRenderableException;
-use \Arbitrage2\Base\CWebApplication;
+use \Framework\Exceptions\EArbitrageRenderableException;
+use \Framework\Base\CWebApplication;
 
-class CViewFilePartialRenderable implements \Arbitrage2\Interfaces\IViewFileRenderable
+class CViewFilePartialRenderable implements \Framework\Interfaces\IViewFileRenderable
 {
 	protected $_path;
 	protected $_content;

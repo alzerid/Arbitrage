@@ -1,10 +1,10 @@
 <?
 namespace Framework\Base;
-use \Arbitrage2\Interfaces\IController;
-use \Arbitrage2\Utils\CArrayObject;
-use \Arbitrage2\Utils\CFlashPropertyObject;
-use \Arbitrage2\Exceptions\EWebApplicationException;
-use \Arbitrage2\Exceptions\EHTTPException;
+use \Framework\Interfaces\IController;
+use \Framework\Utils\CArrayObject;
+use \Framework\Utils\CFlashPropertyObject;
+use \Framework\Exceptions\EWebApplicationException;
+use \Framework\Exceptions\EHTTPException;
 
 abstract class CController implements IController
 {
@@ -54,11 +54,11 @@ abstract class CController implements IController
 
 	/**
 	 * Static method creates a CController and assigns an application to it.
-	 * @param \Arbitrage2\Base\CApplication $application The application to assign this controller with.
-	 * @param \Arbitrage2\Base\CPackage $package The package to assign this controller with.
-	 * @return \Arbitrage2\Base\CController An instance of CController.
+	 * @param \Framework\Base\CApplication $application The application to assign this controller with.
+	 * @param \Framework\Base\CPackage $package The package to assign this controller with.
+	 * @return \Framework\Base\CController An instance of CController.
 	 */
-	static public function createController(\Arbitrage2\Base\CApplication $application, \Arbitrage2\Base\CPackage $package=NULL)
+	static public function createController(\Framework\Base\CApplication $application, \Framework\Base\CPackage $package=NULL)
 	{
 		$class      = get_called_class();
 		$controller = new $class;
@@ -211,7 +211,7 @@ abstract class CController implements IController
 
 	/**
 	 * Returns the action object.
-	 * @return \Arbitrage2\Base\CAction Returns the CAction associated with this controller.
+	 * @return \Framework\Base\CAction Returns the CAction associated with this controller.
 	 */
 	public function getAction()
 	{
@@ -220,7 +220,7 @@ abstract class CController implements IController
 
 	/**
 	 * Method returns the package assigned to the controller.
-	 * @return \Arbitrage2\Base\CPackage Returns the package the controller is associated with.
+	 * @return \Framework\Base\CPackage Returns the package the controller is associated with.
 	 */
 	public function getPackage()
 	{
@@ -229,7 +229,7 @@ abstract class CController implements IController
 
 	/**
 	 * Method returns the application assigned to the controller.
-	 * @return \Arbitrage2\Base\CApplication Returns the application the controller is associated with.
+	 * @return \Framework\Base\CApplication Returns the application the controller is associated with.
 	 */
 	public function getApplication()
 	{
@@ -258,7 +258,7 @@ abstract class CController implements IController
 	public function render($content=NULL)
 	{
 		$out = NULL;
-		if($content instanceof \Arbitrage2\Interfaces\IRenderable)
+		if($content instanceof \Framework\Interfaces\IRenderable)
 			$out = $content->render();
 		elseif(is_array($content))
 		{
@@ -269,7 +269,7 @@ abstract class CController implements IController
 			$class      = CKernel::getInstance()->convertArbitrageNamespaceToPHP($this->_renderable);
 			$renderable = new $class;
 
-			if($renderable instanceof \Arbitrage2\Renderables\CViewFilePartialRenderable || $renderable instanceof \Arbtirage2\Interfaces\IViewFileRenderable)
+			if($renderable instanceof \Framework\Renderables\CViewFilePartialRenderable || $renderable instanceof \Arbtirage2\Interfaces\IViewFileRenderable)
 			{
 				$path = preg_replace('/controllers.*$/i', 'views', CKernel::getInstance()->convertArbitrageNamespaceToPath($this->_namespace));
 				$path = $this->_application->getPath() . "/$path";
@@ -289,7 +289,7 @@ abstract class CController implements IController
 				$renderable->initialize($content);
 
 			//Check renderable type, if it is of type CViewFileRenderable, set layouts
-			if($renderable instanceof \Arbitrage2\Interfaces\ILayoutRenderable)
+			if($renderable instanceof \Framework\Interfaces\ILayoutRenderable)
 				$renderable->setLayout($this->_layout);
 
 			//Render the renderable
@@ -311,7 +311,7 @@ abstract class CController implements IController
 	/**
 	 * Proxy function that calls CWebApplication::requireRenderable
 	 * @param string $namespace The arbitrage namespace where the renderable object resides.
-	 * @throws \Arbitrage2\Exceptions\EWebApplicationException
+	 * @throws \Framework\Exceptions\EWebApplicationException
 	 */
 	public function requireRenderable($namespace)
 	{

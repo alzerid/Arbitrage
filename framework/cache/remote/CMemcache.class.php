@@ -1,7 +1,7 @@
 <?
 namespace Framework\Cache\Remote;
-use \Arbitrage2\Interfaces\IRemoteCache;
-use \Arbitrage2\Exceptions\EArbitrageRemoteCacheException;
+use \Framework\Interfaces\IRemoteCache;
+use \Framework\Exceptions\EArbitrageRemoteCacheException;
 
 class CMemcache implements IRemoteCache
 {

@@ -1,6 +1,6 @@
 <?
 namespace Framework\Database;
-use \Arbitrage2\Interfaces\IModuleLoader;
+use \Framework\Interfaces\IModuleLoader;
 
 class CDatabaseDriverFactory implements IModuleLoader
 {

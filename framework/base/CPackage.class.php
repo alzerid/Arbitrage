@@ -1,6 +1,6 @@
 <?
 namespace Framework\Base;
-use \Arbitrage2\Config\CArbitrageConfig;
+use \Framework\Config\CArbitrageConfig;
 
 class CPackage
 {
@@ -13,10 +13,10 @@ class CPackage
 	 * Constructor initializes the CPackace instance.
 	 * @param string $path The path where the package resides in.
 	 * @param string $namespace The namespace associated with the object.
-	 * @param \Arbitrage2\Base\CPackage $parent The parent of this package.
-	 * @param \Arbitrage2\Config\CArbitrageConfigProperty $config The configuration to merge with.
+	 * @param \Framework\Base\CPackage $parent The parent of this package.
+	 * @param \Framework\Config\CArbitrageConfigProperty $config The configuration to merge with.
 	 */
-	public function __construct($path, $namespace, $parent=NULL, \Arbitrage2\Config\CArbitrageConfigProperty $config=NULL)
+	public function __construct($path, $namespace, $parent=NULL, \Framework\Config\CArbitrageConfigProperty $config=NULL)
 	{
 		$this->_path      = $path;
 		$this->_namespace = $namespace;
@@ -35,7 +35,7 @@ class CPackage
 
 	/**
 	 * Returns the config object associated with the package.
-	 * @return \Arbitrage2\Base\CArbitrageConfig Returns the arbitrage config object.
+	 * @return \Framework\Base\CArbitrageConfig Returns the arbitrage config object.
 	 */
 	public function getConfig()
 	{

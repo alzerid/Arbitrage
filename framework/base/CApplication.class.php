@@ -1,7 +1,7 @@
 <?
 namespace Framework\Base;
 
-abstract class CApplication extends CPackage implements \Arbitrage2\Interfaces\IErrorHandlerListener
+abstract class CApplication extends CPackage implements \Framework\Interfaces\IErrorHandlerListener
 {
 	private $_packages;            //A list of packages registered to this application
 
@@ -14,7 +14,7 @@ abstract class CApplication extends CPackage implements \Arbitrage2\Interfaces\I
 		$this->_packages = array();
 
 		//Setup error handler
-		\Arbitrage2\ErrorHandler\CErrorHandlerObserver::getInstance()->addListener($this);
+		\Framework\ErrorHandler\CErrorHandlerObserver::getInstance()->addListener($this);
 
 		//Call CPackage::initialize
 		parent::initialize();
@@ -62,7 +62,7 @@ abstract class CApplication extends CPackage implements \Arbitrage2\Interfaces\I
 			foreach($packages as $package => $lconfig)
 			{
 				$key = preg_replace('/\.[^\.]+$/', '', strtolower($package));
-				$this->_packages[$key] = CKernel::getInstance()->createPackage($package, $this, new \Arbitrage2\Config\CArbitrageConfigProperty($lconfig));
+				$this->_packages[$key] = CKernel::getInstance()->createPackage($package, $this, new \Framework\Config\CArbitrageConfigProperty($lconfig));
 			}
 		}
 	}
@@ -70,7 +70,7 @@ abstract class CApplication extends CPackage implements \Arbitrage2\Interfaces\I
 	/**
 	 * Method handles errors.
 	 */
-	public function handleError(\Arbitrage2\Interfaces\IEvent $event)
+	public function handleError(\Framework\Interfaces\IEvent $event)
 	{
 		die('CApplication::handleError');
 	}
@@ -78,7 +78,7 @@ abstract class CApplication extends CPackage implements \Arbitrage2\Interfaces\I
 	/**
 	 * Methods handles exceptions.
 	 */
-	public function handleException(\Arbitrage2\Interfaces\IEvent $event)
+	public function handleException(\Framework\Interfaces\IEvent $event)
 	{
 		die('CApplication::handleException');
 	}

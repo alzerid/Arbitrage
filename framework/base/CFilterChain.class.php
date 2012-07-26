@@ -1,6 +1,6 @@
 <?
 namespace Framework\Base;
-use \Arbitrage2\Base\Controller;
+use \Framework\Base\Controller;
 
 class CFilterChain
 {

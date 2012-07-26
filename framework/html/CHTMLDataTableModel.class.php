@@ -1,6 +1,6 @@
 <?
 namespace Framework\HTML;
-use \Arbitrage2\HTML\CHTMLDataTable;
+use \Framework\HTML\CHTMLDataTable;
 
 class CHTMLDataTableModel extends CHTMLDataTable
 {

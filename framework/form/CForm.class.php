@@ -1,6 +1,6 @@
 <?
 namespace Framework\Forms;
-use \Arbitrage2\HTML\CHTMLComponent;
+use \Framework\HTML\CHTMLComponent;
 
 Class CForm extends CHTMLComponent
 {
@@ -30,7 +30,7 @@ Class CForm extends CHTMLComponent
 			$this->_model  = get_class($this->_values);
 			$this->_values = $this->_values->toArray();
 		}
-		elseif($this->_values instanceof \Arbitrage2\Model2\CModel)
+		elseif($this->_values instanceof \Framework\Model2\CModel)
 			$this->_model = get_class($this->_values);
 		elseif($this->_values === NULL)
 			$this->_values = array();

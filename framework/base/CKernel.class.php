@@ -1,7 +1,7 @@
 <?
 namespace Framework\Base;
-use \Arbitrage2\Interfaces\ISingleton;
-use \Arbitrage2\Exceptions\EArbitrageKernelException;
+use \Framework\Interfaces\ISingleton;
+use \Framework\Exceptions\EArbitrageKernelException;
 
 class CKernel implements ISingleton
 {
@@ -68,7 +68,7 @@ class CKernel implements ISingleton
 	 * @param $namespace The namespace to convert to a file name.
 	 * @param $opt_throw Optional parameter that specifies if we should throw an error.
 	 * @param $opt_variables Optional parameter that pases variables into the required file.
-	 * @throws \Arbitrage2\Exceptions\EArbitrageKernelException
+	 * @throws \Framework\Exceptions\EArbitrageKernelException
 	 * @return boolean Returns true if the file was included else false.
 	 */
 	public function requireFile($namespace, $opt_throw=true, $opt_variables=array())
@@ -88,7 +88,7 @@ class CKernel implements ISingleton
 	 * @param string $namespace The Arbitrage namespace to include.
 	 * @param $opt_throw Optional parameter that specifies if we should throw an error.
 	 * @param $opt_variables Optional parameter that pases variables into the required file.
-	 * @throws \Arbitrage2\Exceptions\EArbitrageKernelException
+	 * @throws \Framework\Exceptions\EArbitrageKernelException
 	 * @return boolean Returns true if the file was included else false.
 	 */
 	public function requireFrameworkFile($namespace, $opt_throw=true, $opt_variables=array())
@@ -118,7 +118,7 @@ class CKernel implements ISingleton
 	/**
 	 * Adds a path to the package search path.
 	 * @param sring $path The path to add for the application search path.
-	 * @throws \Arbitrage2\Exceptions\EArbitrageKernelException
+	 * @throws \Framework\Exceptions\EArbitrageKernelException
 	 */
 	public function registerPackagePath($path)
 	{
@@ -165,7 +165,7 @@ class CKernel implements ISingleton
 	/**
 	 * Creates an application.
 	 * @namespace The root namespace the application resides on.
-	 * @return \Arbitrage2\Base\CApplication Returns a web application.
+	 * @return \Framework\Base\CApplication Returns a web application.
 	 */
 	public function createApplication($namespace)
 	{
@@ -174,7 +174,7 @@ class CKernel implements ISingleton
 		$info  = $this->_requireFile(preg_replace('/\.[^\.]+$/', '.application', $namespace));
 
 		//Ensure this class is of type CApplication
-		if(!is_subclass_of($class, '\Arbitrage2\Base\CApplication'))
+		if(!is_subclass_of($class, '\Framework\Base\CApplication'))
 			throw new EArbitrageKernelException("Application '$namespace' does not extend CApplication!");
 		
 		//Create application
@@ -187,11 +187,11 @@ class CKernel implements ISingleton
 	/**
 	 * Creates a package and returns it.
 	 * @param string $namespace The namespace the package resides on.
-	 * @param \Arbitrage2\Base\CPackage $opt_parent The parent package this package will belong to.
-	 * @param \Arbitrage2\Config\CArbitrageConfig $opt_config The local configuration for this package.
-	 * @return \Arbitrage2\Base\CApplication Returns a web application.
+	 * @param \Framework\Base\CPackage $opt_parent The parent package this package will belong to.
+	 * @param \Framework\Config\CArbitrageConfig $opt_config The local configuration for this package.
+	 * @return \Framework\Base\CApplication Returns a web application.
 	 */
-	public function createPackage($namespace, \Arbitrage2\Base\CPackage $opt_parent=NULL, \Arbitrage2\Config\CArbitrageConfigProperty $opt_config=NULL)
+	public function createPackage($namespace, \Framework\Base\CPackage $opt_parent=NULL, \Framework\Config\CArbitrageConfigProperty $opt_config=NULL)
 	{
 		$package = $this->_createPackage($namespace, $opt_parent, $opt_config);
 		if($package == NULL)
@@ -204,9 +204,9 @@ class CKernel implements ISingleton
 
 	/**
 	 * Initialize services via configuration object.
-	 * @param \Arbitrage2\Base\CApplication $application The application object.
+	 * @param \Framework\Base\CApplication $application The application object.
 	 */
-	public function initializeServices(\Arbitrage2\Base\CApplication $application)
+	public function initializeServices(\Framework\Base\CApplication $application)
 	{
 		//Get arbitrage2 config
 		$config = $application->getConfig();
@@ -216,16 +216,16 @@ class CKernel implements ISingleton
 			foreach($services as $service => $value)
 			{
 				foreach($value as $namespace => $lconfig)
-					$this->createService($application, $service, $namespace, new \Arbitrage2\Config\CArbitrageConfigProperty($lconfig));  //Create service with configuration
+					$this->createService($application, $service, $namespace, new \Framework\Config\CArbitrageConfigProperty($lconfig));  //Create service with configuration
 			}
 		}
 	}
 
 	/**
 	 * Method returns a CService.
-	 * @param \Arbitrage2\Base\CApplication $application The application object.
+	 * @param \Framework\Base\CApplication $application The application object.
 	 * @param string $service_type The type of service to fetch.
-	 * @return \Arbitrage2\Base\CService Returns a CService instance or NULL.
+	 * @return \Framework\Base\CService Returns a CService instance or NULL.
 	 */
 	public function getService($application, $service_type)
 	{
@@ -237,10 +237,10 @@ class CKernel implements ISingleton
 
 	/**
 	 * Creates a service and regsisters it into the kernel.
-	 * @param \Arbitrage2\Base\CApplication $application The application object.
+	 * @param \Framework\Base\CApplication $application The application object.
 	 * @param string $service The service namespace to register to.
 	 * @param string $namespace The namespace to load.
-	 * @param \Arbitrage2\Config\CArbitrageConfig $config Configuration object to tie to the serivce.
+	 * @param \Framework\Config\CArbitrageConfig $config Configuration object to tie to the serivce.
 	 */
 	public function createService($application, $service, $namespace, $config)
 	{
@@ -379,9 +379,9 @@ class CKernel implements ISingleton
 	/**
 	 * Method to create a package
 	 * @param string $namespace The namespace the package resides on.
-	 * @param \Arbitrage2\Base\CPackage $opt_parent The parent package this package will belong to.
-	 * @param \Arbitrage2\Config\CArbitrageConfig $opt_config The local configuration for this package.
-	 * @return \Arbitrage2\Base\CApplication Returns a web application.
+	 * @param \Framework\Base\CPackage $opt_parent The parent package this package will belong to.
+	 * @param \Framework\Config\CArbitrageConfig $opt_config The local configuration for this package.
+	 * @return \Framework\Base\CApplication Returns a web application.
 	 */
 	public function _createPackage($namespace, $opt_parent=NULL, $opt_config=NULL)
 	{

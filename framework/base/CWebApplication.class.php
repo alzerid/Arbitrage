@@ -1,6 +1,6 @@
 <?
 namespace Framework\Base;
-use \Arbitrage2\Exceptions\EWebApplicationException;
+use \Framework\Exceptions\EWebApplicationException;
 
 class CWebApplication extends CApplication
 {
@@ -104,7 +104,7 @@ class CWebApplication extends CApplication
 	/**
 	 * Method requires the controller.
 	 * @param string $namespace The arbitrage namespace where the controller resides.
-	 * @throws \Arbitrage2\Exceptions\EWebApplicationException
+	 * @throws \Framework\Exceptions\EWebApplicationException
 	 */
 	public function requireController($namespace)
 	{
@@ -125,7 +125,7 @@ class CWebApplication extends CApplication
 	/**
 	 * Method requires a renderable object.
 	 * @param string $namespace The arbitrage namespace where the renderable object resides.
-	 * @throws \Arbitrage2\Exceptions\EWebApplicationException
+	 * @throws \Framework\Exceptions\EWebApplicationException
 	 */
 	public function requireRenderable($namespace)
 	{
@@ -185,7 +185,7 @@ class CWebApplication extends CApplication
 	/**
 	 * Method handles errors.
 	 */
-	public function handleError(\Arbitrage2\Interfaces\IEvent $event)
+	public function handleError(\Framework\Interfaces\IEvent $event)
 	{
 		//TODO: Handle Debug Mode Exceptions
 
@@ -204,7 +204,7 @@ class CWebApplication extends CApplication
 			var_dump($event);
 			die("ERROR");
 		}
-		elseif($event->exception instanceof \Arbitrage2\Exceptions\EHTTPException)
+		elseif($event->exception instanceof \Framework\Exceptions\EHTTPException)
 		{
 			die("HTTP Exception!");
 		}
@@ -221,7 +221,7 @@ class CWebApplication extends CApplication
 	/**
 	 * Method intializes services specified in the application configuration file.
 	 */
-	public function handleException(\Arbitrage2\Interfaces\IEvent $event)
+	public function handleException(\Framework\Interfaces\IEvent $event)
 	{
 		//TODO: Handle HTTP Exceptions
 		//TODO: Handle Debug Mode Exceptions
@@ -251,9 +251,9 @@ class CWebApplication extends CApplication
 
 	/**
 	 * Method prints out in HTML format the error or exception event.
-	 * @param \Arbitrage2\Interfaces\IEvent $event The event to print out.
+	 * @param \Framework\Interfaces\IEvent $event The event to print out.
 	 */
-	private function _printEvent(\Arbitrage2\Interfaces\IEvent $event)
+	private function _printEvent(\Framework\Interfaces\IEvent $event)
 	{
 		echo '<style type="text/css"> h3 { border-bottom: 1px solid black; } div.title { font-weight: bold; float: left; width: 100px; } div.value { float: left; } div.tracenumber { float: left; width: 100px; } div.tracefile { float: left; }</style>';
 		echo '<h1>Arbitrage2: Global Exception Caught</h1><br />';

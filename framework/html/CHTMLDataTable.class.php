@@ -1,6 +1,6 @@
 <?
 namespace Framework\HTML;
-use \Arbitrage2\Interfaces\IHTMLDataTable;
+use \Framework\Interfaces\IHTMLDataTable;
 
 class CHTMLDataTable implements IHTMLDataTable
 {
