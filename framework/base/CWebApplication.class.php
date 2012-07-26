@@ -62,6 +62,15 @@ class CWebApplication extends CApplication
 	}
 
 	/**
+	 * Method returns the current URI.
+	 * @return string Returns the URI.
+	 */
+	public function getURI()
+	{
+		return $_SERVER['REQUEST_URI'];
+	}
+
+	/**
 	 * Method loads the controller.
 	 * @param string $route URL formatted route that specifies the controller.
 	 * @param boolean $ajax Determines if the controller is an AJAX controller.
@@ -72,7 +81,7 @@ class CWebApplication extends CApplication
 		//Add the Controllers namespace
 		$url    = explode('/', $route);
 		$action = preg_replace('/\?.*$/', '', $url[count($url)-1]);
-		$route  = implode('/', array_slice($url, 0, 1)) . "/controllers/" . implode('/', array_slice($url, 1, count($url)-2));
+		$route  = implode('/', array_slice($url, 0, -2)) . "/controllers/" . implode('/', array_splice($url, -2, -1));
 
 		//Transforms the route from URL format to FileSystem format
 		$namespace = CKernel::getInstance()->convertURLNamespaceToArbitrage($route);
