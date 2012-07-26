@@ -72,6 +72,7 @@ class CKernel implements ISingleton
 	 */
 	public function requireFile($namespace, $opt_throw=true, $opt_variables=array())
 	{
+		$namespace = preg_replace('/^Arbitrage2\./', 'Framework.', $namespace);
 		//Iterate through and find file
 		$file = $this->convertArbitrageNamespaceToPath($namespace);
 
@@ -143,6 +144,7 @@ class CKernel implements ISingleton
 	public function registerPackagePath($path)
 	{
 		$this->_package_paths[] = $path;
+		$this->_pacakge_paths   = array_unique($this->_package_paths);
 	}
 
 	/**
@@ -231,7 +233,7 @@ class CKernel implements ISingleton
 			foreach($services as $service => $value)
 			{
 				foreach($value as $namespace => $lconfig)
-					$this->createService($application, $service, $namespace, $lconfig);  //Create service with configuration
+					$this->createService($application, $service, $namespace, new \Arbitrage2\Config\CArbitrageConfigProperty($lconfig));  //Create service with configuration
 			}
 		}
 	}
