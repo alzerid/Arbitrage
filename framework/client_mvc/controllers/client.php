@@ -1,13 +1,8 @@
 <?
 namespace Arbitrage2\ClientMVC\Controllers;
 
-class ClientController extends \Arbitrage2\Base\CController
+class ClientController extends \Arbitrage2\Base\CJavascriptController
 {
-	public function initialize()
-	{
-		$this->setRenderable('Arbitrage2.Renderables.CJavascriptRenderable');
-	}
-
 	public function bootstrapAction()
 	{
 		$routes = $this->getPackage()->getConfig()->routes->toArray();
