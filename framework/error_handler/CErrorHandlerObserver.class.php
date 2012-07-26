@@ -1,13 +1,7 @@
 <?
-namespace Arbitrage2\ErrorHandler;
-use \Arbitrage2\Interfaces\IObserver;
-use \Arbitrage2\Interfaces\IListener;
-use \Arbitrage2\Interfaces\ISingleton;
+namespace Framework\ErrorHandler;
 
-use \Arbitrage2\Events\CErrorEvent;
-use \Arbitrage2\Events\CExceptionEvent;
-
-class CErrorHandlerObserver implements IObserver, ISingleton
+class CErrorHandlerObserver implements \Framework\Interfaces\IObserver, \Framework\Interfaces\ISingleton
 {
 	static private $_instance = NULL;
 	static private $_PHP_ERROR_TYPE = array(
@@ -41,7 +35,7 @@ class CErrorHandlerObserver implements IObserver, ISingleton
 	}
 
 	/* IListener Implementation */
-	public function prependListener(IListener $listener)
+	public function prependListener(\Framework\Interfaces\IListener $listener)
 	{
 		$this->_listeners = array_merge(array($listener), $this->_listeners);
 		return true;
@@ -85,7 +79,7 @@ class CErrorHandlerObserver implements IObserver, ISingleton
 	static public function handleError($errno, $errstr, $errfile, $errline)
 	{
 		//TODO: Check for stop propagation from event
-		$event = new CErrorEvent($errno, self::$_PHP_ERROR_TYPE[$errno], $errstr, $errfile, $errline);
+		$event = new \Framework\Events\CErrorEvent($errno, self::$_PHP_ERROR_TYPE[$errno], $errstr, $errfile, $errline);
 
 		//Send event to handleError listeners
 		$listeners = CErrorHandlerObserver::getInstance()->_listeners;
@@ -103,7 +97,7 @@ class CErrorHandlerObserver implements IObserver, ISingleton
 	{
 		//TODO: Check for stop propagation from event
 
-		$event = new CExceptionEvent($ex);
+		$event = new \Framework\Events\CExceptionEvent($ex);
 
 		//Send event to the listeners
 		$listeners = CErrorHandlerObserver::getInstance()->_listeners;
@@ -118,6 +112,6 @@ class CErrorHandlerObserver implements IObserver, ISingleton
 }
 
 //Set global exception handler and php error handler
-set_error_handler(array("\\Arbitrage2\\ErrorHandler\\CErrorHandlerObserver", "handleError"));
-set_exception_handler(array("\\Arbitrage2\\ErrorHandler\\CErrorHandlerObserver", "handleException"));
+set_error_handler(array("\\Framework\\ErrorHandler\\CErrorHandlerObserver", "handleError"));
+set_exception_handler(array("\\Framework\\ErrorHandler\\CErrorHandlerObserver", "handleException"));
 ?>
