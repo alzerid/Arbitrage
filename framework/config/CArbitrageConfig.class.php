@@ -15,30 +15,6 @@ class CArbitrageConfig extends CArbitrageConfigProperty
 		parent::__construct($config);
 	}
 
-	/*public function initialize(array &$config=array())
-	{
-		//Create config
-		$config = array();
-
-		//Setup _internals
-		$this->_variables['_internals']                  = array();
-		$this->_variables['_internals']['fwrootpath']    = ARBITRAGE2_FW_PATH;
-		$this->_variables['_internals']['approotpath']   = realpath("$root/../") . "/";
-		$this->_variables['_internals']['appconfigpath'] = realpath("$root/../") . "/";
-
-
-		//Setup view and layout path
-		$this->_variables['_internals']['viewpath']   = realpath($this->_variables['_internals']['approotpath'] . "app/views/") . "/";
-		$this->_variables['_internals']['layoutpath'] = realpath($this->_variables['_internals']['approotpath'] . "app/views/layout/") . "/";
-
-		//Setup arbitrage
-		$config['server']              = array();
-		$config['server']['debugMode'] = false;            //Default debug mode is off
-
-		//Initialize
-		parent::initialize($config);
-	}*/
-
 	public function getEnvironment()
 	{
 		return $this->_env;
@@ -72,6 +48,11 @@ class CArbitrageConfigProperty extends CArrayObject
 			return new CArbitrageConfigProperty($this->_data[$name]);
 
 		return $this->_data[$name];
+	}
+
+	public function offsetGet($offset)
+	{
+		return $this->$offset;
 	}
 	/* End Magic Methods */
 
