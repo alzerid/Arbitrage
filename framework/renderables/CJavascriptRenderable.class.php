@@ -1,16 +1,22 @@
 <?
 namespace Arbitrage2\Renderables;
-use \Arbitrage2\Interfaces\IRenderable;
 
-class CJavascriptRenderable implements IRenderable
+class CJavascriptRenderable implements \Arbitrage2\Interfaces\IContentRenderable
 {
-	public function render($data=NULL)
+	protected $_content;
+
+	public function initialize($content)
+	{
+		$this->_content = $content;
+	}
+
+	public function render()
 	{
 		ob_start();
 		ob_implicit_flush(false);
 		header("Content-Type: application/javascript");
 
-		echo $data['data'];
+		echo $this->_content['render'];
 
 		return ob_get_clean();
 	}
