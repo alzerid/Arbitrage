@@ -8,11 +8,11 @@ class CKernel implements ISingleton
 	static private $_VERION     = "2.0.0";
 	static protected $_INSTANCE = NULL;
 	
-	private $_package_paths;
-	private $_service_paths;
-	private $_applications;
-	private $_services;
-	private $_path;
+	private $_package_paths;           //List of paths where packages are supposed to be searched for
+	private $_service_paths;           //List of paths where services are supposed to be searched for
+	private $_applications;            //List of applications managed by the Kernel
+	private $_services;                //List of services managed by the Kernel
+	private $_path;                    //The path of where the framework exists
 
 	protected function __construct()
 	{
@@ -43,6 +43,7 @@ class CKernel implements ISingleton
 		//Set path
 		$this->_path            = ARBITRAGE2_FW_PATH;
 		$this->_service_paths[] = $this->_path;
+		$this->_package_paths[] = $this->_path;
 
 		//Require needed files
 		$ret = $this->requireFrameworkFile('Exceptions', false);                    //File full of base exception classes
@@ -72,35 +73,14 @@ class CKernel implements ISingleton
 	 */
 	public function requireFile($namespace, $opt_throw=true, $opt_variables=array())
 	{
-		$namespace = preg_replace('/^Arbitrage2\./', 'Framework.', $namespace);
-		//Iterate through and find file
-		$file = $this->convertArbitrageNamespaceToPath($namespace);
-
-		//Extract opt_variables
-		if(count($opt_variables))
-			extract($opt_variables);
-
-		//Find the file in _package_paths
-		foreach($this->_package_paths as $path)
-		{
-			$path .= "/$file";
-			if(file_exists("$path.php"))
-			{
-				require_once("$path.php");
-				return true;
-			}
-			elseif(file_exists("$path.class.php"))
-			{
-				require_once("$path.php");
-				return true;
-			}
-		}
+		//Call private method
+		$ret = $this->_requireFile($namespace, $opt_variables);
 
 		//Check if we should throw an exception
-		if($opt_throw)
-			throw new EArbitrageKernelException("Unable to require '$namespace' ($path).");
+		if($opt_throw && $ret === NULL)
+			throw new EArbitrageKernelException("Unable to require '$namespace'.");
 
-		return false;
+		return ($ret != NULL);
 	}
 
 	/**
@@ -184,46 +164,50 @@ class CKernel implements ISingleton
 	}
 
 	/**
-	 * Creates and returns a Web Application.
+	 * Creates an application.
 	 * @namespace The root namespace the application resides on.
-	 * @return \Arbitrage2\Base\CWebApplication Returns a web application.
+	 * @return \Arbitrage2\Base\CApplication Returns a web application.
 	 */
-	public function createWebApplication($namespace)
+	public function createApplication($namespace)
 	{
-		//Convert namespace to path
-		$apath = $this->convertArbitrageNamespaceToPath("$namespace.null");
-		$apath = preg_replace('/\/null$/', '', $apath);
+		//Get class 
+		$class = $this->convertArbitrageNamespaceToPHP($namespace);
+		$info  = $this->_requireFile(preg_replace('/\.[^\.]+$/', '.application', $namespace));
 
-		//Search through application paths
-		foreach($this->_package_paths as $path)
-		{
-			$cpath = "$path/$apath";
-			if(file_exists($cpath))
-			{
-				$application = new CWebApplication();
-				$application->initialize($path, $namespace);
+		//Ensure this class is of type CApplication
+		if(!is_subclass_of($class, '\Arbitrage2\Base\CApplication'))
+			throw new EArbitrageKernelException("Application '$namespace' does not extend CApplication!");
+		
+		//Create application
+		$application = new $class($info['path'], $info['namespace']);
+		$application->initialize();
 
-				return $application;
-			}
-		}
-
-		throw new EArbitrageKernelException("Unable to load Web Application '$namespace'.");
+		return $application;
 	}
 
 	/**
-	 * Creates and returns a CLI Application.
-	 * @return Returns a CLI Application.
+	 * Creates a package and returns it.
+	 * @param string $namespace The namespace the package resides on.
+	 * @param \Arbitrage2\Base\CPackage $opt_parent The parent package this package will belong to.
+	 * @param \Arbitrage2\Config\CArbitrageConfig $opt_config The local configuration for this package.
+	 * @return \Arbitrage2\Base\CApplication Returns a web application.
 	 */
-	public function createCLIApplication()
+	public function createPackage($namespace, \Arbitrage2\Base\CPackage $opt_parent=NULL, \Arbitrage2\Config\CArbitrageConfigProperty $opt_config=NULL)
 	{
-		die('code createCLIApplication');
+		$package = $this->_createPackage($namespace, $opt_parent, $opt_config);
+		if($package == NULL)
+			throw new EArbitrageKernelException("Application '$namespace' does not exist!");
+
+		//Initialize package
+		$package->initialize();
+		return $package;
 	}
 
 	/**
 	 * Initialize services via configuration object.
-	 * param \Arbitrage2\Base\CApplication $application The application object.
+	 * @param \Arbitrage2\Base\CApplication $application The application object.
 	 */
-	public function initializeServices($application)
+	public function initializeServices(\Arbitrage2\Base\CApplication $application)
 	{
 		//Get arbitrage2 config
 		$config = $application->getConfig();
@@ -355,6 +339,68 @@ class CKernel implements ISingleton
 		$namespace = preg_replace('/ /', '', $namespace);
 
 		return $namespace;
+	}
+
+	/**
+	 * Methods requires a file.
+	 * @param $namespace The namespace to convert to a file name.
+	 * @param $opt_variables Optional parameter that pases variables into the required file.
+	 * @return array Returns path of the package and namespace. Returns NULL if file does not exist.
+	 */
+	private function _requireFile($namespace, $opt_variables=array())
+	{
+		$namespace = preg_replace('/^Arbitrage2\./', 'Framework.', $namespace);
+		$ret       = NULL;
+
+		//Iterate through and find file
+		$file = $this->convertArbitrageNamespaceToPath($namespace);
+
+		//Extract opt_variables
+		if(count($opt_variables))
+			extract($opt_variables);
+
+		//Find the file in _package_paths
+		foreach($this->_package_paths as $path)
+		{
+			$opath = $path;
+			$path .= "/$file";
+			if(file_exists("$path.php"))
+			{
+				require_once("$path.php");
+				$ret = array('path' => $opath, 'namespace' => preg_replace('/\.[^\.]+$/', '', $namespace));
+				break;
+			}
+			elseif(file_exists("$path.class.php"))
+			{
+				require_once("$path.class.php");
+				$ret = array('path' => $opath, 'namespace' => preg_replace('/\.[^\.]+$/', '', $namespace));
+				break;
+			}
+		}
+
+		return $ret;
+	}
+
+	/**
+	 * Method to create a package
+	 * @param string $namespace The namespace the package resides on.
+	 * @param \Arbitrage2\Base\CPackage $opt_parent The parent package this package will belong to.
+	 * @param \Arbitrage2\Config\CArbitrageConfig $opt_config The local configuration for this package.
+	 * @return \Arbitrage2\Base\CApplication Returns a web application.
+	 */
+	public function _createPackage($namespace, $opt_parent=NULL, $opt_config=NULL)
+	{
+		//Get class
+		$class = $this->convertArbitrageNamespaceToPHP($namespace);
+		$info  = $this->_requireFile($namespace);
+
+		if(!class_exists($class))
+			return NULL;
+
+		//Create new application
+		$package = new $class($info['path'], $info['namespace'], $opt_parent, $opt_config);
+
+		return $package;
 	}
 }
 ?>
