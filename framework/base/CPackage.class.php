@@ -68,6 +68,15 @@ class CPackage
 	}
 
 	/**
+	 * Method aliased to getRootParent.
+	 * @return \Arbitrage\Base\CApplication Returns the application package.
+	 */
+	public function getApplication()
+	{
+		return $this->getRootParent();
+	}
+
+	/**
 	 * Method returns the file system path of where the package is located.
 	 * @return string Returns the file system path.
 	 */
