@@ -41,7 +41,7 @@ class CErrorHandlerObserver implements \Framework\Interfaces\IObserver, \Framewo
 		return true;
 	}
 
-	public function addListener(IListener $listener)
+	public function addListener(\Framework\Interfaces\IListener $listener)
 	{
 		$this->_listeners[] = $listener;
 		return true;
@@ -52,7 +52,7 @@ class CErrorHandlerObserver implements \Framework\Interfaces\IObserver, \Framewo
 		$this->_listeners = array();
 	}
 
-	public function removeListener(IListener $listener)
+	public function removeListener(\Framework\Interfaces\IListener $listener)
 	{
 		$cnt = count($this->_listeners);
 		for($i=0; $i<$cnt; $i++)

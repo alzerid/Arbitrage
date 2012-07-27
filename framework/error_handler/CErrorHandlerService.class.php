@@ -19,7 +19,7 @@ class CErrorHandlerService extends \Framework\Base\CService implements \Framewor
 	{
 		//Forward event
 		$application = $this->getApplication();
-		$application->forward("Arbitrage2.ErrorHandler.CErrorHandlerController.handle", array('event' => serialize($event)));
+		$application->forward("Framework.ErrorHandler.CErrorHandlerController.handle", array('event' => serialize($event)));
 
 		//Stop event
 		$event->stopPropagation();
