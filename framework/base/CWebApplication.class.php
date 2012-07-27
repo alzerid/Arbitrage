@@ -4,6 +4,8 @@ use \Framework\Exceptions\EWebApplicationException;
 
 class CWebApplication extends CApplication
 {
+	private $_request_uri;         //Request URI
+	private $_virtual_uri;         //Virtual URI (translated URI)
 	private $_renderable_paths;    //Paths where the renderables exist
 	private $_controller_queue;    //Controller queue
 	private $_router;              //Router instance
@@ -16,6 +18,8 @@ class CWebApplication extends CApplication
 	public function initialize()
 	{
 		//Setup variables
+		$this->_real_uri         = '';
+		$this->_virtual_uri      = '';
 		$this->_renderable_paths = array();
 		$this->_controller_queue = array();
 		$this->_router           = NULL;
@@ -32,14 +36,16 @@ class CWebApplication extends CApplication
 		CKernel::getInstance()->requireFrameworkFile('Utils.CFlashPropertyObject');
 		CKernel::getInstance()->requireFrameworkFile('DOM.CDOMGenerator');
 
+		//Create router instance and route
+		$this->_router      = new CRouter($this->getConfig()->webApplication->routes);
+		$this->_request_uri = $_SERVER['REQUEST_URI'];
+		$this->_virtual_uri = $this->_router->route($_SERVER['REQUEST_URI']);
+
 		//Create relavent services
 		$this->_initializeServices();
 
 		//Initialize Packages
 		$this->_initializePackages();
-
-		//Create router instance
-		$this->_router = new CRouter($this->getConfig()->webApplication->routes);
 	}
 
 	/** 
@@ -47,23 +53,32 @@ class CWebApplication extends CApplication
 	 */
 	public function run()
 	{
-		//Get route
-		$route = $this->_router->route($_SERVER['REQUEST_URI']);
+		//Route again
+		$this->_virtual_uri = $this->_router->route($_SERVER['REQUEST_URI']);
 
 		//Load the controller
-		$controller = $this->loadController($route, isset($_REQUEST['_ajax']));
+		$controller = $this->loadController($this->_virtual_uri, isset($_REQUEST['_ajax']));
 
 		//Execute the action
 		$controller->execute();
 	}
 
 	/**
-	 * Method returns the current URI.
-	 * @return string Returns the URI.
+	 * Method returns the virtual URI.
+	 * @return string Returns the virtual URI.
 	 */
-	public function getURI()
+	public function getVirtualURI()
 	{
-		return $_SERVER['REQUEST_URI'];
+		return $this->_virtual_uri;
+	}
+
+	/**
+	 * Method returns the request URI.
+	 * @return string Retuns the request URI.
+	 */
+	public function getRequestURI()
+	{
+		return $this->_request_uri;
 	}
 
 	/**
