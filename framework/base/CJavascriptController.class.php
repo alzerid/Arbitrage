@@ -6,18 +6,19 @@ class CJavascriptController extends CController
 	public function initialize()
 	{
 		//Set renderable
-		$this->setRenderable('Arbitrage2.Renderables.CJavascriptRenderable');
-
-		//Get path and add a route for this namespace for javascript
-		$namespace = $this->getPackage()->getNamespace();
-		//$config = $this->getApplication()->getConfig();
-		var_dump($namespace);
-		die();
+		$this->setRenderable('Framework.Renderables.CJavascriptRenderable');
 	}
 
-	public function processRequestAction()
+	public function getJavascriptAction()
 	{
-		die('process request action');
+		//Get path and namespace
+		$path = $this->getPackage()->getPath(). $_SERVER['REQUEST_URI'];
+
+		//Check if exists
+		if(!file_exists($path))
+			throw new \Framework\Exceptions\EHTTPException(\Framework\Exceptions\EHTTPException::$HTTP_BAD_REQUEST);
+
+		return array('render' => file_get_contents($path));
 	}
 }
 ?>
