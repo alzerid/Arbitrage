@@ -34,17 +34,5 @@ class ClientController extends \Framework\Base\CJavascriptController
 
 		return array('render' => $js);
 	}
-
-	public function javascriptAction()
-	{
-		$path = $this->getPackage()->getPath() . "/" . \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPath($this->getPackage()->getNamespace() . '.null');
-		$path = preg_replace('/.null/', '', $path) . preg_replace('/\/client_mvc/i', '', $_SERVER['REQUEST_URI']);
-
-		//Check if exists
-		if(!file_exists($path))
-			throw new \Framework\Exceptions\EHTTPException(\Framework\Exceptions\EHTTPException::$HTTP_BAD_REQUEST);
-
-		return array('render' => file_get_contents($path));
-	}
 }
 ?>
