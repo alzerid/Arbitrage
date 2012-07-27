@@ -1,7 +1,7 @@
 <?
 namespace Framework\Renderables;
 use \Framework\Exceptions\EArbitrageRenderableException;
-$_application->requireRenderable('Arbitrage2.Renderables.CViewFilePartialRenderable');
+$_application->requireRenderable('Framework.Renderables.CViewFilePartialRenderable');
 
 class CViewFileRenderable extends \Framework\Renderables\CViewFilePartialRenderable implements \Framework\Interfaces\ILayoutRenderable
 {
