@@ -131,10 +131,7 @@ class CWebApplication extends CApplication
 	{
 		//Require the file
 		$variables = array('_application' => $this);
-		if(preg_match('/^Arbitrage2\./', $namespace))
-			CKernel::getInstance()->requireFrameworkFile(preg_replace('/^Arbitrage2\./', 'Framework.', $namespace), true, $variables);
-		else
-			CKernel::getInstance()->requireFile($namespace, true, $variables);
+		CKernel::getInstance()->requireFile($namespace, true, $variables);
 	}
 
 	/**
@@ -244,7 +241,7 @@ class CWebApplication extends CApplication
 		//Ensure error_handler service is defined
 		$services = $this->getConfig()->arbitrage2->services;
 		if(!isset($services->errorHandler))
-			$services->errorHandler = array('Arbitrage2.ErrorHandler.CErrorHandlerService' => array('debugMode' => $this->getConfig()->arbitrage2->debugMode));
+			$services->errorHandler = array('Framework.ErrorHandler.CErrorHandlerService' => array('debugMode' => $this->getConfig()->arbitrage2->debugMode));
 
 		parent::_initializeServices();
 	}
