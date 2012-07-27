@@ -49,7 +49,7 @@ abstract class CController implements IController
 		$this->_ajax      = preg_match('/AjaxController$/i', $this->_namespace);
 		$this->_action    = NULL;
 		$this->_layout    = 'default';
-		$this->setRenderable('Arbitrage2.Renderables.CViewFileRenderable');  //Set default renderable
+		$this->setRenderable('Framework.Renderables.CViewFileRenderable');  //Set default renderable
 	}
 
 	/**
@@ -245,7 +245,7 @@ abstract class CController implements IController
 		static $renderable = NULL;
 		if($renderable == NULL)
 		{
-			$renderable = $this->requireRenderable('Arbitrage2.Renderables.CViewFilePartialRenderable');
+			$renderable = $this->requireRenderable('Framework.Renderables.CViewFilePartialRenderable');
 			var_dump($renderable);
 			die('$controller->renderPartial');
 		}
