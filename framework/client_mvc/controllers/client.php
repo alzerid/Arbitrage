@@ -26,7 +26,7 @@ class ClientController extends \Framework\Base\CJavascriptController
 		$config = $this->getPackage()->getConfig()->toArray();
 		unset($config['routes']);
 		$config = array_merge($config, array('debug' => $this->_application->getConfig()->arbitrage2->debugMode));
-		$config['mvc']['routing'] = $global;
+		$config['mvc']['routes'] = $global;
 
 		//Get JSON
 		$config = json_encode($config);
