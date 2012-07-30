@@ -53,16 +53,29 @@ abstract class CApplication extends CPackage implements \Framework\Interfaces\IE
 	{
 		//Get arbitrage2 config
 		$config = $this->getConfig();
-		if($config->arbitrage2 && $config->arbitrage2->packages)
-		{
-			//Grab packages
-			$packages = $config->arbitrage2->packages;
 
-			//Create package
-			foreach($packages as $package => $lconfig)
+		//Check if arbitrage2 is defined
+		if($config->arbitrage2->packagePaths)
+		{
+			//Add package paths
+			if($config->arbitrage2->packagePaths)
 			{
-				$key = preg_replace('/\.[^\.]+$/', '', strtolower($package));
-				$this->_packages[$key] = CKernel::getInstance()->createPackage($package, $this, new \Framework\Config\CArbitrageConfigProperty($lconfig));
+				foreach($config->arbitrage2->packagePaths as $path)
+					CKernel::getInstance()->registerPackagePath($path);
+			}
+
+			//Include the packages
+			if($config->arbitrage2->packages)
+			{
+				//Grab packages
+				$packages = $config->arbitrage2->packages;
+
+				//Create package
+				foreach($packages as $package => $lconfig)
+				{
+					$key = preg_replace('/\.[^\.]+$/', '', strtolower($package));
+					$this->_packages[$key] = CKernel::getInstance()->createPackage($package, $this, new \Framework\Config\CArbitrageConfigProperty($lconfig));
+				}
 			}
 		}
 	}
