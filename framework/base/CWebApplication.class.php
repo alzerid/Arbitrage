@@ -102,10 +102,25 @@ class CWebApplication extends CApplication
 		//Create an instance of the controller
 		$class = CKernel::getInstance()->convertArbitrageNamespaceToPHP($namespace) . "Controller";
 		if(!class_exists($class))
-			throw new EWebApplicationException("Controller '$class' does not exists.");
+			throw new EWebApplicationException("Controller '$class' does not exist.");
+
+		//Get package
+		$package = $this->getPackage(preg_replace('/\.Controller.*$/i', '', $namespace));
+
+		//Get ajax controller if exists
+		if($ajax)
+		{
+			//Require ajax controller
+			$namespace = preg_replace('/\.Controllers\./i', '.Ajax.', $namespace);
+			$this->requireController($namespace);
+
+			//Get class
+			$class = CKernel::getInstance()->convertArbitrageNamespaceToPHP($namespace) . "AjaxController";
+			if(!class_exists($class))
+				throw new EWebApplicationException("Ajax controller '$class' does not exist.");
+		}
 
 		//Create controller
-		$package                   = $this->getPackage(preg_replace('/\.Controller.*$/i', '', $namespace));
 		$controller                = $class::createController($this, (($package)? $package : $this));
 		$this->_controller_queue[] = $controller;
 
@@ -154,7 +169,7 @@ class CWebApplication extends CApplication
 	 * @param string $namespace The namespace of the Controller/Action to forward the execution to.
 	 * @param array $opt_variables The variables to pass to the constructor.
 	 */
-	public function forward($namespace, $opt_variables)
+	public function forward($namespace, $opt_variables=array())
 	{
 		static $request = array();
 
@@ -183,7 +198,7 @@ class CWebApplication extends CApplication
 		$action = new CAction($controller, $action);
 		$controller->setAction($action);
 
-		//Execute controller and return raw results
+		//Execute controller
 		$controller->execute();
 
 		//Pop variables
