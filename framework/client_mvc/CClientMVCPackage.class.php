@@ -23,9 +23,16 @@ class CClientMVCPackage extends \Framework\Base\CPackage
 		\Framework\DOM\CDOMGenerator::addJavascriptTag(array('src' => '/bootstrap.js?action=' . $app->getVirtualURI()));
 		\Framework\DOM\CDOMGenerator::addJavascriptTag(array('src' => '/framework/client_mvc/javascript/arbitrage2/base/arbitrage2.js'));
 
+
 		//require javascript file defined by user
-		if(isset($this->getConfig()->applicationPath))
-			\Framework\DOM\CDOMGenerator::addJavascriptTag(array('src' => $this->getConfig()->applicationPath . "/application.js"));
+		$namespace = preg_replace('/^\/?([^\/]+)\/?.*$/', '$1' , $app->getVirtualURI());
+		$path      = $this->getConfig()->includePaths[$namespace];
+		if(isset($path))
+		{
+			$path = $path . "/" . $namespace . "/application.js";
+			$path = preg_replace('/[\\/]+/', '/', $path); //Remove double '/'
+			\Framework\DOM\CDOMGenerator::addJavascriptTag(array('src' => $path));
+		}
 	}
 }
 ?>
