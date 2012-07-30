@@ -51,5 +51,4 @@ class CViewFilePartialRenderable implements \Framework\Interfaces\IViewFileRende
 		return $content;
 	}
 }
-
 ?>

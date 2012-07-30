@@ -7,6 +7,12 @@ class CViewFileRenderable extends \Framework\Renderables\CViewFilePartialRendera
 {
 	protected $_layout;
 
+	public function initialize($path, $content)
+	{
+		parent::initialize($path, $content);
+		$this->_layout = 'default';
+	}
+
 	public function setLayout($layout)
 	{
 		$this->_layout = $layout;

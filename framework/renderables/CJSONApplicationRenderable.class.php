@@ -1,34 +1,26 @@
 <?
 namespace Framework\Renderables;
-use \Framework\Renderables\CJSONRenderable;
+$_application->requireRenderable('Framework.Renderables.CJSONRenderable');
 
-class CJSONApplicationRenderable extends CJSONRenderable
+class CJSONApplicationRenderable extends \Framework\Renderables\CJSONRenderable
 {
-	public function render($data=NULL)
+	public function render()
 	{
-		ob_start();
-		ob_implicit_flush(false);
-		header('Content-Type: application/json');
+		static $defaults = array('header' => array('type'    => 'application',
+		                                           'scope'   => '',
+		                                           'errno'   => 0,
+		                                           'message' => 'success'),
+		                         'user'   => array());
 
-		echo json_encode($this->renderJSON($data));
+		//Merge header
+		$return = $this->_content;
+		$return['header'] = array_merge($defaults['header'], $return['header']);
+		$return['user']   = array_merge($defaults['user'], isset($return['user'])? $return['user'] : array());
 
-		return ob_get_clean();
-	}
+		//Set content
+		$this->_content = array('render' => $return);
 
-	public function renderJSON($json)
-	{
-		static $default = array('header' => array('type'    => 'application',
-		                                          'scope'   => '',
-		                                          'errno'   => 0,
-		                                          'message' => 'success'),
-		                        'user'   => array());
-
-		//Merge
-		$ret = $default;
-		$ret['header'] = array_merge($ret['header'], ((isset($json['header']))? $json['header'] : array()));
-		$ret['user']   = array_merge($ret['user'], ((isset($json['user']))? $json['user'] : array()));
-
-		return $ret;
+		return parent::render();
 	}
 }
 ?>
