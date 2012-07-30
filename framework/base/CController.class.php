@@ -252,6 +252,24 @@ abstract class CController implements IController
 	}
 
 	/**
+	 * Method forwards execution to another controller specified by Arbitrage namespace.
+	 * @param string $namespace The namespace of the Controller/Action to forward the execution to.
+	 * @param array $opt_variables The variables to pass to the constructor.
+	 * @param boolean $opt_param Option parameter specifying if we return the content rendered.
+	 */
+	public function forward($namespace, $opt_variables=array(), $opt_return=false)
+	{
+		if($opt_return)
+			ob_start();
+
+		//Forward instructions
+		$this->_application->forward($namespace, $opt_variables);
+
+		if($opt_return)
+		 return ob_get_clean();
+	}
+
+	/**
 	 * Render the return from an Action to a renderbable.
 	 * @param $content Either an array or IRenderable.
 	 */
@@ -271,7 +289,7 @@ abstract class CController implements IController
 
 			if($renderable instanceof \Framework\Renderables\CViewFilePartialRenderable || $renderable instanceof \Arbtirage2\Interfaces\IViewFileRenderable)
 			{
-				$path = preg_replace('/controllers.*$/i', 'views', CKernel::getInstance()->convertArbitrageNamespaceToPath($this->_namespace));
+				$path = preg_replace('/(controllers|ajax).*$/i', 'views', CKernel::getInstance()->convertArbitrageNamespaceToPath($this->_namespace));
 				$path = $this->_application->getPath() . "/$path";
 
 				//Setup default render
