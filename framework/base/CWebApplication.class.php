@@ -60,7 +60,10 @@ class CWebApplication extends CApplication
 		$controller = $this->loadController($this->_virtual_uri, isset($_REQUEST['_ajax']));
 
 		//Execute the action
-		$controller->execute();
+		$ret = $controller->execute();
+
+		//Render the return
+		$controller->render($ret);
 	}
 
 	/**
@@ -168,8 +171,10 @@ class CWebApplication extends CApplication
 	 * Method forwards execution to another controller specified by Arbitrage namespace.
 	 * @param string $namespace The namespace of the Controller/Action to forward the execution to.
 	 * @param array $opt_variables The variables to pass to the constructor.
+	 * @param boolean $opt_render Render the returned results from the action.
+	 * @param returns Returns the result from the action.
 	 */
-	public function forward($namespace, $opt_variables=array())
+	public function forward($namespace, $opt_variables=array(), $opt_render=false)
 	{
 		static $request = array();
 
@@ -178,6 +183,7 @@ class CWebApplication extends CApplication
 		$controller = implode('.', array_slice($action, 0, -1));
 		$action     = $action[count($action)-1];
 
+		//Check if class exists
 		$class = CKernel::getInstance()->convertArbitrageNamespaceToPHP($controller);
 		if(!class_exists($class))
 			throw new EWebApplicationException("Unable to forward to '$namespace' because it does not exist!");
@@ -199,12 +205,17 @@ class CWebApplication extends CApplication
 		$controller->setAction($action);
 
 		//Execute controller
-		$controller->execute();
+		$ret = $controller->execute();
+
+		if($opt_render)
+			$controller->render($ret);
 
 		//Pop variables
 		array_pop($this->_controller_queue);
 		if(count($request))
 			$_REQUEST = array_pop($request);
+
+		return $ret;
 	}
 
 	/** Overloaded Error Handling Methods **/
@@ -220,29 +231,6 @@ class CWebApplication extends CApplication
 		$debug  = ((isset($config->arbitrage2->debugMode))? $config->arbitrage2->debugMode : false);
 
 		$this->handleException($event);
-
-		return;
-
-		if($debug === true)
-		{
-			//$this->_forwardError($event);
-			//Grab error handler controller
-			//TODO: Render error
-			var_dump($event);
-			die("ERROR");
-		}
-		elseif($event->exception instanceof \Framework\Exceptions\EHTTPException)
-		{
-			die("HTTP Exception!");
-		}
-		else
-		{
-			//Show http_500
-			die("show http500");
-		}
-
-		$event->stopPropagation();
-		$event->preventDefault();
 	}
 
 	/**
