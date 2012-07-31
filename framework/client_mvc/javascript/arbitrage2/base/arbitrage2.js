@@ -57,9 +57,16 @@ arbitrage2.ready = false;
 	@description Arbitrage2 config.
 */
 arbitrage2.config = arbitrage2.config || {
-	javascriptPath: "/javascript",           //Javascript path to use when including files
-	stylesheetPath: "/stylesheets",          //Stylesheet path to use when including css
-	mvc: { }                                 //Empty config only used when MVC pattern is used
+	frameworkPath: "/framework/mvc_client/javascript",       //Javascript path to use when including files
+	applicationPath: "/javascript",                          //Javascript path to the application
+
+	includePaths: {                                          //The include paths
+		'arbitrage2': '/framework/client_mvc/javascript',      //arbitrage2 namespace
+		'application': '/javascript'                           //application namespace
+	},
+
+	stylesheetPath: "/stylesheets",                          //Stylesheet path to use when including css
+	mvc: { }                                                 //Empty config only used when MVC pattern is used
 };
 
 /**
@@ -270,50 +277,10 @@ arbitrage2.requireJavascript = function(file, opt_cb_load, opt_cb_error) {
 	@params opt_cb_error Optional onload error callback.
 */
 arbitrage2.require = function(namespace, opt_cb_load, opt_cb_error) {
-
-	/*function _checkReady() {
-
-		arbitrage2._loading--;
-		this.state = 'loaded';
-
-		if(arbitrage2._loading == 0)
-			arbitrage2.ready = true;
-
-		$l('require done', arbitrage2._loading, arbitrage2.ready);
-
-		//User callback
-		if(opt_cb_load)
-			opt_cb_load.call(this.element);
-	};
-
-	function _markError() {
-		arbitrage2._loading--;
-		this.state = 'error';
-
-		if(arbitrage2._loading == 0)
-			arbitrage2.ready = true;
-
-		$l('error requiring', this.getAttribute('src'), arbitrage2._loading, arbitrage2.ready);
-
-		//User callback
-		if(opt_cb_error)
-			opt_cb_error.call(this.element);
-	};*/
-
+	var self = this;
 
 	//Ensure symbol does not exist
 	var symbol = arbitrage2.getSymbol(namespace);
-	/*if(symbol)
-	{
-		for(var i=0, script; i<arbitrage2._required_javascripts.length, script=arbitrage2._required_javascripts[i]; i++)
-		{
-			if(script.namespace == namespace)
-			{
-				if(script.appendCallbacks(opt_cb_load, opt_cb_error))
-					return
-			}
-		}
-	}*/
 
 	//Require the javascript file and add to _required_javascipts
 	var onamespace = namespace;
@@ -322,8 +289,9 @@ arbitrage2.require = function(namespace, opt_cb_load, opt_cb_error) {
 	var split      = file.join('').match(/[A-Z][a-z]+/g);
 	if(split)
 		file = split.join('_').toLowerCase();
-	
-	var path = arbitrage2.config.javascriptPath + "/" + namespace.join('/') + "/" + file + ".js";
+
+	//Get root path
+	var path = self.config.includePaths[namespace[0]] + "/" + namespace.join('/') + "/" + file + ".js";
 
 	//Require the JS File in a closure to retain namespacing
 	(function(namespace, path, opt_cb_load, opt_cb_error) {
@@ -406,6 +374,19 @@ arbitrage2.getSymbol = function(namespace) {
 };
 
 /**
+	@description Method converts a URL to an arbitrage namespace.
+	@param url The url to convert to an Arbitrage namespace.
+	@return Returns the Arbitrage namespace.
+*/
+arbitrage2.convertURLNamespaceToArbitrage = function(url) {
+	var ret = url;
+
+	ret = ret.replace(/^\//, '');
+	ret = ret.replace(/\//gi, '.');
+	return ret;
+};
+
+/**
 	@description Calls a callback method when all required js files have been included and the application is ready to run.
 	@param cb_main The callback to call.
 */
@@ -446,6 +427,12 @@ arbitrage2.main = function(cb_main) {
 
 	var _check = setInterval(_checkDocumentReady, 10);
 };
+
+/**
+	@description Function converts a URL namespace to an arbitrage namespace.
+*/
+
+  
 
 //Include other base items
 arbitrage2.bulkRequire('arbitrage2.base.utils', 'arbitrage2.base.ajax', 'arbitrage2.base.cache', 'arbitrage2.base.dbus', 'arbitrage2.base.mvc', 'arbitrage2.base.gui', 'arbitrage2.base.form', function() {
