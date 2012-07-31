@@ -338,6 +338,20 @@ class CKernel implements ISingleton
 	}
 
 	/**
+	 * Method converts an arbitrage formatted namespace to a url.
+	 * @params string $namespace The namespace to convert.
+	 * @return string Returns the url.
+	 */
+	public function convertArbitrageNamespaceToURL($namespace)
+	{
+		$url = preg_replace('/([a-z0-9])([A-Z])/', '$1 $2', $namespace);
+		$url = strtolower(preg_replace('/\s/', '_', $url));
+		$url = preg_replace('/\./', '/', $url);
+
+		return $url;
+	}
+
+	/**
 	 * Methods requires a file.
 	 * @param $namespace The namespace to convert to a file name.
 	 * @param $opt_variables Optional parameter that pases variables into the required file.
