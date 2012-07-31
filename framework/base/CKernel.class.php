@@ -397,7 +397,7 @@ class CKernel implements ISingleton
 	 * @param \Framework\Config\CArbitrageConfig $opt_config The local configuration for this package.
 	 * @return \Framework\Base\CApplication Returns a web application.
 	 */
-	public function _createPackage($namespace, $opt_parent=NULL, $opt_config=NULL)
+	public function _createPackage($namespace, \Framework\Base\CPackage $opt_parent=NULL, \Framework\Config\CArbitrageConfigProperty $opt_config=NULL)
 	{
 		//Get class
 		$class = $this->convertArbitrageNamespaceToPHP($namespace);
@@ -408,7 +408,6 @@ class CKernel implements ISingleton
 
 		//Create new application
 		$package = new $class($info['path'], $info['namespace'], $opt_parent, $opt_config);
-
 		return $package;
 	}
 }
