@@ -16,7 +16,7 @@ class CPackage
 	 * @param \Framework\Base\CPackage $parent The parent of this package.
 	 * @param \Framework\Config\CArbitrageConfigProperty $config The configuration to merge with.
 	 */
-	public function __construct($path, $namespace, $parent=NULL, \Framework\Config\CArbitrageConfigProperty $config=NULL)
+	public function __construct($path, $namespace, \Framework\Base\CPackage $parent=NULL, \Framework\Config\CArbitrageConfigProperty $config=NULL)
 	{
 		$this->_path      = $path;
 		$this->_namespace = $namespace;
