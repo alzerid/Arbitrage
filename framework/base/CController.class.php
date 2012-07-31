@@ -24,6 +24,7 @@ abstract class CController implements IController
 	private $_namespace;    //Namespace of the controller
 	private $_renderable;   //Type of renderables being used for this controller (default is CViewFileRenderable)
 	private $_layout;       //Layout associated with the view (used only for CViewFileRenderable)
+	private $_chain;        //Filter chain object
 
 	/**
 	 * Constructor initializes the controller.
@@ -42,6 +43,7 @@ abstract class CController implements IController
 		$this->_files          = new CArrayObject($files);
 		$this->_cookie         = new CArrayObject($_COOKIE);
 		$this->_view_variables = new CArrayObject();
+		$this->_chain          = new CFilterChain($this);
 		$this->_flash          = NULL;
 
 		//Set controller variables
@@ -90,9 +92,9 @@ abstract class CController implements IController
 
 	/**
 	 * Method executes the action/controller/view.
-	 * @param boolean $render Determines if we should render the action or return.
+	 * return array Returns the contents from the executed action.
 	 */
-	public function execute($render=true)
+	public function execute()
 	{
 		if($this->_action == NULL)
 		{
@@ -102,11 +104,8 @@ abstract class CController implements IController
 				throw new EHTTPException(EHTTPException::$HTTP_BAD_REQUEST);
 		}
 
-		//Get filters
-		$chain = new CFilterChain($this);
-
 		//Run before filter
-		$chain->runFilter('before_filter');
+		$this->_chain->runFilter('before_filter');
 
 		//Setup flash variables
 		$this->_flash = new CFlashPropertyObject();
@@ -114,30 +113,13 @@ abstract class CController implements IController
 		//Execute the action
 		$ret = $this->_action->execute();
 
-		if(!$render)
-			return $ret;
-
-		//Merge view variables
-		/*if(is_array($ret))
-			$ret['variables'] = array_merge((isset($ret['variables'])? $ret['variables'] : array()), $this->_view_variables->toArray());*/
-
 		//Add flash variable to session
 		$this->_flash->update();
 
 		//Run the after filter
-		$chain->runFilter('after_filter', $ret);
+		$this->_chain->runFilter('after_filter', $ret);
 
-		//Output Buffer start
-		ob_start();
-
-		//Render the content
-		$content = $this->render($ret);
-		$chain->runFilter('post_process', $content);
-
-		//Print out the view
-		echo $content;
-
-		ob_end_flush();
+		return $ret;
 	}
 
 	/**
@@ -255,26 +237,22 @@ abstract class CController implements IController
 	 * Method forwards execution to another controller specified by Arbitrage namespace.
 	 * @param string $namespace The namespace of the Controller/Action to forward the execution to.
 	 * @param array $opt_variables The variables to pass to the constructor.
-	 * @param boolean $opt_param Option parameter specifying if we return the content rendered.
 	 */
-	public function forward($namespace, $opt_variables=array(), $opt_return=false)
+	public function forward($namespace, $opt_variables=array())
 	{
-		if($opt_return)
-			ob_start();
-
 		//Forward instructions
-		$this->_application->forward($namespace, $opt_variables);
-
-		if($opt_return)
-		 return ob_get_clean();
+		return $this->_application->forward($namespace, $opt_variables);
 	}
 
 	/**
 	 * Render the return from an Action to a renderbable.
 	 * @param $content Either an array or IRenderable.
+	 * @param boolean $opt_return Determines if the render should return or echo out the rendered results.
 	 */
-	public function render($content=NULL)
+	public function render($content, $opt_return=false)
 	{
+		ob_start();
+
 		$out = NULL;
 		if($content instanceof \Framework\Interfaces\IRenderable)
 			$out = $content->render();
@@ -322,6 +300,15 @@ abstract class CController implements IController
 			else
 				throw new EHTTPException(EHTTPException::$HTTP_INTERNAL_ERROR);
 		}
+
+		//After filter
+		$this->_chain->runFilter('post_process', $out);
+
+		//Check to see if we print out the view or not
+		if(!$opt_return)
+			echo $out;
+
+		ob_end_flush();
 
 		return $out;
 	}
