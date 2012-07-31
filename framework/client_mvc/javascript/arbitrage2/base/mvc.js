@@ -1,6 +1,37 @@
 arbitrage2.provide('_arbitrage2.base.mvc');
 
 /**
+  @description Router class that parses the URL.
+	@constructor
+	@params routes The routes to take into consideration.
+*/
+_arbitrage2.base.mvc.Router = function(routes) {
+	var self    = this;
+	self.routes = routes;
+};
+
+/**
+	@description 
+*/
+_arbitrage2.base.mvc.Router.prototype.route = function(url) {
+	var self = this;
+	var ret  = null;
+
+	//Look at the routes and see if we need to map it
+	for(var idx in self.routes)
+	{
+		var route = self.routes[idx];
+		var exp   = new RegExp(idx);
+
+		//Check expression
+		if(exp.test(url))
+			return route;
+	}
+	
+	return url;
+};
+
+/**
 	@description Application container class that manages controllers, canvases, etc...
 	@constructor
 	@params config The configuration rules.
@@ -8,11 +39,12 @@ arbitrage2.provide('_arbitrage2.base.mvc');
 _arbitrage2.base.mvc.Application = function(config) {
 	var self            = this;
 	self.config         = config || self.config;
-	self.routing        = self.config.mvc.routing || { };
+	self.router         = new _arbitrage2.base.mvc.Router(self.config.mvc.routes || { });
+	self.virtual_uri    = "";
+	self.request_uri    = window.location.hash.replace(/^#!/, '') || "/";
 	self.controllers    = { };
 	self.canvases       = { };
 	self.layouts        = { };
-	self.pageController = null;
 	self.loadCount      = 0;
 	self.needStart      = true;
 	self.cache          = new arbitrage2.cache.CacheManager();
@@ -125,33 +157,18 @@ _arbitrage2.base.mvc.Application.prototype.requireController = function(namespac
 	var self = this;
 	self.loadCount++;
 
-	//Remove the controller name from the namespace
-	var controller = namespace.split('.');
-	namespace      = controller.splice(0, controller.length-1);
-
-	//Require
-	var require = namespace.join('.') + "." + controller.join('').replace(/controller$/i, '').match(/[A-Z][a-z]+/g).join('_').toLowerCase();
-	$l('mvc requiring ' + require, self.loadCount);
-
-	//Require namespace
-	arbitrage2.require(require, function() {
-		var symbol = arbitrage2.getSymbol(namespace.join('.') + '.' + controller);
-		require    = require.split('.');
-		controller = require[require.length-1];
-
-		//Add controller to application
-		self.controllers[controller] = new symbol();
+	//Require controller if it does not exist
+	arbitrage2.require(namespace, function() {
 		self.loadCount--;
 
-		$l('mvc required ' + controller, self.loadCount);
-
-		//Callback
 		if(opt_cb_success)
-			opt_cb_success();
+			opt_cb_success(namespace);
 	},
-
 	function() {
-		alert('error');
+		self.loadCount--;
+
+		if(opt_cb_error)
+			opt_cb_error(namespace);
 	});
 };
 
@@ -194,7 +211,22 @@ _arbitrage2.base.mvc.Application.prototype.run = function() {
 	if(self.loadCount > 0)
 		setTimeout(function() { self.run(); }, 100);
 	else
-		self.route(window.location.hash.replace(/^#!/, ''));
+	{
+		//Grab the route
+		self.virtual_uri = self.router.route(self.request_uri);
+
+		//Load the controller
+		self.loadController(self.virtual_uri, function(controller) {
+
+			//Check if controller is already loaded
+			var action = controller.loadAction(self.virtual_uri);
+			if(!action)
+				return;
+			
+			//Execute the action
+			self.execute(controller, action);
+		});
+	}
 };
 
 /**
@@ -206,103 +238,97 @@ _arbitrage2.base.mvc.Application.prototype.navigate = function(url, opt_hard) {
 };
 
 /**
-	@description Routes to specific URL.
-	@param url The URL to route to.
+	@description Method loads the controller into memory and grabs it if need be.
+	@param url The url to convert to a url to get the controller.
+	@param opt_cb_loaded Optional callback function to call.
 */
-_arbitrage2.base.mvc.Application.prototype.route = function(url) {
-	var self = this;
+_arbitrage2.base.mvc.Application.prototype.loadController = function(url, opt_cb_loaded) {
+	var self       = this;
+	var namespace  = arbitrage2.convertURLNamespaceToArbitrage(url).split('.');
+	var controller = namespace.slice(-2, -1).join('').toUpperCaseFirst() + "Controller";
+	var action     = namespace.splice(-1).join('');
+	var symbol;
 
-	var _parseRoute = function(url) {
+	//add controllers into namespace
+	namespace = [].concat(namespace.slice(0, -1), ['controllers'], namespace.slice(-1)).join('.');
+	symbol    = namespace.replace(/\.[^\.]+$/, "." + controller);
 
-		url            = url.split('?');
-		var parameters = url[1] || "";
-		var route      = url[0].split('/');
-		var controller = route[1] || "";
-		var action     = route[2] || "";
-
-		//If route has a different url, use it
-		for(var idx in self.routing)
-		{
-			if(idx == "_default")
-				continue;
-
-			var val = self.routing[idx];
-			var exp = new RegExp(idx);
-
-			if(exp.test(url))
-			{
-				//Do replacements
-				url        = url[0].replace(exp, val);
-				route      = url.split('/');
-				controller = route[1] || "";
-				action     = route[2] || "";
-				break;
-			}
-		}
-
-		//Normalize parameters
-		parameters = parameters.replace(/&$/, '').split('&');
-		var params = { };
-		for(var idx in parameters)
-		{
-			var tmp = parameters[idx].split('=');
-			params[tmp[0]] = tmp[1] || '';
-		}
-
-		return { route: route.slice(1, 3), controller: controller, action: action, url: url, arguments: route.slice(3), parameters: params };
-	};
-
-	var route = _parseRoute(((url)? url : self.routing['_default']));
-
-	//Grab controller from controllers list
-	var controller = this.controllers[route.controller];
-	if(!controller)
+	//Check if controller exists
+	var rsymbol = arbitrage2.getSymbol(symbol);
+	if(rsymbol)
 	{
-		if(self.config.mvc.autoRequire)
-		{
-			//Require namespace
-			self.requireController(self.config.mvc.controllerNamespace + '.' + route.controller.toUpperCaseFirst() + "Controller", function() {
-				self.route(url);
-			},
-			function() {
-				alert("Unable to auto require controller '" + route.controller + "'.");
-			});
-		}
-		else
-			alert("Unknown controller '" + route.controller + "'.");
+		if(opt_cb_loaded)
+			opt_cb_loaded(self.controllers[symbol]);
 
-		return false;
+		return;
 	}
 
-	//Call load on the controller if it hasn't been loaded
-	/*if(!controller.loaded)
-		controller.load();*/
+	//Require the file
+	self.requireController(namespace, function() {
 
-	//Grab action and execute it
-	var action = controller.actions[route.action];
-	if(!action)
-	{
-		alert("Unkonwn action '" + route.action + "' for '" + route.controller + "'");
-		return false;
-	}
+		//Create new controller since we never seen it
+		controller = arbitrage2.getSymbol(symbol);
+		self.controllers[symbol]           = new controller(self);
+		self.controllers[symbol].namespace = symbol;
+		self.controllers[symbol].load();
 
-	//Execute
-	self.execute(route, controller, action);
+		if(opt_cb_loaded)
+			opt_cb_loaded(self.controllers[symbol]);
+	},
+	function() {
+		alert("Unable to auto require controller '" + symbol + "'.");
+	});
+	
+
+	//Require namespace
+	return;
 };
 
 /**
 	@description Method executes the action and draws it onto the canvas.
-	@param route A route object explaining how to route the service call.
 	@param <_arbitrage2.base.mvc.Controller> controller The controller to execute.
 	@param <_arbitrage2.base.mvc.Action> action The action to execute.
 */
-_arbitrage2.base.mvc.Application.prototype.execute = function(route, controller, action) {
+_arbitrage2.base.mvc.Application.prototype.execute = function(controller, action) {
 	var self   = this;
-	var canvas = controller.canvas;
-	var params = { };
-	var key    = route.url + "?";
+	var params = "";
 
 	function _renderCache(cache) {
+		consoel.log("_renderCache:", cache);
+	};
+
+	//TODO: Generate Parameters
+	
+	//Get from cache if possible
+	var key   = controller.namespace + "?" + params;
+	var cache = self.cache.get(key);
+	if(!cache)
+	{
+		self.ajax.post(self.virtual_uri, params, function(ev) {
+			console.log("post", ev);
+
+			//Create cache object
+
+
+			//_renderCache(cache);
+
+		});
+
+	}
+	else
+		_renderCache(cache);
+
+	return;
+
+
+	//var canvas = controller.canvas;
+	//var params = { };
+	//var key    = route.url + "?";
+
+	console.log(namespace);
+	return;
+
+	/*function _renderCache(cache) {
 		//Hide current
 		if(self.currentAction)
 			self.currentAction.hide();
@@ -393,7 +419,7 @@ _arbitrage2.base.mvc.Application.prototype.execute = function(route, controller,
 		});
 	}
 	else
-		_renderCache(cache);
+		_renderCache(cache);*/
 };
 
 /**
@@ -609,13 +635,41 @@ _arbitrage2.base.mvc.Application.prototype.Ajax.prototype._escalate = function(m
 */
 _arbitrage2.base.mvc.Controller = function() {
 	var self = this;
-	self.application = arbitrage2.mvc.Application.prototype._instance;
-	self.actions     = { };
-	self.loaded      = false;
+	self.currentAction = null;
+	self.application   = arbitrage2.mvc.Application.prototype._instance;
+	self.namespace     = "";
+	self.actions       = { };
+	self.loaded        = false;
 
 	//Create actions
-	for(var idx in self.Actions)
-		self.actions[idx] = new self.Actions[idx](self);
+	/*for(var idx in self.Actions)
+		self.actions[idx] = new self.Actions[idx](self);*/
+};
+
+/**
+	@description Loads the controller into memeory.
+	@param {string} url The url of the request.
+*/
+_arbitrage2.base.mvc.Controller.prototype.loadAction = function(uri) {
+	var self    = this;
+	var action = uri.split('/').slice(-1)[0];
+
+	//Check if action even exists
+	if(!self.Actions[action])
+	{
+		alert("Action '" + action + "' does not exist in controller '" + self.namespace + "'.");
+		return null;
+	}
+
+	//Get action
+	if(!self.actions[action])
+	{
+		self.actions[action]            = new self.Actions[action]();
+		self.actions[action].controller = self;
+		self.actions[action].namespace  = self.namespace + "." + action;
+	}
+	
+	return self.actions[action];
 };
 
 /**
@@ -641,14 +695,13 @@ _arbitrage2.base.mvc.Controller.prototype.arguments = function() {
 /**
 	@description Action base class.
 	@constructor
-	@param <_arbitrage2.base.mvc.Controller> controller The controller class associated with the action.
 */
-_arbitrage2.base.mvc.Action = function(controller, args) {
+_arbitrage2.base.mvc.Action = function() {
+	//TODO: Add Caching Capabilities
 	var self = this;
 	self.initialized = false;
-	self.controller  = controller;
-	self.args_list   = args || [];
-	self.args        = { };
+	self.controller  = null;
+	self.namespace   = "";
 };
 
 /**
