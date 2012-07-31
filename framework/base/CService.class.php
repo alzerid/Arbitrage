@@ -57,7 +57,9 @@ abstract class CService
 
 	public function requireServiceFile($namespace)
 	{
-		$path = $this->_fs_path . "/{$namespace}.class.php";
+		$namespace = explode('.', $namespace);
+		$namespace = strtolower(implode('/', array_slice($namespace, 0, -1))) . '/' . $namespace[count($namespace)-1];
+		$path      = $this->_fs_path . "/{$namespace}.class.php";
 		if(!file_exists($path))
 			throw new EArbitrageServiceException("Unable to require service file '$namespace' ($path)");
 
