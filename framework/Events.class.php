@@ -49,6 +49,18 @@ class CEvent implements IEvent
 	}
 }
 
+class CAutoLoadEvent extends CEvent
+{
+	public $class;
+	public $application;
+
+	public function __construct($application, $class)
+	{
+		$this->class       = $class;
+		$this->application = $application;
+	}
+}
+
 class CErrorEvent extends CEvent
 {
 	public $errno;
