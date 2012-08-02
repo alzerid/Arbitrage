@@ -1,7 +1,7 @@
 <?
-namespace Framework\Database;
+namespace Framework\Database\Drivers\Mongo;
 
-class CMongoDriver extends CDatabaseDriver
+class CDatabaseDriver extends \Framework\Database\CDatabaseDriver
 {
 	public function __construct($config)
 	{

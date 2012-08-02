@@ -1,7 +1,7 @@
 <?
-namespace Framework\Database;
+namespace Framework\Database\Drivers\Mongo;
 
-class CMongoModelBatch extends CMongoModelQuery
+class CDriverBatch extends \Framework\Database\CDriverBatch
 {
 	public function execute(\Framework\Database\CModelResults $results)
 	{

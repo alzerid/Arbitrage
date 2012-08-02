@@ -16,7 +16,7 @@ abstract class CModelResults implements \ArrayAccess, \Iterator
 	/**
 	 * Constructor initializes the CModelResults object.
 	 */
-	public function __construct(\Framework\Database\CModelQuery $query)
+	public function __construct(\Framework\Database\CDriverQuery $query)
 	{
 		$this->_query   = $query;
 		$this->_class   = $query->getClass();

@@ -1,5 +1,5 @@
 <?
-namespace Framework\Database;
+namespace Framework\Database\Types;
 
 class CModelHashData extends CModelData
 {
@@ -16,7 +16,7 @@ class CModelHashData extends CModelData
 		if($val instanceof CModelData)
 			$this->_variables[$name] = $val;
 		else
-			throw new CModelDataException('Unable to directly set CModelHashData that is not of type ' . $this->_class);
+			throw new \Framework\Database\Exceptions\EModelDataException('Unable to directly set CModelHashData that is not of type ' . $this->_class);
 	}
 
 	protected function _getData($name)

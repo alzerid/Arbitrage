@@ -1,5 +1,5 @@
 <?
-namespace Framework\Database;
+namespace Framework\Database\Types;
 
 class CModelData implements \ArrayAccess
 {

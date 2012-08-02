@@ -1,12 +1,12 @@
 <?
-namespace Framework\Database;
+namespace Framework\Database\Drivers\Mongo;
 
 /* Mongo */
-class CMongoModelResults extends CModelResults
+class CModelResults extends \Framework\Database\CModelResults
 {
 	private $_raw;
 
-	public function __construct(\Framework\Database\CModelQuery $query)
+	public function __construct(\Framework\Database\CDriverQuery $query)
 	{
 		parent::__construct($query);
 		$this->_raw = NULL;
@@ -62,7 +62,6 @@ class CMongoModelResults extends CModelResults
 	public function next()
 	{
 		return $this->_results->next();
-
 	}
 
 	public function rewind()

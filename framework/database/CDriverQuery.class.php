@@ -1,7 +1,7 @@
 <?
 namespace Framework\Database;
 
-abstract class CModelQuery
+abstract class CDriverQuery
 {
 	protected $_class;
 	protected $_driver;

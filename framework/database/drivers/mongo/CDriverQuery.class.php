@@ -1,7 +1,7 @@
 <?
-namespace Framework\Database;
+namespace Framework\Database\Drivers\Mongo;
 
-class CMongoModelQuery extends CModelQuery
+class CMongoModelQuery extends \Framework\Database\CDriverQuery
 {
 	public function findOne($query=array())
 	{
@@ -17,7 +17,7 @@ class CMongoModelQuery extends CModelQuery
 		$this->_cmd   = 'find';
 		$this->_query = $query;
 
-		return new CMongoModelResults($this);
+		return new CModelResults($this);
 	}
 
 	public function count($query=array())

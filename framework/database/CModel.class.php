@@ -1,7 +1,7 @@
 <?
 namespace Framework\Database;
 
-abstract class CModel extends CModelData
+abstract class CModel extends \Framework\Database\Types\CModelData
 {
 	static private $_ID_KEYS = array();
 	private $_idVal=NULL;

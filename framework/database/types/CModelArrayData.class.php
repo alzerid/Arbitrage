@@ -1,5 +1,5 @@
 <?
-namespace Framework\Database;
+namespace Framework\Database\Types;
 
 class CModelArrayData extends CModelData implements \Iterator
 {

@@ -14,17 +14,17 @@ class CDatabaseService extends CService implements \Framework\Interfaces\IAutoLo
 	public function initialize()
 	{
 		//Require base service classes
-		$this->requireServiceFile("EModelException");
-		$this->requireServiceFile("CModelResults");
-		$this->requireServiceFile("CModelData");
-		$this->requireServiceFile("CModelArrayData");
-		$this->requireServiceFile("CModelHashData");
-		$this->requireServiceFile("CModelQuery");
-		$this->requireServiceFile("CModelBatch");
-		$this->requireServiceFile("CModel", array('_service' => $this));
-		$this->requireServiceFile("CDatabaseDriver");
+		$this->requireServiceFile("EModelException");                      //Model Exception classes
+		$this->requireServiceFile("CDatabaseDriver");                      //Database driver base class
+		$this->requireServiceFile("CModelResults");                        //Wrapper class that keeps the results
+		$this->requireServiceFile("Types.CModelData");                     //Basic Model data type
+		$this->requireServiceFile("Types.CModelArrayData");                //Array data type
+		$this->requireServiceFile("Types.CModelHashData");                 //Hash (key value pair) type
+		$this->requireServiceFile("CDriverQuery");                         //Driver query
+		$this->requireServiceFile("CDriverBatch");                         //Driver batch
+		$this->requireServiceFile("CModel", array('_service' => $this));   //Model
 
-		//TODO: Load necessary drivers
+		//Load necessary drivers
 		$this->_db_config = array();
 		$this->_drivers   = array();
 		$config           = $this->getConfig();
@@ -35,11 +35,11 @@ class CDatabaseService extends CService implements \Framework\Interfaces\IAutoLo
 			if(!in_array($val['driver'], $loaded))
 			{
 				//Load the driver
-				$namespace = ucwords($val['driver']);
-				$this->requireServiceFile("$namespace.C{$namespace}Driver");
-				$this->requireServiceFile("$namespace.C{$namespace}ModelQuery");
-				$this->requireServiceFile("$namespace.C{$namespace}ModelBatch");
-				$this->requireServiceFile("$namespace.C{$namespace}ModelResults");
+				$namespace = "Drivers." . ucwords($val['driver']);
+				$this->requireServiceFile("$namespace.CDatabaseDriver");
+				$this->requireServiceFile("$namespace.CDriverQuery");
+				//$this->requireServiceFile("$namespace.CDriverBatch"); //TODO: Add back batch
+				$this->requireServiceFile("$namespace.CModelResults");
 
 				//Add to loaded
 				$loaded[] = $val['driver'];
@@ -73,7 +73,7 @@ class CDatabaseService extends CService implements \Framework\Interfaces\IAutoLo
 			return $this->_drivers[$key];
 
 		//Create driver
-		$class                = '\\Framework\\Database\\C' . $config['driver'] . 'Driver';
+		$class                = '\\Framework\\Database\\Drivers\\' . ucwords($config['driver']) . '\\CDatabaseDriver';
 		$this->_drivers[$key] = new $class($config);
 
 		return $this->_drivers[$key];
