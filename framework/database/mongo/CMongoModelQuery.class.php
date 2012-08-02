@@ -5,6 +5,7 @@ class CMongoModelQuery extends CModelQuery
 {
 	public function findOne($query=array())
 	{
+		die('findOne');
 		$this->_cmd   = 'findOne';
 		$this->_query = $query;
 
@@ -16,11 +17,12 @@ class CMongoModelQuery extends CModelQuery
 		$this->_cmd   = 'find';
 		$this->_query = $query;
 
-		return $this;
+		return new CMongoModelResults($this);
 	}
 
 	public function count($query=array())
 	{
+		die('count');
 		$this->_cmd   = 'count';
 		$this->_query = $query;
 
@@ -29,6 +31,7 @@ class CMongoModelQuery extends CModelQuery
 
 	public function update($query, $data)
 	{
+		die('update');
 		$this->_cmd   = "update";
 		$this->_query = $query;
 		$this->_data  = $data;
@@ -38,6 +41,7 @@ class CMongoModelQuery extends CModelQuery
 
 	public function upsert($query, $data)
 	{
+		die('upsert');
 		$this->_cmd   = "upsert";
 		$this->_query = $query;
 		$this->_data  = $data;
@@ -47,6 +51,7 @@ class CMongoModelQuery extends CModelQuery
 
 	public function insert($data)
 	{
+		die('insert');
 		$this->_cmd   = "insert";
 		$this->_query = NULL;
 		$this->_data  = $data;
@@ -56,6 +61,7 @@ class CMongoModelQuery extends CModelQuery
 
 	public function save($data)
 	{
+		die('save');
 		$this->_cmd   = "save";
 		$this->_query = NULL;
 		$this->_data  = $data;
@@ -65,6 +71,7 @@ class CMongoModelQuery extends CModelQuery
 
 	public function remove($query)
 	{
+		die('remove');
 		$this->_cmd   = "remove";
 		$this->_query = $query;
 		$this->_data  = NULL;
@@ -72,17 +79,15 @@ class CMongoModelQuery extends CModelQuery
 		return $this;
 	}
 
-	public function execute()
+	public function execute(\Framework\Database\CModelResults $results)
 	{
 		//Execute command
 		$class = $this->_class;
-		$prop  = $class::properties();
+		$prop  = array_merge($this->_driver->getConfig(), $class::properties());
 
-		//Query
-		//TODO: DB Factory
-		$dbconfig = ((isset($prop['config']))? $prop['config'] : '_default');
-		$handle   = CDatabaseDriverFactory::getInstance()->getHandle('mongo', $dbconfig);
-		$handle   = $handle->{$prop['database']}->{$prop['table']};
+		//Get handle
+		$handle = $this->_driver->getHandle();
+		$handle = $handle->{$prop['database']}->{$prop['table']};
 
 		//Query
 		if(in_array($this->_cmd, array('find', 'findOne', 'count')))
@@ -94,30 +99,29 @@ class CMongoModelQuery extends CModelQuery
 			if($this->_cmd == "find")
 			{
 				//Sort
-				if($this->_sort !== NULL)
-					$res = $res->sort($this->_sort);
-					
+				if($results->getSort() !== NULL)
+					$res = $res->sort($results->getSort());
+
 				//Limit
-				if($this->_limit !== NULL)
-					$res = $res->limit($this->_limit);
+				if($results->getLimit() !== NULL)
+					$res = $res->limit($results->getLimit());
 
 				//Create ModelList
 				if($res->count() > 0)
-				{
-					$list = new CMongoModelResults($res, $this->_class);
-					return $list;
-				}
+					return $res;
 			}
 			elseif($this->_cmd == "count")
 				return $res;
 			else
 			{
+				die("FIND ONE");
 				$class = $this->_class;
 				return $class::model($res);
 			}
 		}
 		elseif($this->_cmd == "update")
 		{
+			die("CMongoModel::execute UPDATE");
 			//Setup update
 			$update = array('$set' => $this->_smartFlatten($this->_data));
 			
@@ -130,6 +134,7 @@ class CMongoModelQuery extends CModelQuery
 		}
 		elseif($this->_cmd == "upsert")
 		{
+			die("CMongoModel::execute UPSERT");
 
 			//Setup update
 			$data = array('$set' => $this->_smartFlatten($this->_data));
@@ -141,16 +146,21 @@ class CMongoModelQuery extends CModelQuery
 		}
 		elseif($this->_cmd == "insert")
 		{
-			die("Code insert!");
+			die("CMongoModel::execute INSERT");
 			//TODO: Do not insert if data has an id
 		}
 		elseif($this->_cmd == "save")
 		{
+			die("CMongoModel::execute SAVE");
+
 			$handle->save($this->_data);
 			return $this->_data['_id'];
 		}
 		elseif($this->_cmd == "remove")
+		{
+			die("CMongoModel::execute REMOVE");
 			$handle->remove($this->_query);
+		}
 		else
 			throw new EModelException("Cannot do batch operation on '{$this->_cmd}'.");
 

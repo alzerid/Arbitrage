@@ -3,8 +3,9 @@ namespace Framework\Database;
 
 class CMongoModelBatch extends CMongoModelQuery
 {
-	public function execute()
+	public function execute(\Framework\Database\CModelResults $results)
 	{
+		die("CMongoModelBatch::execute");
 		//Execute command
 		$class = $this->_class;
 		$prop  = $class::properties();

@@ -3,21 +3,27 @@ namespace Framework\Database;
 
 class CMongoDriver extends CDatabaseDriver
 {
-	static private $_HANDLES = array();
-
-	static public function getHandle($config)
+	public function __construct($config)
 	{
-		//Get key
-		$key = "mongodb://" . ((isset($config['host']))? $config['host'] : '127.0.0.1') . ':' . ((isset($config['port']))? $config['port'] : 27017);
+		parent::__construct($config);
 
-		//Get handle
-		if(isset(self::$_HANDLES[$key]))
-			return self::$_HANDLES[$key];
+		//Connect
+		$uri           = "mongodb://" . ((isset($config['host']))? $config['host'] : '127.0.0.1') . ':' . ((isset($config['port']))? $config['port'] : 27017);
+		$this->_handle = new \Mongo($uri);
+	}
 
-		//Create new mongo handle
-		self::$_HANDLES[$key] = new \Mongo($key);
+	public function getForm(array $form)
+	{
+	}
 
-		return self::$_HANDLES[$key];
+	public function getQuery($class)
+	{
+		return new CMongoModelQuery($this, $class);
+	}
+
+	public function getBatch()
+	{
+		die('batch');
 	}
 }
 ?>

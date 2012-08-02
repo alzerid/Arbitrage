@@ -6,9 +6,9 @@ class CMongoModelResults extends CModelResults
 {
 	private $_raw;
 
-	public function __construct($results, $class)
+	public function __construct(\Framework\Database\CModelQuery $query)
 	{
-		parent::__construct($results, $class);
+		parent::__construct($query);
 		$this->_raw = NULL;
 	}
 
@@ -67,8 +67,8 @@ class CMongoModelResults extends CModelResults
 
 	public function rewind()
 	{
+		$this->_executeQuery();
 		return $this->_results->rewind();
-
 	}
 
 	public function valid()
@@ -76,5 +76,15 @@ class CMongoModelResults extends CModelResults
 		return $this->_results->valid();
 	}
 	/* End Iterator */
+
+	
+	private function _executeQuery()
+	{
+		if($this->_results != NULL)
+			return;
+
+		//Query
+		$this->_results = $this->_query->execute($this);
+	}
 }
 ?>
