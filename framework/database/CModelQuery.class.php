@@ -4,6 +4,7 @@ namespace Framework\Database;
 abstract class CModelQuery
 {
 	protected $_class;
+	protected $_driver;
 
 	//Query
 	protected $_query;
@@ -11,20 +12,22 @@ abstract class CModelQuery
 	protected $_limit;
 	protected $_skip;
 	protected $_cmd;
-	protected $_sort;
 
-	public function __construct($class)
+	/**
+	 * Method initializes the CModelQuery
+	 * @param \Framework\Database\CDatabaseDriver $driver The database driver to associate with.
+	 * @param string $class The string representation of the model to associate with.
+	 */
+	public function __construct(\Framework\Database\CDatabaseDriver $driver, $class)
 	{
 		//Database
 		$this->_class  = $class;
+		$this->_driver = $driver;
 
 		//Query
 		$this->_query = NULL;
 		$this->_data  = NULL;
-		$this->_limit = NULL;
-		$this->_skip  = NULL;
 		$this->_cmd   = NULL;
-		$this->_sort  = NULL;
 	}
 
 	abstract public function findOne($query);
@@ -37,25 +40,20 @@ abstract class CModelQuery
 	abstract public function remove($query);
 
 	//Actually execute
-	abstract public function execute();
+	/**
+	 * Abstract method that must be defined in the driver.
+	 * @param \Framework\Database\CModelResults $results The result object to use for querying and setting the results.
+	 * @return \Framework\Database\CModelResults Retuns the result.
+	 */
+	abstract public function execute(\Framework\Database\CModelResults $results);
 
-	//Other options
-	public function sort($sort)
+	/**
+	 * Method returns the model class associated with this query object.
+	 * @return string Returns the class.
+	 */
+	public function getClass()
 	{
-		$this->_sort = $sort;
-		return $this;
-	}
-
-	public function limit($limit)
-	{
-		$this->_limit = $limit;
-		return $this;
-	}
-
-	public function skip($skip)
-	{
-		$this->_skip = $skip;
-		return $this;
+		return $this->_class;
 	}
 }
 ?>
