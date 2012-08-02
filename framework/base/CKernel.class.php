@@ -3,6 +3,10 @@ namespace Framework\Base;
 use \Framework\Interfaces\ISingleton;
 use \Framework\Exceptions\EArbitrageKernelException;
 
+//TODO: Ability to have multiple applications --EMJ
+//TODO: Ability to manage package_paths per application --EMJ
+//TODO: Ability for applications to have their own virtual namespaces (manage their own pacakges etc, ensure service objects are tied to application) --EMJ
+
 class CKernel implements ISingleton
 {
 	static private $_VERION     = "2.0.0";
@@ -181,6 +185,9 @@ class CKernel implements ISingleton
 		$application = new $class($info['path'], $info['namespace']);
 		$application->initialize();
 
+		//Add application to applications list
+		$this->_applications[] = $application;
+
 		return $application;
 	}
 
@@ -216,7 +223,7 @@ class CKernel implements ISingleton
 			foreach($services as $service => $value)
 			{
 				foreach($value as $namespace => $lconfig)
-					$this->createService($application, $service, $namespace, new \Framework\Config\CArbitrageConfigProperty($lconfig));  //Create service with configuration
+					$this->createService($application, $service, $namespace, new \Framework\Config\CArbitrageConfigProperty($value[$namespace]));  //Create service with configuration
 			}
 		}
 	}
@@ -274,6 +281,15 @@ class CKernel implements ISingleton
 		}
 
 		throw new EArbitrageKernelException("Unable to load '$namespace' for service '$service'.");
+	}
+
+	/**
+	 * Method returns the applications.
+	 * returns \Framework\Base\CApplication Retuns the application registered to the kernel.
+	 */
+	public function getApplication()
+	{
+		return ((isset($this->_applications[0]))? $this->_applications[0] : NULL);
 	}
 
 	/**
