@@ -20,12 +20,29 @@ interface IFactory
 /**
  * IModuleLoader interface
  * Interface used when loading modules (see CDatabaseDriverFactory)
-*/
+ */
 interface IModuleLoader extends ISingleton
 {
 	public function registerPath($path);
 	public function load($driver, $config);
 	public function getHandle($driver, $config);
+}
+
+/**
+ * IAutoLoadListener
+ */
+interface IAutoLoadListener
+{
+	public function handleAutoLoad(\Framework\Interfaces\IEvent $event);
+}
+
+/**
+ * IAutoLoadObserver
+ */
+interface IAutoLoadObserver
+{
+	public function registerAutoLoadListener(\Framework\Interfaces\IAutoLoadListener $handler);
+	public function handleAutoLoad($class);
 }
 
 /**
