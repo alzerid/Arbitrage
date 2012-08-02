@@ -57,23 +57,12 @@ abstract class CModel extends CModelData
 
 	static public function query()
 	{
-		//Setup model object
-		$driver = static::properties();
-		$driver = $driver['driver'];
-
-		//Return Query Object
-		$class = 'Arbitrage2\Database\C' . $driver . "ModelQuery";
-		if(!class_exists($class))
-			throw new EModelException("Unable to load query for '$driver'. Driver not loaded?");
-
-
-		$query = new $class(get_called_class());
-
-		return $query;
+		return \Framework\Base\CKernel::getInstance()->getApplication()->getService('database')->getDriver(static::properties())->getQuery(get_called_class());
 	}
 
 	static public function batch()
 	{
+		die("BATCH");
 		//Setup model object
 		$driver = static::properties();
 		$driver = $driver['driver'];
@@ -102,6 +91,7 @@ abstract class CModel extends CModelData
 	/* Update Methods */
 	public function update()
 	{
+		die("CModel::update");
 		//Ensure _id is there
 		if(!isset($this->_idVal))
 			throw new EModelException("Cannot update without an ID");
@@ -117,6 +107,7 @@ abstract class CModel extends CModelData
 
 	public function upsert(array $keys)
 	{
+		die("CModel::upsert");
 		if(count($keys) <= 0)
 			throw new EModelDataException("Keys must be specified for an upsert.");
 
@@ -134,6 +125,7 @@ abstract class CModel extends CModelData
 
 	public function save()
 	{
+		die("CModel::save");
 		$this->_merge();
 		$vars = $this->toArray();
 
@@ -151,6 +143,7 @@ abstract class CModel extends CModelData
 
 	public function remove()
 	{
+		die("CModel::remove");
 		if(empty($this->_idVal))
 			throw new EModelException("Cannot update without an ID");
 
