@@ -55,13 +55,23 @@ abstract class CService
 		return $this->_application;
 	}
 
-	public function requireServiceFile($namespace)
+	/**
+	 * Method requires a service file.
+	 * @param string $namespace The namespace the rqeuire.
+	 * @param $opt_variables Optional parameter that pases variables into the required file.
+	 * @throws \Framework\Exceptions\EArbitrageServiceException
+	 */
+	public function requireServiceFile($namespace, $opt_variables=array())
 	{
 		$namespace = explode('.', $namespace);
 		$namespace = strtolower(implode('/', array_slice($namespace, 0, -1))) . '/' . $namespace[count($namespace)-1];
 		$path      = $this->_fs_path . "/{$namespace}.class.php";
 		if(!file_exists($path))
 			throw new EArbitrageServiceException("Unable to require service file '$namespace' ($path)");
+
+		//Extract opt_variables
+		if(count($opt_variables))
+			extract($opt_variables);
 
 		//Require the file
 		require_once($path);
