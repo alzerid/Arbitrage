@@ -1,9 +1,10 @@
 <?
 namespace Framework\Base;
 
-abstract class CApplication extends CPackage implements \Framework\Interfaces\IErrorHandlerListener
+abstract class CApplication extends CPackage implements \Framework\Interfaces\IErrorHandlerListener, \Framework\Interfaces\IAutoLoadObserver
 {
-	private $_packages;            //A list of packages registered to this application
+	private $_packages;             //A list of packages registered to this application
+	private $_auto_load_listeners;  //List of auto load handlers
 
 	/**
 	 * Initializes the arbitrage application, loads the application config.
@@ -11,10 +12,14 @@ abstract class CApplication extends CPackage implements \Framework\Interfaces\IE
 	public function initialize()
 	{
 		//Set arrays
-		$this->_packages = array();
+		$this->_packages           = array();
+		$this->_auto_load_listeners = array();
 
 		//Setup error handler
 		\Framework\ErrorHandler\CErrorHandlerObserver::getInstance()->addListener($this);
+
+		//Register autoload
+		spl_autoload_register(array($this, 'handleAutoLoad'), true, true);
 
 		//Call CPackage::initialize
 		parent::initialize();
@@ -29,6 +34,16 @@ abstract class CApplication extends CPackage implements \Framework\Interfaces\IE
 	{
 		$key = strtolower($namespace);
 		return ((isset($this->_packages[$key]))? $this->_packages[$key] : NULL);
+	}
+
+	/**
+	 * Method returns the service requested.
+	 * @param string $service The service to retreive.
+	 * @return \Framework\Base\CService Returns the service.
+	 */
+	public function getService($service)
+	{
+		return CKernel::getInstance()->getService($this, $service);
 	}
 
 	/**
@@ -77,6 +92,33 @@ abstract class CApplication extends CPackage implements \Framework\Interfaces\IE
 					$this->_packages[$key] = CKernel::getInstance()->createPackage($package, $this, $packages[$package]);
 				}
 			}
+		}
+	}
+
+	/**
+	 * Method is called to register auto load handlers.
+	 * @param \Framework\Interfaces\IAutoLoadListener $listener The listener to register.
+	 */
+	public function registerAutoLoadListener(\Framework\Interfaces\IAutoLoadListener $listener)
+	{
+		$this->_auto_load_listeners[] = $listener;
+	}
+
+	/**
+	 * Method is called when auto load is triggered.
+	 * @param string $class The class to attempt to load.
+	 */
+	public function handleAutoLoad($class)
+	{
+		//Create new event
+		$event = new \Framework\Events\CAutoLoadEvent($this, $class);
+
+		//Trigger each listener
+		foreach($this->_auto_load_listeners as $listener)
+		{
+			$listener->handleAutoLoad($event);
+			if(!$event->getPropagation())
+				break;
 		}
 	}
 
