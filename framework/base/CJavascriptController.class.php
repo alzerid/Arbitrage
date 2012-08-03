@@ -12,7 +12,7 @@ class CJavascriptController extends CController
 	public function getJavascriptAction()
 	{
 		//Get path and namespace
-		$path = $this->getPackage()->getPath(). $_SERVER['REQUEST_URI'];
+		$path = $this->getPackage()->getPath() . $_SERVER['REQUEST_URI'];
 
 		//Check if exists
 		if(!file_exists($path))
