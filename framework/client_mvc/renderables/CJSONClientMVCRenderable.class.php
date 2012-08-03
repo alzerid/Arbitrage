@@ -7,23 +7,35 @@ class CJSONClientMVCRenderable extends \Framework\Renderables\CViewFileRenderabl
 {
 	public function render()
 	{
-		//Ensure we have array set
-		!isset($this->_content['header']) && $this->_content['header'] = array();
-		!isset($this->_content['client']) && $this->_content['client'] = array();
-		!isset($this->_content['client']['layout']) && $this->_content['client']['layout'] = $this->_layout;
-		!isset($this->_content['client']['canvas']) && $this->_content['client']['canvas'] = array();
+		//Set content
+		$content = array();
 
-		//TODO: Render each canvas
-		foreach($this->_content['client']['canvas'] as &$canvas)
+		//Ensure we have array set
+		!isset($content['header']) && $content['header'] = array('type' => 'client_mvc');
+		!isset($content['client_mvc']) && $content['client_mvc'] = array();
+		!isset($content['client_mvc']['layout']) && $content['client_mvc']['layout'] = $this->_layout;
+
+		//Set content
+		$content = array_merge($content, $this->_content);
+
+		//Generate and create client_mvc portion of the return
+		unset($content['render']);
+		unset($content['variables']);
+
+		//Render each canvas
+		foreach($content['client_mvc']['canvas'] as $key => $canvas)
 		{
 			$file      = $canvas['render'];
 			$variables = ((isset($canvas['variables']))? $canvas['variables'] : array());
 			$canvas    = parent::renderPartial($file, $variables);
+
+			//Set canvas html
+			$content['client_mvc']['canvas'][$key] = $canvas;
 		}
 		
 		//Create CJSONApplicationRenderable
 		$json = new \Framework\Renderables\CJSONApplicationRenderable();
-		$json->initialize($this->_content);
+		$json->initialize($content);
 		return $json->render();
 	}
 }
