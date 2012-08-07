@@ -86,6 +86,15 @@ class CWebApplication extends CApplication
 	}
 
 	/**
+	 * Method returns the current routes for the application.
+	 * @return \Framework\Config\CArbitrageConfigProperty Returns the routes.
+	 */
+	public function getRoutes()
+	{
+		return $this->getConfig()->webApplication->routes;
+	}
+
+	/**
 	 * Method loads the controller.
 	 * @param string $route URL formatted route that specifies the controller.
 	 * @param boolean $ajax Determines if the controller is an AJAX controller.
