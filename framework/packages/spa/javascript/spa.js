@@ -1,11 +1,11 @@
-arbitrage2.provide('_arbitrage2.base.mvc');
+arbitrage2.provide('spa');
 
 /**
   @description Router class that parses the URL.
 	@constructor
 	@params routes The routes to take into consideration.
 */
-_arbitrage2.base.mvc.Router = function(routes) {
+spa.Router = function(routes) {
 	var self    = this;
 	self.routes = routes;
 };
@@ -13,7 +13,7 @@ _arbitrage2.base.mvc.Router = function(routes) {
 /**
 	@description 
 */
-_arbitrage2.base.mvc.Router.prototype.route = function(url) {
+spa.Router.prototype.route = function(url) {
 	var self = this;
 	var ret  = null;
 
@@ -36,10 +36,10 @@ _arbitrage2.base.mvc.Router.prototype.route = function(url) {
 	@constructor
 	@params config The configuration rules.
 */
-_arbitrage2.base.mvc.Application = function(config) {
+spa.Application = function(config) {
 	var self            = this;
 	self.config         = config || self.config;
-	self.router         = new _arbitrage2.base.mvc.Router(self.config.mvc.routes || { });
+	self.router         = new spa.Router(self.config.mvc.routes || { });
 	self.virtual_uri    = "";
 	self.request_uri    = window.location.hash.replace(/^#!/, '') || "/";
 	self.controllers    = { };
@@ -49,7 +49,7 @@ _arbitrage2.base.mvc.Application = function(config) {
 	self.needStart      = true;
 	self.cache          = new arbitrage2.cache.CacheManager();
 	self.currentAction  = null;
-	self.ajax           = new _arbitrage2.base.mvc.Application.prototype.Ajax(self);
+	self.ajax           = new spa.Application.prototype.Ajax(self);
 
 	//Setup canvases
 	if(self.config.mvc.canvases)
@@ -59,7 +59,7 @@ _arbitrage2.base.mvc.Application = function(config) {
 	}
 
 	//Set instance to self
-	_arbitrage2.base.mvc.Application.prototype._instance = self;
+	spa.Application.prototype._instance = self;
 
 	//Onhash change event
 	var listen = true;
@@ -101,7 +101,7 @@ _arbitrage2.base.mvc.Application = function(config) {
 	@description Default configuration
 	@static
 */
-_arbitrage2.base.mvc.Application.prototype.config = arbitrage2.config;
+spa.Application.prototype.config = arbitrage2.config;
 
 /*arbitrage2.config['mvc'] = {
 	serverCanvas: false,       //Determines if the server dictates where to draw returned HTML
@@ -116,14 +116,14 @@ _arbitrage2.base.mvc.Application.prototype.config = arbitrage2.config;
 	@description Global static instance of the application.
 	@static
 */
-_arbitrage2.base.mvc.Application.prototype._instance = undefined;
+spa.Application.prototype._instance = undefined;
 
 /**
 	@description Requires a layout script.
 	@param layout The layout to require.
 	@param opt_cb The callback to call after the require is done.
 */
-_arbitrage2.base.mvc.Application.prototype.requireLayout = function(layout, opt_cb) {
+spa.Application.prototype.requireLayout = function(layout, opt_cb) {
 	var self = this;
 
 	//Get Layout
@@ -153,7 +153,7 @@ _arbitrage2.base.mvc.Application.prototype.requireLayout = function(layout, opt_
 	@param namespace The fully qualified namespace.
 	@param opt_cb_success The optional callback to execute.
 */
-_arbitrage2.base.mvc.Application.prototype.requireController = function(namespace, opt_cb_success, opt_cb_error) {
+spa.Application.prototype.requireController = function(namespace, opt_cb_success, opt_cb_error) {
 	var self = this;
 	self.loadCount++;
 
@@ -176,7 +176,7 @@ _arbitrage2.base.mvc.Application.prototype.requireController = function(namespac
 	@description Requires a css stylesheet.
 	@param css The css filename to include.
 */
-_arbitrage2.base.mvc.Application.prototype.requireCSS = function(css) {
+spa.Application.prototype.requireCSS = function(css) {
 
 	//Check to see if css already included, if yes, don't include
 	var nodes = document.getElementsByTagName('link');
@@ -204,7 +204,7 @@ _arbitrage2.base.mvc.Application.prototype.requireCSS = function(css) {
 /**
 	@description Runs the application by calling routes etc...
 */
-_arbitrage2.base.mvc.Application.prototype.run = function() {
+spa.Application.prototype.run = function() {
 	var self = this;
 
 	//Check to see if dependencis are still being loaded
@@ -233,7 +233,7 @@ _arbitrage2.base.mvc.Application.prototype.run = function() {
 	@description Navigates to a url by doing a hash change.
 	@param url The url to navigate to.
 */
-_arbitrage2.base.mvc.Application.prototype.navigate = function(url, opt_hard) {
+spa.Application.prototype.navigate = function(url, opt_hard) {
 	window.location.hash = "#!" + url;
 };
 
@@ -242,7 +242,7 @@ _arbitrage2.base.mvc.Application.prototype.navigate = function(url, opt_hard) {
 	@param url The url to convert to a url to get the controller.
 	@param opt_cb_loaded Optional callback function to call.
 */
-_arbitrage2.base.mvc.Application.prototype.loadController = function(url, opt_cb_loaded) {
+spa.Application.prototype.loadController = function(url, opt_cb_loaded) {
 	var self       = this;
 	var namespace  = arbitrage2.convertURLNamespaceToArbitrage(url).split('.');
 	var controller = namespace.slice(-2, -1).join('').toUpperCaseFirst() + "Controller";
@@ -286,10 +286,10 @@ _arbitrage2.base.mvc.Application.prototype.loadController = function(url, opt_cb
 
 /**
 	@description Method executes the action and draws it onto the canvas.
-	@param <_arbitrage2.base.mvc.Controller> controller The controller to execute.
-	@param <_arbitrage2.base.mvc.Action> action The action to execute.
+	@param <spa.Controller> controller The controller to execute.
+	@param <spa.Action> action The action to execute.
 */
-_arbitrage2.base.mvc.Application.prototype.execute = function(controller, action) {
+spa.Application.prototype.execute = function(controller, action) {
 	var self   = this;
 	var params = "";
 
@@ -424,9 +424,9 @@ _arbitrage2.base.mvc.Application.prototype.execute = function(controller, action
 
 /**
 	@description Removes all cache associated with the action.
-	@param {_arbitrage2.base.mvc.Action} The action remove from cache.
+	@param {spa.Action} The action remove from cache.
 */
-_arbitrage2.base.mvc.Application.prototype.staleAction = function(action) {
+spa.Application.prototype.staleAction = function(action) {
 	var self = this;
 
 	//Iterate through cache and set stale
@@ -447,7 +447,7 @@ _arbitrage2.base.mvc.Application.prototype.staleAction = function(action) {
 /**
 	@description Flushes the entire cache except for the current action.
 */
-_arbitrage2.base.mvc.Application.prototype.flush = function() {
+spa.Application.prototype.flush = function() {
 	var self = this;
 	var keys = [];
 
@@ -468,12 +468,12 @@ _arbitrage2.base.mvc.Application.prototype.flush = function() {
 /**
 	@description Info bar static object.
 */
-_arbitrage2.base.mvc.Application.prototype.InfoBar = { };
+spa.Application.prototype.InfoBar = { };
 
 /**
 	@description Private variable holding a timer handle.
 */
-_arbitrage2.base.mvc.Application.prototype.InfoBar._timer = null;
+spa.Application.prototype.InfoBar._timer = null;
 
 /**
 	@description Shows an infobar on the page.
@@ -481,7 +481,7 @@ _arbitrage2.base.mvc.Application.prototype.InfoBar._timer = null;
 	@param type The type of info bar to show.
 	@param seconds The seconds to show, 0 if infinite.
 */
-_arbitrage2.base.mvc.Application.prototype.InfoBar.show = function(txt, type, seconds) {
+spa.Application.prototype.InfoBar.show = function(txt, type, seconds) {
 	if(!type)
 		type = 'info';
 	
@@ -508,23 +508,23 @@ _arbitrage2.base.mvc.Application.prototype.InfoBar.show = function(txt, type, se
 	//Set timer
 	if(seconds)
 	{
-		if(_arbitrage2.base.mvc.Application.prototype.InfoBar._timer)
-			clearTimeout(_arbitrage2.base.mvc.Application.prototype.InfoBar._timer);
+		if(spa.Application.prototype.InfoBar._timer)
+			clearTimeout(spa.Application.prototype.InfoBar._timer);
 
-		_arbitrage2.base.mvc.Application.prototype.InfoBar._timer = setTimeout(_arbitrage2.base.mvc.Application.prototype.InfoBar.hide, seconds*1000);
+		spa.Application.prototype.InfoBar._timer = setTimeout(spa.Application.prototype.InfoBar.hide, seconds*1000);
 	}
 };
 
 /**
 	@description Hides the infobar on the page.
 */
-_arbitrage2.base.mvc.Application.prototype.InfoBar.hide = function() {
+spa.Application.prototype.InfoBar.hide = function() {
 	var ele = document.getElementById('arbitrage2_mvc_infobar');
 	if(ele)
 		ele.parentElement.removeChild(ele)
 
-	clearTimeout(_arbitrage2.base.mvc.Application.prototype.InfoBar._timer);
-	_arbitrage2.base.mvc.Application.prototype.InfoBar._timer = null;
+	clearTimeout(spa.Application.prototype.InfoBar._timer);
+	spa.Application.prototype.InfoBar._timer = null;
 };
 
 
@@ -532,7 +532,7 @@ _arbitrage2.base.mvc.Application.prototype.InfoBar.hide = function() {
 	@description Ajax module.
 	@constructor
 */
-_arbitrage2.base.mvc.Application.prototype.Ajax = function(application) { 
+spa.Application.prototype.Ajax = function(application) { 
 	var self = this;
 	self.application = application;
 	self.timer       = null;
@@ -545,7 +545,7 @@ _arbitrage2.base.mvc.Application.prototype.Ajax = function(application) {
 	@param parameters The parameters to send with the AJAX call.
 	@param cb_success The success callback function to execute upon success.
 */
-_arbitrage2.base.mvc.Application.prototype.Ajax.prototype.post = function(url, parameters, cb_success) {
+spa.Application.prototype.Ajax.prototype.post = function(url, parameters, cb_success) {
 	var self = this;
 
 	//Start timer, if more than 1 second, show loading bar
@@ -566,7 +566,7 @@ _arbitrage2.base.mvc.Application.prototype.Ajax.prototype.post = function(url, p
 	@param parameters The parameters to send with the AJAX call.
 	@param cb_success The success callback function to execute upon success.
 */
-_arbitrage2.base.mvc.Application.prototype.Ajax.prototype.get = function(url, parameters, cb_success) {
+spa.Application.prototype.Ajax.prototype.get = function(url, parameters, cb_success) {
 	var self = this;
 
 	//Start timer, if more than 1 second, show loading bar
@@ -585,7 +585,7 @@ _arbitrage2.base.mvc.Application.prototype.Ajax.prototype.get = function(url, pa
 	@description Method escalates the ajax loading bar text.
 	@protected
 */
-_arbitrage2.base.mvc.Application.prototype.Ajax.prototype._escalate = function(mode) {
+spa.Application.prototype.Ajax.prototype._escalate = function(mode) {
 	var self = this;
 
 
@@ -633,7 +633,7 @@ _arbitrage2.base.mvc.Application.prototype.Ajax.prototype._escalate = function(m
 	@description Controller base class. Defines an arbitrage2 JS controller.
 	@constructor
 */
-_arbitrage2.base.mvc.Controller = function() {
+spa.Controller = function() {
 	var self = this;
 	self.currentAction = null;
 	self.application   = arbitrage2.mvc.Application.prototype._instance;
@@ -650,7 +650,7 @@ _arbitrage2.base.mvc.Controller = function() {
 	@description Loads the controller into memeory.
 	@param {string} url The url of the request.
 */
-_arbitrage2.base.mvc.Controller.prototype.loadAction = function(uri) {
+spa.Controller.prototype.loadAction = function(uri) {
 	var self    = this;
 	var action = uri.split('/').slice(-1)[0];
 
@@ -675,7 +675,7 @@ _arbitrage2.base.mvc.Controller.prototype.loadAction = function(uri) {
 /**
 	@description Controller load method called when the controller is loaded.
 */
-_arbitrage2.base.mvc.Controller.prototype.load = function () {
+spa.Controller.prototype.load = function () {
 	var self = this;
 	self.loaded = true;
 };
@@ -683,12 +683,12 @@ _arbitrage2.base.mvc.Controller.prototype.load = function () {
 /**
 	@description Controller unload method. Called when the page is unloading.
 */
-_arbitrage2.base.mvc.Controller.prototype.unload = function() { };
+spa.Controller.prototype.unload = function() { };
 
 /**
  @description Returns a list of arguments to use for the AJAX call to the server.
 */
-_arbitrage2.base.mvc.Controller.prototype.arguments = function() {
+spa.Controller.prototype.arguments = function() {
 	return { };
 };
 
@@ -696,7 +696,7 @@ _arbitrage2.base.mvc.Controller.prototype.arguments = function() {
 	@description Action base class.
 	@constructor
 */
-_arbitrage2.base.mvc.Action = function() {
+spa.Action = function() {
 	//TODO: Add Caching Capabilities
 	var self = this;
 	self.initialized = false;
@@ -708,7 +708,7 @@ _arbitrage2.base.mvc.Action = function() {
 	@description Called when the action needs to be initialized for the first time.
 	@param opt_data Optional data that is passed (depending if ajax structured response).
 */
-_arbitrage2.base.mvc.Action.prototype.initialize = function(opt_data) { 
+spa.Action.prototype.initialize = function(opt_data) { 
 	var self = this;
 	self.initialized = true;
 };
@@ -716,32 +716,32 @@ _arbitrage2.base.mvc.Action.prototype.initialize = function(opt_data) {
 /**
 	@description Called when the action is being removed from memory.
 */
-_arbitrage2.base.mvc.Action.prototype.free = function() { };
+spa.Action.prototype.free = function() { };
 
 /**
 	@description Called when the action is about to get unloaded from the page (prior to hide).
 	@return Return true if we want to continue the unload process else false to stop it.
 */
-_arbitrage2.base.mvc.Action.prototype.unload = function() {
+spa.Action.prototype.unload = function() {
 	return true;
 };
 
 /**
 	@description Called when the action needs to be shown on the canvas.
 */
-_arbitrage2.base.mvc.Action.prototype.show = function() {
+spa.Action.prototype.show = function() {
 };
 
 /**
 	@description Called when the action needs to be hidden from view.
 */
-_arbitrage2.base.mvc.Action.prototype.hide = function() {
+spa.Action.prototype.hide = function() {
 };
 
 /**
 	@description Removes any cache associated with action
 */
-_arbitrage2.base.mvc.Action.prototype.setStale = function() {
+spa.Action.prototype.setStale = function() {
 	var self = this;
 	self.controller.application.staleAction(self);
 };
@@ -750,7 +750,7 @@ _arbitrage2.base.mvc.Action.prototype.setStale = function() {
  @description Returns a list of arguments to use for the AJAX call to the server.
  @params opt_params Optional arguments to map.
 */
-_arbitrage2.base.mvc.Action.prototype.arguments = function(opt_params) {
+spa.Action.prototype.arguments = function(opt_params) {
 	var self   = this;
 	var params = { };
 
@@ -770,7 +770,7 @@ _arbitrage2.base.mvc.Action.prototype.arguments = function(opt_params) {
  @description Canvas class specifies drawing area for controllers.
  @param element The element to draw in.
 */
-_arbitrage2.base.mvc.Canvas = function($element) {
+spa.Canvas = function($element) {
 	var self      = this;
 	self.$element = $element;
 };
@@ -779,7 +779,7 @@ _arbitrage2.base.mvc.Canvas = function($element) {
 	@description Renders the HTML onto the canvas.
 	@param $data The $data to render.
 */
-_arbitrage2.base.mvc.Canvas.prototype.render = function($data) {
+spa.Canvas.prototype.render = function($data) {
 	var self = this;
 
 	//TODO: When detaching do we ensure caching?
@@ -792,9 +792,7 @@ _arbitrage2.base.mvc.Canvas.prototype.render = function($data) {
 /**
   @description Layout controller
 */
-_arbitrage2.base.mvc.Layout = function() {
+spa.Layout = function() {
 	var self = this;
 	self.page = window.location.pathname;
 };
-
-arbitrage2.exportSymbol('arbitrage2.mvc', _arbitrage2.base.mvc);
