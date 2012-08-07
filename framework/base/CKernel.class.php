@@ -200,6 +200,9 @@ class CKernel implements ISingleton
 	 */
 	public function createPackage($namespace, \Framework\Base\CPackage $opt_parent=NULL, \Framework\Config\CArbitrageConfigProperty $opt_config=NULL)
 	{
+		//Add actual package name to namespace
+		$namespace = preg_replace('/(.*)\.([^\,]+)$/', '$1.$2.C$2Package', $namespace);
+
 		$package = $this->_createPackage($namespace, $opt_parent, $opt_config);
 		if($package == NULL)
 			throw new EArbitrageKernelException("Application '$namespace' does not exist!");

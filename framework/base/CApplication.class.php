@@ -87,10 +87,7 @@ abstract class CApplication extends CPackage implements \Framework\Interfaces\IE
 
 				//Create package
 				foreach($packages as $package => $lconfig)
-				{
-					$key                   = preg_replace('/\.[^\.]+$/', '', strtolower($package));
-					$this->_packages[$key] = CKernel::getInstance()->createPackage($package, $this, $packages[$package]);
-				}
+					$this->_packages[strtolower($package)] = CKernel::getInstance()->createPackage($package, $this, $packages[$package]);
 			}
 		}
 	}
