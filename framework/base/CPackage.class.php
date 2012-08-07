@@ -101,6 +101,7 @@ class CPackage
 		return $this->_path;
 	}
 
+
 	/**
 	 * Method returns the namespace of this package.
 	 * @return string Returns the namespace of this package.
@@ -117,7 +118,7 @@ class CPackage
 	public function depends($namespace)
 	{
 		if(!$this->getApplication()->getPackage($namespace))
-			throw new \Framework\Exceptions\EArbtiragePackageException("Dependant package '$namespace' is not loaded!");
+			throw new \Framework\Exceptions\EArbitragePackageException("Dependant package '$namespace' is not loaded!");
 	}
 
 	/**

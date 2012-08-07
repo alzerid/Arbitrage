@@ -22,5 +22,13 @@ class CWebPackage extends CPackage
 		//Update routes
 		$this->getApplication()->getConfig()->webApplication->routes = array_merge($new_route, $routes);
 	}
+
+	/**
+	 * Method retunrs the root URL for this package.
+	 */
+	public function getURL()
+	{
+		return CKernel::getInstance()->convertArbitrageNamespaceToURL($this->getNamespace());
+	}
 }
 ?>
