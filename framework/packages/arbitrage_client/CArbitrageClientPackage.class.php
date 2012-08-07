@@ -1,28 +1,37 @@
 <?
-namespace Framework\ArbitrageClient;
+namespace Framework\Packages\ArbitrageClient;
 
-class CArbitrageClientPackage extends \Framework\Base\CPackage
+class CArbitrageClientPackage extends \Framework\Base\CWebPackage
 {
 	private $_includes;
 
 	public function initialize()
 	{
+		$url = $this->getURL();
+
 		//Initialize include paths
-		$this->_includes = array();
+		$this->_includes = array('arbitrage2' => "/$url/javascript");
 
 		//Initialize the package
 		parent::initialize();
 
 		//Add bootstrap route
-		$route = array('/^\/bootstrap\.js(\?.*)?$/i' => 'framework/arbitrage_client/client/bootstrap');
-		$this->getApplication()->getConfig()->webApplication->routes = array_merge($this->getApplication()->getConfig()->webApplication->routes->toArray(), $route);
+		$this->addRoute('/^\/bootstrap\.js(\?.*)?$/i', $url . '/client/bootstrap');
 
 		//Initialize JS routing
-		parent::initializeJavascript('client');
+		$this->initializeJavascript('client');
 
 		//Add arbitrage javascript
-		\Framework\DOM\CDOMGenerator::addJavascriptTag(array('src' => '/bootstrap.js?action=' . $this->getApplication()->getVirtualURI()));
-		\Framework\DOM\CDOMGenerator::addJavascriptTag(array('src' => '/framework/arbitrage_client/javascript/arbitrage2/base/arbitrage2.js'));
+		\Framework\DOM\CDOMGenerator::addJavascriptTag(array('src' => '/bootstrap.js'));
+		\Framework\DOM\CDOMGenerator::addJavascriptTag(array('src' => "/$url/javascript/arbitrage2/base/arbitrage2.js"));
+	}
+
+	/**
+	 * @return array Returns the include url paths.
+	 */
+	public function getIncludePaths()
+	{
+		return $this->_includes;
 	}
 
 	/**
@@ -33,10 +42,5 @@ class CArbitrageClientPackage extends \Framework\Base\CPackage
 	{
 		$this->_includes[$namespace] = $path;
 	}
-
-	/**
-	 * @param array $config The configuration array to append.
-	 */
-	
 }
 ?>
