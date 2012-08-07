@@ -56,6 +56,11 @@ class CArbitrageConfigProperty extends CArrayObject
 	}
 	/* End Magic Methods */
 
+	public function setData(array &$data)
+	{
+		$this->_data = $data;
+	}
+
 	public function merge(array $config)
 	{
 		foreach($config as $key=>$val)
