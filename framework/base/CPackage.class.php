@@ -34,6 +34,22 @@ class CPackage
 	}
 
 	/**
+	 * Initialize JS the package.
+	 * @param string The controller to use for Javascript Return.
+	 */
+	public function initializeJavascript($controller)
+	{
+		//Create URL
+		$base = CKernel::getInstance()->convertArbitrageNamespaceToURL($this->getNamespace());
+		$url  = "/$base/javascript/";
+		$url  = "/^" . preg_replace('/\//', '\/', $url) . ".*.js$/";
+
+		//Create route
+		$route = array($url => "$base/$controller/getJavascript");
+		$this->getApplication()->getConfig()->webApplication->routes = array_merge($this->getApplication()->getConfig()->webApplication->routes->toArray(), $route);
+	}
+
+	/**
 	 * Returns the config object associated with the package.
 	 * @return \Framework\Base\CArbitrageConfig Returns the arbitrage config object.
 	 */
@@ -92,6 +108,16 @@ class CPackage
 	public function getNamespace()
 	{
 		return $this->_namespace;
+	}
+
+	/**
+	 * Method ensures dependencies are loaded.
+	 * @return string $namespace The namespaced package to check.
+	 */
+	public function depends($namespace)
+	{
+		if(!$this->getApplication()->getPackage($namespace))
+			throw new \Framework\Exceptions\EArbtiragePackageException("Dependant package '$namespace' is not loaded!");
 	}
 
 	/**
