@@ -432,9 +432,7 @@ arbitrage2.main = function(cb_main) {
 	@description Function converts a URL namespace to an arbitrage namespace.
 */
 
-  
-
 //Include other base items
-arbitrage2.bulkRequire('arbitrage2.base.utils', 'arbitrage2.base.ajax', 'arbitrage2.base.cache', 'arbitrage2.base.dbus', 'arbitrage2.base.mvc', 'arbitrage2.base.gui', 'arbitrage2.base.form', function() {
+arbitrage2.bulkRequire('arbitrage2.base.utils', 'arbitrage2.base.ajax', 'arbitrage2.base.cache', 'arbitrage2.base.dbus', 'arbitrage2.base.gui', 'arbitrage2.base.form', function() {
 	arbitrage2.ready = true;
 });
