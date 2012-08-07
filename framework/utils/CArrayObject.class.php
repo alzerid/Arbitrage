@@ -131,6 +131,11 @@ class CArrayObject implements \ArrayAccess, \Iterator
 		return $this->_data;
 	}
 
+	public function unshift($new)
+	{
+		array_unshift($this->_data, $new);
+	}
+
 	public function push($new)
 	{
 		$this->_data[] = $new;
