@@ -23,8 +23,8 @@ class CSPAPackage extends \Framework\Base\CWebPackage
 		$this->getApplication()->getPackage('Framework.Packages.ArbitrageClient')->addIncludePath('spa', "/$url");
 
 		//Add javascript SPA
-		\Framework\DOM\CDOMGenerator::addJavascriptTag(array('src' => "/$url/javascript/spa.js"));
 		\Framework\DOM\CDOMGenerator::addJavascriptTag(array('src' => "/$url/javascript/config.js?action=" . $this->getApplication()->getVirtualURI()));
+		\Framework\DOM\CDOMGenerator::addJavascriptTag(array('src' => "/$url/javascript/spa.js"));
 	}
 }
 ?>
