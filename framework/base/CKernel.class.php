@@ -18,6 +18,9 @@ class CKernel implements ISingleton
 	private $_services;                //List of services managed by the Kernel
 	private $_path;                    //The path of where the framework exists
 
+	private $_bootstrap_web;           //Boolean indicating we included web specific files
+	private $_bootstrap_cli;           //Boolean indicating we included cli specific files
+
 	protected function __construct()
 	{
 		$this->_package_paths = array();
@@ -25,6 +28,9 @@ class CKernel implements ISingleton
 		$this->_applications  = array();
 		$this->_services      = array();
 		$this->_path          = '';
+
+		$this->_bootstrap_web = false;
+		$this->_bootstrap_cli = false;
 	}
 
 	static public function getInstance()
@@ -62,7 +68,6 @@ class CKernel implements ISingleton
 		$this->requireFrameworkFile('Base.CExtension');                      //Extension class
 		$this->requireFrameworkFile('Base.CPackage');                        //Package class
 		$this->requireFrameworkFile('Base.CApplication');                    //Application class
-		$this->requireFrameworkFile('Base.CWebApplication');                 //Web application class
 		$this->requireFrameworkFile('Config.CArbitrageConfig');              //Configuration object
 		$this->requireFrameworkFile('Config.CArbitrageConfigLoader');        //Configuration loader
 	}
@@ -167,31 +172,6 @@ class CKernel implements ISingleton
 	}
 
 	/**
-	 * Creates an application.
-	 * @namespace The root namespace the application resides on.
-	 * @return \Framework\Base\CApplication Returns a web application.
-	 */
-	public function createApplication($namespace)
-	{
-		//Get class 
-		$class = $this->convertArbitrageNamespaceToPHP($namespace);
-		$info  = $this->_requireFile(preg_replace('/\.[^\.]+$/', '.application', $namespace));
-
-		//Ensure this class is of type CApplication
-		if(!is_subclass_of($class, '\Framework\Base\CApplication'))
-			throw new EArbitrageKernelException("Application '$namespace' does not extend CApplication!");
-		
-		//Create application
-		$application = new $class($info['path'], $info['namespace']);
-		$application->initialize();
-
-		//Add application to applications list
-		$this->_applications[] = $application;
-
-		return $application;
-	}
-
-	/**
 	 * Creates a package and returns it.
 	 * @param string $namespace The namespace the package resides on.
 	 * @param \Framework\Base\CPackage $opt_parent The parent package this package will belong to.
@@ -210,6 +190,64 @@ class CKernel implements ISingleton
 		//Initialize package
 		$package->initialize();
 		return $package;
+	}
+
+	/**
+	 * Creates a Web application.
+	 * @namespace The root namespace the application resides on.
+	 * @return \Framework\Base\CApplication Returns a web application.
+	 */
+	public function createWebApplication($namespace)
+	{
+		//Ensure we bootstrap web applications
+		$this->_bootstrapWebApplication();
+
+		//Get class 
+		$class = $this->convertArbitrageNamespaceToPHP($namespace);
+		$info  = $this->_requireFile(preg_replace('/\.[^\.]+$/', '.application', $namespace));
+
+		//Ensure this class is of type CApplication
+		if(!is_subclass_of($class, '\Framework\Base\CApplication'))
+			throw new EArbitrageKernelException("Application '$namespace' does not extend CApplication!");
+
+		//Create application
+		$application = new $class($info['path'], $info['namespace']);
+		$application->initialize();
+
+		//Add application to applications list
+		$this->_applications[] = $application;
+
+		return $application;
+	}
+
+	/**
+	 * Creates a CLI Application.
+	 * @param string $namespace The namespace the application resides in.
+	 * @return \Framework\Base\CCLIApplication Returns a CLI application.
+	 */
+	public function createCLIApplication($namespace)
+	{
+		//Ensure we bootstrap web applications
+		$this->_bootstrapCLIApplication();
+
+		//Get class 
+		$class = $this->convertArbitrageNamespaceToPHP($namespace);
+		$info  = $this->_requireFile(preg_replace('/\.[^\.]+$/', '.application', $namespace));
+
+		//Ensure this class is of type CApplication
+		if(!is_subclass_of($class, '\Framework\Base\CApplication'))
+			throw new EArbitrageKernelException("Application '$namespace' does not extend CApplication!");
+
+		//Create application
+		$application = new $class($info['path'], $info['namespace']);
+		$application->initialize();
+
+		//Add application to applications list
+		$this->_applications[] = $application;
+
+		return $application;
+
+		var_dump($namespace) or die();
 	}
 
 	/**
@@ -416,7 +454,7 @@ class CKernel implements ISingleton
 	 * @param \Framework\Config\CArbitrageConfig $opt_config The local configuration for this package.
 	 * @return \Framework\Base\CApplication Returns a web application.
 	 */
-	public function _createPackage($namespace, \Framework\Base\CPackage $opt_parent=NULL, \Framework\Config\CArbitrageConfigProperty $opt_config=NULL)
+	private function _createPackage($namespace, \Framework\Base\CPackage $opt_parent=NULL, \Framework\Config\CArbitrageConfigProperty $opt_config=NULL)
 	{
 		//Get class
 		$class = $this->convertArbitrageNamespaceToPHP($namespace);
@@ -428,6 +466,30 @@ class CKernel implements ISingleton
 		//Create new application
 		$package = new $class($info['path'], $info['namespace'], $opt_parent, $opt_config);
 		return $package;
+	}
+
+	/**
+	 * Method includes WEB Application files.
+	 */
+	public function _bootstrapWebApplication()
+	{
+		if(!$this->_bootstrap_web)
+		{
+			$this->requireFrameworkFile('Base.CWebApplication');                 //Web application class
+			$this->_bootstrap_web = true;
+		}
+	}
+
+	/**
+	 * Method includes CLI APplicatino files.
+	 */
+	public function _bootstrapCLIApplication()
+	{
+		if(!$this->_bootstrap_cli)
+		{
+			$this->requireFrameworkFile('Base.CCLIApplication');                 //Web application class
+			$this->_bootstrap_cli = true;
+		}
 	}
 }
 ?>
