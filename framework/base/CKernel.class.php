@@ -246,8 +246,6 @@ class CKernel implements ISingleton
 		$this->_applications[] = $application;
 
 		return $application;
-
-		var_dump($namespace) or die();
 	}
 
 	/**
@@ -487,6 +485,8 @@ class CKernel implements ISingleton
 	{
 		if(!$this->_bootstrap_cli)
 		{
+			$this->requireFrameworkFile('CLI.CCommand');
+			$this->requireFrameworkFile('CLI.CArgumentParser');
 			$this->requireFrameworkFile('Base.CCLIApplication');                 //Web application class
 			$this->_bootstrap_cli = true;
 		}
