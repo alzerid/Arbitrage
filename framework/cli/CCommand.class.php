@@ -1,5 +1,7 @@
 <?
-abstract class CCLIParentCommand extends CCLICommand
+namespace Framework\CLI;
+
+abstract class CParentCommand extends CCommand
 {
 	abstract public function commands();
 
@@ -9,7 +11,7 @@ abstract class CCLIParentCommand extends CCLICommand
 	}
 }
 
-abstract class CCLICommand
+abstract class CCommand
 {
 	public $command;
 	public $arguments;
@@ -37,7 +39,7 @@ abstract class CCLICommand
 		$command = new $class($cmd, $args);
 
 		//Resursive if Instance of Subcommand
-		while($command instanceof CCLIParentCommand && $command->isChildCommand($args))
+		while($command instanceof CParentCommand && $command->isChildCommand($args))
 		{
 			$cmd    .= " {$args[0]}";
 			$class   = preg_replace('/command$/i', '', $class) . "_" . $args[0] . "Command";
