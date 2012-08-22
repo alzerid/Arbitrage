@@ -1,11 +1,9 @@
 <?
 namespace Framework\Database;
-use \Framework\Base\CService;
 
-class CDatabaseService extends CService implements \Framework\Interfaces\IAutoLoadListener
+class CDatabaseService extends \Framework\Base\CService implements \Framework\Interfaces\IAutoLoadListener
 {
 	static protected $_SERVICE_TYPE = "database";   //Service type
-	protected $_db_config;                          //Database configuration
 	protected $_drivers;                            //Driver list
 
 	/**
@@ -25,7 +23,6 @@ class CDatabaseService extends CService implements \Framework\Interfaces\IAutoLo
 		$this->requireServiceFile("CModel", array('_service' => $this));   //Model
 
 		//Load necessary drivers
-		$this->_db_config = array();
 		$this->_drivers   = array();
 		$config           = $this->getConfig();
 		$loaded           = array();
@@ -60,6 +57,7 @@ class CDatabaseService extends CService implements \Framework\Interfaces\IAutoLo
 		$key    = ((isset($opt_prop['config']))? $opt_prop['config'] : '_default');
 		$config = $this->getConfig();
 
+		//Check if $key exists in config
 		if(!isset($config[$key]))
 			throw new EDatabaseDriverException("Unable to load config for '$key'.");
 

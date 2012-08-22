@@ -1,6 +1,6 @@
 <?
 namespace Framework\Database;
-abstract class CDatabaseDriver
+abstract class CDatabaseDriver implements \Framework\Interfaces\IDriver
 {
 	protected $_handle;
 	protected $_config;
