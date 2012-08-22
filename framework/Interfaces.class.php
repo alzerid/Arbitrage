@@ -29,6 +29,16 @@ interface IModuleLoader extends ISingleton
 }
 
 /**
+ * IDriver
+ */
+interface IDriver
+{
+	public function __construct($config);
+	public function getHandle();
+	public function getConfig();
+}
+
+/**
  * IAutoLoadListener
  */
 interface IAutoLoadListener
@@ -136,9 +146,11 @@ interface IModel
 /**
  * Remote Cache Interface
  */
-interface IRemoteCache extends ISingleton
+interface IRemoteCache
 {
-	public function connect($address, $port);
+	public function __construct($config);
+
+	public function connect();
 	public function close();
 
 	public function get($key, $serialize=true);
