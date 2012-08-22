@@ -1,31 +1,26 @@
 <?
 namespace Framework\Cache\Remote;
-use \Framework\Interfaces\IRemoteCache;
-use \Framework\Exceptions\EArbitrageRemoteCacheException;
 
-class CRedis implements IRemoteCache
+class CRedisDriver implements \Framework\Interfaces\IDriver, \Framework\Interfaces\IRemoteCache
 {
-	static private $_instance = NULL;
-	private $_cache;
-
-	public function __construct()
+	/**
+	 * Class holds the handle and other information for the driver connection.
+	 * @param $config The config to use for connection purposes.
+	 */
+	public function __construct($config)
 	{
+		$this->_config = $config;
 		$this->_cache = new redis();
 	}
 
-	static public function getInstance()
+	/**
+	 * Method is called to connect to the remote cache server.
+	 */
+	public function connect()
 	{
-		if(self::$_isntance === NULL)
-			self::$_instance = new CMemcache();
-
-		return self::$_instance;
-	}
-
-	public function connect($host, $port)
-	{
-		$ret = @$this->_cache->connect($host, $port);
+		$ret = @$this->_cache->connect($this->_config->host, $this->_config->port);
 		if($ret === false)
-			throw new EArbitrageRemoteCacheException("Unable to connect to memcache '$host:$port'.");
+			throw new EArbitrageRemoteCacheException("Unable to connect to redis server '$host:$port'.");
 	}
 
 	public function close()
@@ -90,5 +85,29 @@ class CRedis implements IRemoteCache
 	{
 		return $this->_cache->rPop($key);
 	}
+
+
+	/***********************/
+	/** IDriver Interface **/
+	/***********************/
+
+	/*
+	 * Method returns the raw handle of the driver.
+	 * @return Returns the handle.
+	 */
+	public function getHandle()
+	{
+		return $this->_handle;
+	}
+
+	/**
+	 * Method retuns the configuration of this driver.
+	 * @returns array Returns driver configuration.
+	 */
+	public function getConfig()
+	{
+		return $this->_config;
+	}
 }
+
 ?>
