@@ -73,6 +73,14 @@ interface IRenderable
 }
 
 /**
+ * Context for rendering.
+ */
+interface IViewFileRenderableContext
+{
+	public function renderContext($file, $_vars=NULL);
+}
+
+/**
  * Content Renderable Interface
  */
 interface IContentRenderable extends IRenderable
@@ -87,6 +95,7 @@ interface IViewFileRenderable extends IRenderable
 {
 	public function initialize($application, $content);
 	public function renderPartial($file, $vars);
+	public function setContext(\Framework\Interfaces\IViewFileRenderableContext $ctx);
 }
 
 /**
