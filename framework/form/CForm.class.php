@@ -1,8 +1,8 @@
 <?
 namespace Framework\Forms;
-use \Framework\HTML\CHTMLComponent;
+use \Framework\DOM\CDomGenerator;
 
-Class CForm extends CHTMLComponent
+Class CForm extends CDomGenerator
 {
 	protected $_values;
 	private $_attributes;
@@ -19,18 +19,12 @@ Class CForm extends CHTMLComponent
 
 
 		//Merge properties
-		$properties = self::_mergeProperties($defaults, $properties);
-
+		$properties        = self::_mergeProperties($defaults, $properties);
 		$this->_values     = $properties['values'];
 		$this->_attributes = $properties['attributes'];
 
-		//check if $values is a model
-		if($this->_values instanceof CModel)
-		{
-			$this->_model  = get_class($this->_values);
-			$this->_values = $this->_values->toArray();
-		}
-		elseif($this->_values instanceof \Framework\Model2\CModel)
+		//Check value type
+		if($this->_values instanceof \Framework\Database\CModel)
 			$this->_model = get_class($this->_values);
 		elseif($this->_values === NULL)
 			$this->_values = array();
@@ -40,11 +34,12 @@ Class CForm extends CHTMLComponent
 	{
 		if(preg_match('/Form$/', $class_name))
 		{
-			$path = CApplication::getConfig()->_internals->approotpath . "app/forms/$class_name.php";
-			if(!file_exists($path))
-				throw new EArbitrageException("Form '$class_name' does not exist.");
+			$namespace = \Framework\Base\CKernel::getInstance()->convertPHPNamespaceToArbitrage($class_name);
+			$ret       = \Framework\Base\CKernel::getInstance()->requireFile($namespace, false);
 
-			require_once($path);
+			//Throw exception if unable to load form
+			if(!$ret)
+				throw new \Framework\Exceptions\EArbitrageException("Unable to load form '$namespace'.");
 		}
 	}
 
@@ -118,11 +113,12 @@ Class CForm extends CHTMLComponent
 
 	public function submitted()
 	{
+		die("submitted");
 	}
 
 	public function __get($name)
 	{
-		$arr = new CArrayObject($this->_values);
+		$arr = new \Framework\Utils\CArrayObject($this->_values);
 		return $arr->$name;
 	}
 
@@ -142,7 +138,7 @@ Class CForm extends CHTMLComponent
 		$value   = ((isset($value))? $value: '');
 		$attribs = array_merge($attribs, array('value' => $value));
 		$id      = $this->_normalizeName($id);
-		return CHTMLComponent::inputText($this->_prependFormID($id), $attribs);
+		return CDomGenerator::inputText($this->_prependFormID($id), $attribs);
 	}
 
 	public function password($id, $attribs=array())
@@ -151,7 +147,7 @@ Class CForm extends CHTMLComponent
 		$value   = ((isset($value))? $value: '');
 		$attribs = array_merge($attribs, array('value' => $value));
 		$id      = $this->_normalizeName($id);
-		return CHTMLComponent::inputPassword($this->_prependFormID($id), $attribs);
+		return CDomGenerator::inputPassword($this->_prependFormID($id), $attribs);
 	}
 
 	public function select($id, $values, $attribs=array(), $default=array())
@@ -162,7 +158,7 @@ Class CForm extends CHTMLComponent
 
 		$default = array_merge($default, $d);
 		$id      = $this->_normalizeName($id);
-		return CHTMLComponent::inputSelect($this->_prependFormID($id), $values, $attribs, $default);
+		return CDomGenerator::inputSelect($this->_prependFormID($id), $values, $attribs, $default);
 	}
 
 	public function multiSelect($id, $values, $attribs=array(), $default=array())
@@ -179,21 +175,21 @@ Class CForm extends CHTMLComponent
 			$selected = $default;
 
 		$id      = $this->_normalizeName($id);
-		return CHTMLComponent::inputMultiSelect($this->_prependFormID($id), $values, $attribs, $selected);
+		return CDomGenerator::inputMultiSelect($this->_prependFormID($id), $values, $attribs, $selected);
 	}
 
 	public function selectState($id, $attribs=array(), $default=array())
 	{
 		$default = ((count($default) == 0)? $this->_getValue($id) : $default);
 		$id = $this->_normalizeName($id);
-		return CHTMLComponent::inputStateSelector($id, $attribs, $default);
+		return CDomGenerator::inputStateSelector($id, $attribs, $default);
 	}
 
 	public function textArea($id, $value=NULL, $attribs=array())
 	{
 		$value   = (($value === NULL)? $this->_getValue($id) : $value);
 		$id      = $this->_normalizeName($id);
-		return CHTMLComponent::inputTextArea($this->_prependFormID($id), $value, $attribs);
+		return CDomGenerator::inputTextArea($this->_prependFormID($id), $value, $attribs);
 	}
 
 	public function file($id, $attribs=array())
@@ -203,7 +199,7 @@ Class CForm extends CHTMLComponent
 		$attribs = array_merge($attribs, array('value' => $value));
 		$id      = $this->_normalizeName($id);
 
-		return CHTMLComponent::inputFile($this->_prependFormID($id), $attribs);
+		return CDomGenerator::inputFile($this->_prependFormID($id), $attribs);
 	}
 
 	public function checkbox($id, $attribs=array())
@@ -213,22 +209,22 @@ Class CForm extends CHTMLComponent
 			$attribs = array_merge($attribs, array('checked' => 'checked'));
 
 		$id = $this->_normalizeName($id);
-		return CHTMLComponent::inputCheckbox($this->_prependFormID($id), $attribs);
+		return CDomGenerator::inputCheckbox($this->_prependFormID($id), $attribs);
 	}
 
 	public function button($id, $value, $attribs=array())
 	{
-		return CHTMLComponent::inputButton($this->_prependFormID($id), $value, $attribs);
+		return CDomGenerator::inputButton($this->_prependFormID($id), $value, $attribs);
 	}
 
 	public function submit($id, $value, $attribs=array())
 	{
-		return CHTMLComponent::submitButton($this->_prependFormID($id), $value, $attribs);
+		return CDomGenerator::submitButton($this->_prependFormID($id), $value, $attribs);
 	}
 	
 	public function imageSubmit($id, $valid, $src, $attribs=array())
 	{
-		return CHTMLComponent::imageSubmitButton($this->_prependFormID($id), $value, $src, $attribs);
+		return CDomGenerator::imageSubmitButton($this->_prependFormID($id), $value, $src, $attribs);
 	}
 
 	public function hidden($id, $value=NULL, $attribs=array())
@@ -302,4 +298,7 @@ Class CForm extends CHTMLComponent
 		return (($this->_prepend_name)? "{$this->_attributes['id']}_$id" : $id);
 	}
 }
+
+//Register autoload for form
+spl_autoload_register('\Framework\Forms\CForm::autoLoad', true);
 ?>
