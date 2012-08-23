@@ -36,6 +36,8 @@ class CWebApplication extends CApplication
 		CKernel::getInstance()->requireFrameworkFile('Base.CWebPackage');
 		CKernel::getInstance()->requireFrameworkFile('Utils.CFlashPropertyObject');
 		CKernel::getInstance()->requireFrameworkFile('DOM.CDOMGenerator');
+		CKernel::getInstance()->requireFrameworkFile('Form.CForm');
+		CKernel::getInstance()->requireFrameworkFile('Form.CRenderableForm');
 
 		//Create router instance and route
 		$this->_router      = new CRouter($this->getConfig()->webApplication->routes);
@@ -227,6 +229,34 @@ class CWebApplication extends CApplication
 
 		return $ret;
 	}
+
+	/**
+	 * Method returns the current controller.
+	 * @return \Framework\Base\CController Returns the current controller.
+	 */
+	public function getController()
+	{
+		return ((isset($this->_controller_queue[0]))? $this->_controller_queue[0] : NULL);
+	}
+
+	/**
+	* Method converts an Arbitrage Namespace to a filesystem path locating the view directory.
+	* @param string $namespace The namespace to convert.
+	* @return Returns a filesystem path.
+	*/
+	public function getViewPathFromArbitrageNamespace($namespace)
+	{
+		//Get file
+		$path = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPath($namespace);
+		$path = explode('/', $path);
+		$file = array_splice($path, -1);
+		$file = $file[0];
+
+		//insert into array
+		array_splice($path, -1, 0, array('views'));
+		return implode('/', $path) . "/$file";
+	}
+
 
 	/** Overloaded Error Handling Methods **/
 

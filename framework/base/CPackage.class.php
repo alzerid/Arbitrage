@@ -85,7 +85,6 @@ class CPackage
 		return $this->_path;
 	}
 
-
 	/**
 	 * Method returns the namespace of this package.
 	 * @return string Returns the namespace of this package.

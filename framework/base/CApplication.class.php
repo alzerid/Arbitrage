@@ -12,7 +12,7 @@ abstract class CApplication extends CPackage implements \Framework\Interfaces\IE
 	public function initialize()
 	{
 		//Set arrays
-		$this->_packages           = array();
+		$this->_packages            = array();
 		$this->_auto_load_listeners = array();
 
 		//Setup error handler
