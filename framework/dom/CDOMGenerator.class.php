@@ -56,10 +56,10 @@ class CDOMGenerator
 		return $out;
 	}
 
-	public static function label($tag, $attribs=array())
+	public static function labelTag($label, $attribs=array())
 	{
 		$attribs = CDOMGenerator::generateAttribs($attribs);
-		$html    = "<label $attribs>$tag</label>\n";
+		$html    = "<label $attribs>$label</label>\n";
 
 		return $html;
 	}
