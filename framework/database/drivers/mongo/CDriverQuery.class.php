@@ -61,12 +61,15 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 
 	public function save($data)
 	{
-		die('save');
 		$this->_cmd   = "save";
 		$this->_query = NULL;
 		$this->_data  = $data;
 
-		return $this;
+		//Create results class
+		$results = new CModelResults($this);
+
+		//Execute
+		return $this->execute($results);
 	}
 
 	public function remove($query)
@@ -151,8 +154,6 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 		}
 		elseif($this->_cmd == "save")
 		{
-			die("CMongoModel::execute SAVE");
-
 			$handle->save($this->_data);
 			return $this->_data['_id'];
 		}

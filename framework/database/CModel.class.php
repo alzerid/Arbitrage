@@ -8,12 +8,15 @@ abstract class CModel extends \Framework\Database\Types\CModelData
 
 	public function __construct(array &$originals=array(), array &$variables=array())
 	{
+		parent::__construct();
+
 		$class      = get_called_class();
 		$properties = self::properties();
 		if(isset($properties['idKey']))
 			self::$_ID_KEYS[$class] = $properties['idKey'];
 
-		parent::__construct($originals, $variables);
+		//Set model data
+		$this->_setModelData($originals);
 	}
 
 	//Loads the model specified into memory
@@ -125,7 +128,6 @@ abstract class CModel extends \Framework\Database\Types\CModelData
 
 	public function save()
 	{
-		die("CModel::save");
 		$this->_merge();
 		$vars = $this->toArray();
 
@@ -134,7 +136,7 @@ abstract class CModel extends \Framework\Database\Types\CModelData
 			$vars[self::$_ID_KEYS[get_called_class()]] = $this->_idVal;
 
 		//Call
-		$id = self::query()->save($vars)->execute();
+		$id = self::query()->save($vars);
 
 		if($this->_idVal === NULL)
 			$this->_idVal = $id;
