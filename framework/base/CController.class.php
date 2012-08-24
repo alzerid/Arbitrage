@@ -217,6 +217,16 @@ abstract class CController implements IController
 	{
 		return $this->_application;
 	}
+
+	/**
+	 * Method returns the $_REQUEST in CArrayObject format.
+	 * @return \Framework\Utils\CArrayObject Returns the $_REQUEST.
+	 */
+	public function getRequest()
+	{
+		return $this->_request;
+	}
+
 	/**
 	 * Renders a partial using a view file.
 	 * @param string $file The view file to render
@@ -232,6 +242,27 @@ abstract class CController implements IController
 			die('$controller->renderPartial');
 		}
 	}
+
+	/**
+	 * Method redirects to another url.
+	 * @param string $namespace The namespace to redirect to.
+	 */
+	public function redirect($namespace)
+	{
+		$url = "/" . \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToURL($namespace);
+		$this->redirectURL($url);
+	}
+
+	/**
+	 * Method redirects to another url.
+	 * @param string $namespace The namespace to redirect to.
+	 */
+	public function redirectURL($url)
+	{
+		header("Location: $url");
+		die();
+	}
+
 
 	/**
 	 * Method forwards execution to another controller specified by Arbitrage namespace.
