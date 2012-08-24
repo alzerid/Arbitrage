@@ -37,6 +37,7 @@ class CWebApplication extends CApplication
 		CKernel::getInstance()->requireFrameworkFile('Utils.CFlashPropertyObject');
 		CKernel::getInstance()->requireFrameworkFile('DOM.CDOMGenerator');
 		CKernel::getInstance()->requireFrameworkFile('Form.CForm');
+		CKernel::getInstance()->requireFrameworkFile('Form.CSubmittedForm');
 		CKernel::getInstance()->requireFrameworkFile('Form.CRenderableForm');
 
 		//Create router instance and route
