@@ -22,6 +22,9 @@ Class CForm extends CDomGenerator
 		$properties        = self::_mergeProperties($defaults, $properties);
 		$this->_values     = $properties['values'];
 		$this->_attributes = $properties['attributes'];
+		
+		//Normalize name
+		$this->_attributes['id'] = preg_replace('/\\\/', '_', $this->_attributes['id']);
 
 		//Check value type
 		if($this->_values instanceof \Framework\Database\CModel)
@@ -43,17 +46,21 @@ Class CForm extends CDomGenerator
 		}
 	}
 
-	static public function getSubmittedForm($class="CForm")
+	static public function getSubmittedForm($class="Framework.Forms.CForm")
 	{
-		$controller = CApplication::getInstance()->getController();
+		$controller = \Framework\Base\CKernel::getInstance()->getApplication()->getController();
 		$request    = $controller->getRequest();
-		if(isset($request['_form']))
+		if(!empty($request->_form))
 		{
 			//Parse form properties
-			list($vals, $model) = self::_parseFormProperties(preg_replace('/\-form$/', '', $request['_form']), $request);
+			list($vals, $model) = self::_parseFormProperties(preg_replace('/\-form$/', '', $request->_form), $request);
 
+			//Create model if the form was attached to one
 			if($model !== NULL)
 				$vals = new $model($vals);
+
+			//Convert to PHP
+			$class = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP($class);
 
 			return new CSubmittedForm(new $class(array('values' => $vals)));
 		}
@@ -86,12 +93,19 @@ Class CForm extends CDomGenerator
 		$vals  = array();
 		$model = NULL;
 
-		foreach($properties as $key=>$val)
+		//Get properties
+		foreach($properties as $form=>$entries)
 		{
-			if(preg_match('/^' . $form_id . '_/i', $key) && $key !== "{$form_id}__model")
+			if($form_id == $form)
+			{
+				$vals = $entries;
+				break;
+			}
+			
+			/*if(preg_match('/^' . $form_id . '_/i', $key) && $key !== "{$form_id}__model")
 				$vals[preg_replace('/^' . $form_id . '_/i', '', $key)] = $val;
 			elseif($key === "{$form_id}__model")
-				$model = $val;
+				$model = $val;*/
 		}
 
 		return array($vals, $model);
@@ -106,14 +120,24 @@ Class CForm extends CDomGenerator
 		return new $class($this->_values);
 	}
 
+	/**
+	 * Method converts form values to a Model.
+	 * @param string $namespace The namespace where the Model resides.
+	 * @returns Returns the model.
+	 */
+	public function convertToModel($namespace)
+	{
+		//Get class
+		$class  = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP($namespace);
+		$values = $this->_values;
+
+		//Create new model class
+		return new $class($values);
+	}
+
 	public function toArray()
 	{
 		return $this->_values;
-	}
-
-	public function submitted()
-	{
-		die("submitted");
 	}
 
 	public function __get($name)
@@ -130,6 +154,14 @@ Class CForm extends CDomGenerator
 
 		$attrs = trim($attrs);
 		echo "<form $attrs>\n";
+	}
+
+	public function label($label, $attribs=array())
+	{
+		if(!empty($attribs['for']))
+			$attribs['for'] = $this->_normalizeName($attribs['for']);
+
+		return CDomGenerator::labelTag($label, $attribs);
 	}
 
 	public function text($id, $attribs=array())
@@ -277,18 +309,13 @@ Class CForm extends CDomGenerator
 	private function _normalizeName($name)
 	{
 		//Dot notation to array notation
-		$key = explode(".", $name);
-		if(count($key) > 1)
-		{
-			$value = $key[0];
-			for($i=1; $i<count($key); $i++)
-				$value .= "[{$key[$i]}]";
-		}
-		else
-			$value = $name;
+		$key   = explode(".", $name);
+		$value = "";
+		for($i=0; $i<count($key); $i++)
+			$value .= "[{$key[$i]}]";
 
 		//Prepend form name
-		$value = "{$this->_attributes['id']}_$value";
+		$value = "{$this->_attributes['id']}$value";
 
 		return $value;
 	}
