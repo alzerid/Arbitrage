@@ -1,15 +1,13 @@
 <?
 namespace Framework\Forms;
-use \Framework\Forms\CForm;
 
 class CSubmittedForm
 {
 	private $form;
 
-	public function __construct(CForm $form)
+	public function __construct(\Framework\Forms\CForm $form)
 	{
 		$this->_form = $form;
-		$this->_form->submitted();
 	}
 	
 	public function __get($name)

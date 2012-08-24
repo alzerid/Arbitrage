@@ -39,8 +39,8 @@ Class CRenderableForm extends CForm implements \Framework\Interfaces\IViewFileRe
 		$path = explode('/', $path);
 
 		//Normalize file
-		$file   = array_splice($path, -1);
-		$file   = strtolower(preg_replace('/([a-z0-9])([A-Z])/', '$1_$2' , $file[0]));
+		$file = array_splice($path, -1);
+		$file = strtolower(preg_replace('/([a-z0-9])([A-Z])/', '$1_$2' , $file[0]));
 
 		//Implode
 		$path = implode('/', $path);
