@@ -202,6 +202,30 @@ class CArrayObject implements \ArrayAccess, \Iterator
 		return $ret;
 	}
 
+	/**
+	 * Recursively merges an array.
+	 * @return Returns a merged array.
+	 */
+	static public function mergeArray(array &$array1, &$array2=NULL)
+	{
+		$merged = $array1;
+		if(is_array($array2))
+		{
+			foreach($array2 as $key=>$val)
+			{
+				if(!isset($merged[$key]))
+					$merged[$key] = array();
+
+				if(is_array($array2[$key]))
+					$merged[$key] = is_array($merged[$key]) ? self::mergeArray($merged[$key], $array2[$key]) : $array2[$key];
+				else
+					$merged[$key] = $val;
+			}
+		}
+
+		return $merged;
+	}
+
 	static public function mergeArrayObject(CArrayObject $obj1, CArrayObject $obj2)
 	{
 		$ret = array_merge($obj1->toArray(), $obj2->toArray());
