@@ -142,14 +142,14 @@ interface IAction
  */
 interface IModel
 {
-	public function save();
+	/*public function save();
 	public function update();
 	public function getID();
 
 	//Bulk/Single operations
 	public function findAll($condition = array());
 	public function findOne($condition = array());
-	public function remove($condition = array());
+	public function remove($condition = array());*/
 }
 
 /**
