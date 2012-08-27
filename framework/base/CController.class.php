@@ -15,7 +15,7 @@ abstract class CController implements IController
 	protected $_session;          //Session
 	protected $_files;            //List of files uploaded
 	protected $_flash;            //Flash variables
-	protected $_view_variables;   //View variables that will passed into the view
+	protected $_view;             //View variables that will passed into the view
 	protected $_application;      //The application the controller belongs to
 	protected $_package;          //The package the controller belongs to
 
@@ -36,15 +36,15 @@ abstract class CController implements IController
 		$session = ((isset($_SESSION))? $_SESSION : array());
 
 		//Setup PHP variables
-		$this->_get            = new CArrayObject($_GET);
-		$this->_post           = new CArrayObject($_POST);
-		$this->_request        = new CArrayObject($_REQUEST);
-		$this->_session        = new CArrayObject($session);
-		$this->_files          = new CArrayObject($files);
-		$this->_cookie         = new CArrayObject($_COOKIE);
-		$this->_view_variables = new CArrayObject();
-		$this->_chain          = new CFilterChain($this);
-		$this->_flash          = NULL;
+		$this->_get     = new CArrayObject($_GET);
+		$this->_post    = new CArrayObject($_POST);
+		$this->_request = new CArrayObject($_REQUEST);
+		$this->_session = new CArrayObject($session);
+		$this->_files   = new CArrayObject($files);
+		$this->_cookie  = new CArrayObject($_COOKIE);
+		$this->_view    = new CArrayObject();
+		$this->_chain   = new CFilterChain($this);
+		$this->_flash   = NULL;
 
 		//Set controller variables
 		$this->_namespace = CKernel::getInstance()->convertPHPNamespaceToArbitrage(get_class($this));
@@ -151,6 +151,18 @@ abstract class CController implements IController
 			session_start();
 			$this->_session = new CArrayObject($_SESSION);
 		}
+	}
+
+	/**
+	 * Method resets the PHP session.
+	 */
+	public function resetSession()
+	{
+		if(!isset($_SESSION))
+			session_start();
+
+		session_unset();
+		session_destroy();
 	}
 
 	/**
@@ -315,7 +327,7 @@ abstract class CController implements IController
 
 				//Add _controller and _application
 				!isset($content['variables']) && $content['variables'] = array();
-				$content['variables'] = array_merge($content['variables'], array('_controller' => $this, '_application' => $this->_application));
+				$content['variables'] = array_merge($content['variables'], array('_controller' => $this, '_application' => $this->_application), $this->_view->toArray());
 
 				//Initialize
 				$renderable->initialize($path, $content);
