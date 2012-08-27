@@ -1,14 +1,8 @@
 <?
 namespace Framework\HTML;
-use \Framework\HTML\CHTMLDataTable;
 
-class CHTMLDivDataTable extends CHTMLDataTable
+class CHTMLDivDataTable extends \Framework\HTML\CHTMLDataTable
 {
-	public function __construct($id, $headers, $data, $attrs=array())
-	{
-		parent::__construct($id, $headers, $data, $attrs);
-	}
-	
 	public function render()
 	{
 		$attrs = CHTMLComponent::generateAttribs($this->_attrs);

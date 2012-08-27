@@ -1,8 +1,7 @@
 <?
 namespace Framework\HTML;
-use \Framework\Interfaces\IHTMLDataTable;
 
-class CHTMLDataTable implements IHTMLDataTable
+class CHTMLDataTable implements \Framework\Interfaces\IHTMLDataTable
 {
 	protected $_headers;
 	protected $_data;
@@ -72,7 +71,7 @@ class CHTMLDataTable implements IHTMLDataTable
 					$arr = new CArrayObject($entry);
 					$val = $this->_normalizeValue($arr->xpath($val));
 				}
-				elseif($val instanceof IHTMLDataTableEntry)
+				elseif($val instanceof \Framework\Interfaces\IHTMLDataTableEntry)
 					$val = $val->render($this, $entry);
 
 				$html .= "<td>$val</td>";
