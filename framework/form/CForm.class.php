@@ -2,11 +2,10 @@
 namespace Framework\Forms;
 use \Framework\DOM\CDomGenerator;
 
-Class CForm extends CDomGenerator
+Class CForm extends CFormModel
 {
 	protected $_values;
 	private $_attributes;
-	private $_model;
 
 	public function __construct($properties=array())
 	{
@@ -19,18 +18,16 @@ Class CForm extends CDomGenerator
 
 
 		//Merge properties
-		$properties        = self::_mergeProperties($defaults, $properties);
-		$this->_values     = $properties['values'];
+		$properties        = \Framework\Utils\CArrayObject::mergeArray($defaults, $properties);
 		$this->_attributes = $properties['attributes'];
+		$this->_values     = $properties['values'];
 		
 		//Normalize name
 		$this->_attributes['id'] = preg_replace('/\\\/', '_', $this->_attributes['id']);
 
-		//Check value type
-		if($this->_values instanceof \Framework\Database\CModel)
-			$this->_model = get_class($this->_values);
-		elseif($this->_values === NULL)
-			$this->_values = array();
+		//Get value and create a CFormMOdel
+		$values        = (($this->_values === NULL)? array() : (($this->_values instanceof \Framework\Interfaces\IModel)? $this->_values->toArray() : $this->_values));
+		$this->_values = new CFormModel($values);
 	}
 
 	static public function autoLoad($class_name)
@@ -68,26 +65,6 @@ Class CForm extends CDomGenerator
 		return NULL;
 	}
 
-	static protected function _mergeProperties(array &$array1, &$array2=NULL)
-	{
-		$merged = $array1;
-		if(is_array($array2))
-		{
-			foreach($array2 as $key=>$val)
-			{
-				if(!isset($merged[$key]))
-					$merged[$key] = array();
-
-				if(is_array($array2[$key]))
-					$merged[$key] = is_array($merged[$key]) ? self::_mergeProperties($merged[$key], $array2[$key]) : $array2[$key];
-				else
-					$merged[$key] = $val;
-			}
-		}
-
-		return $merged;
-	}
-
 	static private function _parseFormProperties($form_id, $properties)
 	{
 		$vals  = array();
@@ -111,41 +88,50 @@ Class CForm extends CDomGenerator
 		return array($vals, $model);
 	}
 
-	public function getModel()
+	/*public function getModel()
 	{
 		if(!isset($this->_model))
 			return NULL;
 
 		$class = $this->_model;
 		return new $class($this->_values);
-	}
+	}*/
 
 	/**
 	 * Method converts form values to a Model.
-	 * @param string $namespace The namespace where the Model resides.
+	 * @param string $opt_namespace The namespace where the Model resides.
 	 * @returns Returns the model.
 	 */
-	public function convertToModel($namespace)
+	public function convertToDatabaseModel($opt_namespace="")
 	{
+		//If namespace is not set, use internal namespace
+		if($opt_namespace == "")
+		{
+			die("CForm::convertToDatabaseModel");
+		}
+
 		//Get class
-		$class  = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP($namespace);
+		$class  = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP($opt_namespace);
 		$values = $this->_values;
 
-		//Create new model class
-		return new $class($values);
+		//Convert values to model values
+		return $this->_values->convertToDatabaseModel($opt_namespace);
 	}
 
-	public function toArray()
+	/*public function toArray()
 	{
-		return $this->_values;
+		return $this->_values->toArray();
 	}
 
 	public function __get($name)
 	{
 		$arr = new \Framework\Utils\CArrayObject($this->_values);
 		return $arr->$name;
-	}
+	}*/
 
+	/**
+	 * Method starts the form
+	 */
 	public function start()
 	{
 		$attrs = "";
@@ -272,6 +258,8 @@ Class CForm extends CDomGenerator
 	{
 		if(isset($this->_model))
 		{
+			//TODO: Recode to use idVal
+			die("CForm::end -- code idVal");
 			echo $this->hidden('_id', (string) $this->_values['_id']);
 			echo $this->hidden('_model', $this->_model);
 		}
