@@ -92,21 +92,21 @@ Class CForm extends CFormModel
 		return array($vals, $model);
 	}
 
-	/*public function getModel()
+	/**
+	 * Method returns the form model.
+	 * @return \Framework\Froms\FormModel Returns the values in Form Model format.
+	 */
+	public function getFormModel()
 	{
-		if(!isset($this->_model))
-			return NULL;
-
-		$class = $this->_model;
-		return new $class($this->_values);
-	}*/
+		return $this->_values;
+	}
 
 	/**
 	 * Method converts form values to a Model.
 	 * @param string $opt_namespace The namespace where the Model resides.
 	 * @returns Returns the model.
 	 */
-	public function convertToDatabaseModel($opt_namespace="")
+	public function getDatabaseModel($opt_namespace="")
 	{
 		//If namespace is not set, use internal namespace
 		if($opt_namespace == "")
@@ -121,17 +121,6 @@ Class CForm extends CFormModel
 		//Convert values to model values
 		return $this->_values->convertToDatabaseModel($opt_namespace);
 	}
-
-	/*public function toArray()
-	{
-		return $this->_values->toArray();
-	}
-
-	public function __get($name)
-	{
-		$arr = new \Framework\Utils\CArrayObject($this->_values);
-		return $arr->$name;
-	}*/
 
 	/**
 	 * Method starts the form
@@ -255,7 +244,7 @@ Class CForm extends CFormModel
 			$value = $this->_getValue($id);
 
 		$id = $this->_normalizeName($id);
-		return parent::inputHidden($this->_prependFormID($id), $value, $attribs);
+		return CDomGenerator::inputHidden($this->_prependFormID($id), $value, $attribs);
 	}
 
 	public function end()
