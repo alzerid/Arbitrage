@@ -23,13 +23,24 @@ class CModelResults extends \Framework\Database\CModelResults
 
 	public function offsetGet($offset)
 	{
-		if($this->_raw == NULL)
-			$this->_raw = iterator_to_array($this->_results, false);
+		//Check if we even queried
+		if($this->_results == NULL)
+			$this->_executeQuery();
 
-		if(!isset($this->_raw[$offset]))
-			return NULL;
+		if($this->_results != NULL)
+		{
+			if(!is_array($this->_results) && $this->_raw == NULL)
+				$this->_raw = iterator_to_array($this->_results, false);
+			elseif(is_array($this->_results))
+				$this->_raw = $this->_results;
 
-		return$this->_getModel($this->_raw[$offset]);
+			if(!isset($this->_raw[$offset]))
+				return NULL;
+
+			return$this->_getModel($this->_raw[$offset]);
+		}
+
+		return NULL;
 	}
 
 	public function offsetSet($offset, $value)

@@ -5,11 +5,10 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 {
 	public function findOne($query=array())
 	{
-		die('findOne');
 		$this->_cmd   = 'findOne';
 		$this->_query = $query;
 
-		return $this;
+		return new CModelResults($this);
 	}
 
 	public function findAll($query=array())
@@ -113,14 +112,10 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 				if($res->count() > 0)
 					return $res;
 			}
-			elseif($this->_cmd == "count")
-				return $res;
+			elseif($this->_cmd == "findOne")
+				return array($res);
 			else
-			{
-				die("FIND ONE");
-				$class = $this->_class;
-				return $class::model($res);
-			}
+				return $res;
 		}
 		elseif($this->_cmd == "update")
 		{
