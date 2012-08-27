@@ -1,7 +1,7 @@
 <?
 namespace Framework\Database;
 
-abstract class CModel extends \Framework\Database\Types\CModelData
+abstract class CModel extends \Framework\Database\Types\CModelData implements \Framework\Interfaces\IModel
 {
 	static private $_ID_KEYS = array();
 	private $_idVal=NULL;
@@ -25,7 +25,7 @@ abstract class CModel extends \Framework\Database\Types\CModelData
 		if($class === NULL)
 			$class = get_called_class();
 
-		new $class;
+		return new $class;
 	}
 
 	/* Called when one wants to create a model with the data
