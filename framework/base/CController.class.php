@@ -246,10 +246,18 @@ abstract class CController implements IController
 	/**
 	 * Method redirects to another url.
 	 * @param string $namespace The namespace to redirect to.
+	 * @param array $parameters Parameters to pass.
 	 */
-	public function redirect($namespace)
+	public function redirect($namespace, $parameters=array())
 	{
 		$url = "/" . \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToURL($namespace);
+		if(count($parameters))
+		{
+			$params = http_build_query($parameters);
+			$url   .= "?$params";
+		}
+
+		//Redirect URL
 		$this->redirectURL($url);
 	}
 
