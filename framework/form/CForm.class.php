@@ -6,6 +6,8 @@ Class CForm extends CFormModel
 {
 	protected $_values;
 	private $_attributes;
+	private $_prepend_name;
+	private $_model;
 
 	public function __construct($properties=array())
 	{
@@ -18,15 +20,17 @@ Class CForm extends CFormModel
 
 
 		//Merge properties
-		$properties        = \Framework\Utils\CArrayObject::mergeArray($defaults, $properties);
-		$this->_attributes = $properties['attributes'];
-		$this->_values     = $properties['values'];
+		$properties          = \Framework\Utils\CArrayObject::mergeArray($defaults, $properties);
+		$this->_attributes   = $properties['attributes'];
+		$this->_values       = $properties['values'];
+		$this->_prepend_name = false;
 		
 		//Normalize name
 		$this->_attributes['id'] = preg_replace('/\\\/', '_', $this->_attributes['id']);
 
 		//Get value and create a CFormMOdel
 		$values        = (($this->_values === NULL)? array() : (($this->_values instanceof \Framework\Interfaces\IModel)? $this->_values->toArray() : $this->_values));
+		$this->_model  = (($this->_values instanceof \Framework\Interfaces\IModel)? get_class($this->_values) : NULL);
 		$this->_values = new CFormModel($values);
 	}
 
