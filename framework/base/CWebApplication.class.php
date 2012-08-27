@@ -90,6 +90,16 @@ class CWebApplication extends CApplication
 	}
 
 	/**
+	 * Method returns the virtual URI in Arbitrage format.
+	 * @return string Returns the Aribtrage formatted URL.
+	 */
+	public function getURIArbitrageNamespace()
+	{
+		return \Framework\Base\CKernel::getInstance()->convertURLNamespaceToArbitrage($this->getVirtualURI());
+	}
+
+
+	/**
 	 * Method returns the current routes for the application.
 	 * @return \Framework\Config\CArbitrageConfigProperty Returns the routes.
 	 */
