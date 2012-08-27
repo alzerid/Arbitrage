@@ -79,6 +79,8 @@ final class EArbitrageRenderableException extends \Exception { }
 final class EWebApplicationException extends \Exception { }
 final class EPHPApplicationException extends \Exception { }
 final class EDatabaseDriverException extends \Exception { }
+final class EModelException extends \Exception { };
+final class EModelDataException extends \Exception { };
 final class EArbitrageConfigException extends EArbitrageException { }
 final class EArbitrageRemoteCacheException extends EArbitrageException { }
 final class EArrayObjectException extends EArbitrageException { }
