@@ -1,7 +1,7 @@
 <?
 namespace Framework\HTML;
 
-class CHTMLDataTable implements \Framework\Interfaces\IHTMLDataTable
+class CDataTable implements \Framework\Interfaces\IHTMLDataTable
 {
 	protected $_headers;
 	protected $_data;

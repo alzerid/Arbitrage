@@ -1,8 +1,7 @@
 <?
 namespace Framework\HTML;
-use \Framework\HTML\CHTMLDataTable;
 
-class CHTMLDataTableModel extends CHTMLDataTable
+class CDataTableModel extends \Framework\HTML\CDataTable
 {
 	public function __construct($id, $headers, $data, $attrs=array())
 	{

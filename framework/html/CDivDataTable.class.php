@@ -1,7 +1,7 @@
 <?
 namespace Framework\HTML;
 
-class CHTMLDivDataTable extends \Framework\HTML\CHTMLDataTable
+class CDivDataTable extends \Framework\HTML\CDataTable
 {
 	public function render()
 	{
