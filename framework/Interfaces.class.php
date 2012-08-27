@@ -229,7 +229,7 @@ interface IHTMLDataTable
 	public function render();
 }
 
-interface IHTMLDataTableEntry
+interface IHTMLDataTableType
 {
 	public function render(IHTMLDataTable $table, array $entry);
 }
