@@ -8,7 +8,7 @@ class CModelHashData extends CModelData
 	public function __construct($class)
 	{
 		parent::__construct();
-		$this->_class = $class;
+		$this->_class = \Framework\Base\CKernel::getInstance()->convertArbitrageNameToPHP($class);
 	}
 
 	protected function _setData($name, $val)
