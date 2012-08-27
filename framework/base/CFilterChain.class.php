@@ -13,6 +13,9 @@ class CFilterChain
 		$this->_controller = $controller;
 		$this->_filters    = $this->_controller->filters();
 		$this->_propagate  = true;
+
+		if(!is_array($this->_filters))
+			throw new \Framework\Exceptions\EArbitrageException('Controller filter functions must return an array! "' . gettype($this->_filters) . '" returned.');
 	}
 
 	/**
