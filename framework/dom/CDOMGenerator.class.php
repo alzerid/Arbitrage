@@ -187,12 +187,12 @@ class CDOMGenerator
 	}
         
 	public static function imageSubmitButton($id, $value, $src, $attribs=array())
-        {
-                $attribs = CDOMGenerator::generateAttribs($attribs);
-                $html    = "<input type=\"image\" id=\"$id\" name=\"$id\" value=\"$value\" src=\"$src\" alt=\"\" $attribs />\n";
+	{
+		$attribs = CDOMGenerator::generateAttribs($attribs);
+		$html    = "<input type=\"image\" id=\"$id\" name=\"$id\" value=\"$value\" src=\"$src\" alt=\"\" $attribs />\n";
 
-                return $html;
-        }
+		return $html;
+	}
 
 	public static function inputButton($id, $value, $attribs=array())
 	{
@@ -281,7 +281,6 @@ class CDOMGenerator
 		}
 
 		return $query;
-
 	}
 
 	public static function generateAttribs($attribs)
