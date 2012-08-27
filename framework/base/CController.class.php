@@ -1,12 +1,11 @@
 <?
 namespace Framework\Base;
-use \Framework\Interfaces\IController;
 use \Framework\Utils\CArrayObject;
 use \Framework\Utils\CFlashPropertyObject;
 use \Framework\Exceptions\EWebApplicationException;
 use \Framework\Exceptions\EHTTPException;
 
-abstract class CController implements IController
+abstract class CController implements \Framework\Interfaces\IController, \Framework\Interfaces\IViewFileRenderableContext
 {
 	protected $_get;              //Get variable
 	protected $_post;             //Post variable
@@ -246,13 +245,10 @@ abstract class CController implements IController
 	 */
 	public function renderPartial($file, array $variables=array())
 	{
-		static $renderable = NULL;
-		if($renderable == NULL)
-		{
-			$renderable = $this->requireRenderable('Framework.Renderables.CViewFilePartialRenderable');
-			var_dump($renderable);
-			die('$controller->renderPartial');
-		}
+		if($this->_renderable instanceof \Framework\Interfaces\IViewFileRenderable)
+			return $this->_renderable->renderPartial($file, $variables);
+
+		throw new \Framework\Exceptions\EArbitrageException("Implement unknown renderPartial!!!");
 	}
 
 	/**
@@ -296,6 +292,19 @@ abstract class CController implements IController
 	}
 
 	/**
+	 * Renders a view with the controller as the context.
+	 * @param $file The file to render and require.
+	 * @param $_vars The variables to pass to the view
+	 */
+	public function renderContext($file, $_vars=NULL)
+	{
+		if($_vars !== NULL)
+			extract($_vars);
+
+		require($file);
+	}
+
+	/**
 	 * Render the return from an Action to a renderbable.
 	 * @param $content Either an array or IRenderable.
 	 * @param boolean $opt_return Determines if the render should return or echo out the rendered results.
@@ -316,7 +325,8 @@ abstract class CController implements IController
 			$class      = CKernel::getInstance()->convertArbitrageNamespaceToPHP($this->_renderable);
 			$renderable = new $class;
 
-			if($renderable instanceof \Framework\Renderables\CViewFilePartialRenderable || $renderable instanceof \Arbtirage2\Interfaces\IViewFileRenderable)
+			//if($renderable instanceof \Framework\Renderables\CViewFilePartialRenderable || $renderable instanceof \Framework\Interfaces\IViewFileRenderable)
+			if($renderable instanceof \Framework\Interfaces\IViewFileRenderable)
 			{
 				$path = preg_replace('/(controllers|ajax).*$/i', 'views', CKernel::getInstance()->convertArbitrageNamespaceToPath($this->_namespace));
 				$path = $this->_application->getPath() . "/$path";
@@ -331,6 +341,8 @@ abstract class CController implements IController
 
 				//Initialize
 				$renderable->initialize($path, $content);
+				$renderable->setContext($this);
+				$this->_renderable = $renderable;
 			}
 			else
 				$renderable->initialize($content);
