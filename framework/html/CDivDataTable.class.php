@@ -36,13 +36,13 @@ class CDivDataTable extends \Framework\HTML\CDataTable
 			foreach($this->_headers as $key => $val)
 			{
 				$html .= "<div class=\"cell\">";
-				if(gettype($val) === "string")
+				/*if(gettype($val) === "string")
 				{
 					$arr = new CArrayObject($entry);
 					$val = $this->_normalizeValue($arr->xpath($val));
 				}
-				else($val instanceof IHTMLDataTableEntry)
-					$val = $val->render($this, $entry);
+				else($val instanceof \Framework\Interfaces\IHTMLDataTableType)
+					$val = $val->render($this, $entry);*/
 
 				$html .= "<div class=\"cell\">$val</div>";
 			}

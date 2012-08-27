@@ -1,5 +1,7 @@
 <?
-class CHTMLImageDataEntry implements IHTMLDataTableEntry
+namespace Framework\HTML\Types;
+
+class CImageType implements \Framework\Interfaces\IHTMLDataTableType
 {
 	private $_path;
 	private $_default;
@@ -11,7 +13,7 @@ class CHTMLImageDataEntry implements IHTMLDataTableEntry
 		$this->_default = $default;
 	}
 
-	public function render(IHTMLDataTable $table, array $entry)
+	public function render(\Framework\Interfaces\IHTMLDataTable $table, array $entry)
 	{
 		$arr = new CArrayObject($entry);
 		$val = $arr->xpath($this->_path);
