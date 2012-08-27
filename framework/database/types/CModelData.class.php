@@ -18,7 +18,7 @@ class CModelData implements \ArrayAccess
 		$this->_path      = array();
 
 		if($this->_originals === NULL)
-			throw new EModelDataException("Unable to get default values for '" . get_called_class() . "'.");
+			throw new \Framework\Exceptions\EModelDataException("Unable to get default values for '" . get_called_class() . "'.");
 	}
 
 	/** Object Access Pattern **/
@@ -191,18 +191,18 @@ class CModelData implements \ArrayAccess
 		elseif(array_key_exists($name, $this->_originals))
 			return $this->_originals[$name];
 
-		throw new EModelException("Data point '$name' not in definitions.");
+		throw new \Framework\Exceptions\EModelException("Data point '$name' not in definitions.");
 	}
 
 	protected function _setData($name, $val)
 	{
 		if(!array_key_exists($name, $this->_originals))
-			throw new EModelDataException("Data point '$name' not in definitions.");
+			throw new \Framework\Exceptions\EModelDataException("Data point '$name' not in definitions.");
 
 		if($this->_originals[$name] instanceof CModelArrayData)
 			$this->_originals[$name]->set($val);
 		elseif($this->_originals[$name] instanceof CModelData)
-			throw new EModelDataException("Unable to set '$name' because it is of type CModelData!");
+			throw new \Framework\Exceptions\EModelDataException("Unable to set '$name' because it is of type CModelData!");
 		else
 		{
 			//type cast
