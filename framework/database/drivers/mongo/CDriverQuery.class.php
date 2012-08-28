@@ -109,8 +109,7 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 					$res = $res->limit($results->getLimit());
 
 				//Create ModelList
-				if($res->count() > 0)
-					return $res;
+				return $res;
 			}
 			elseif($this->_cmd == "findOne")
 				return array($res);
