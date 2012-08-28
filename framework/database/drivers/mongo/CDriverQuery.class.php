@@ -30,12 +30,15 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 
 	public function update($query, $data)
 	{
-		die('update');
 		$this->_cmd   = "update";
 		$this->_query = $query;
 		$this->_data  = $data;
 
-		return $this;
+		//Create results class
+		$results = new CModelResults($this);
+
+		//Execute
+		return $this->execute($results);
 	}
 
 	public function upsert($query, $data)
@@ -118,12 +121,11 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 		}
 		elseif($this->_cmd == "update")
 		{
-			die("CMongoModel::execute UPDATE");
 			//Setup update
 			$update = array('$set' => $this->_smartFlatten($this->_data));
-			
+
 			//Setup conditions
-			$query = new \CArrayObject($this->_query);
+			$query = new \Framework\Utils\CArrayObject($this->_query);
 			$query = $query->flatten()->toArray();
 
 			//Update
