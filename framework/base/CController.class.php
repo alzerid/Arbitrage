@@ -239,6 +239,15 @@ abstract class CController implements \Framework\Interfaces\IController, \Framew
 	}
 
 	/**
+	 * Method returns the $_SESSION in CArrayObject format.
+	 * @return \Framework\Utils\CArrayObject Returns the $_SESSIOn.
+	 */
+	public function getSession()
+	{
+		return $this->_session;
+	}
+
+	/**
 	 * Renders a partial using a view file.
 	 * @param string $file The view file to render
 	 * @param array $variables A key value array.
