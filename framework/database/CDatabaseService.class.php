@@ -99,7 +99,7 @@ class CDatabaseService extends \Framework\Base\CService implements \Framework\In
 
 			//Throw exception if unable to load model
 			if(!$ret)
-				throw new EDatabaseDriverException("Unable to load model '$namespace'.");
+				throw new \Framework\Exceptions\EDatabaseDriverException("Unable to load model '$namespace'.");
 
 			//Loaded, prevent from propagating
 			$event->stopPropagation();
