@@ -4,7 +4,7 @@ namespace Framework\Database;
 abstract class CModel extends \Framework\Database\Types\CModelData implements \Framework\Interfaces\IModel
 {
 	static private $_ID_KEYS = array();
-	private $_idVal=NULL;
+	private $_idVal          = NULL;
 
 	public function __construct(array &$originals=array(), array &$variables=array())
 	{
@@ -94,15 +94,14 @@ abstract class CModel extends \Framework\Database\Types\CModelData implements \F
 	/* Update Methods */
 	public function update()
 	{
-		die("CModel::update");
 		//Ensure _id is there
 		if(!isset($this->_idVal))
-			throw new EModelException("Cannot update without an ID");
+			throw new EModelException("Cannot update without an ID.");
 
 		//Grab $variables not originals
 		$vars = $this->toArrayUpdated();
 		$key  = self::$_ID_KEYS[get_called_class()];
-		self::query()->update(array(self::$_ID_KEYS[get_called_class()] => $this->_idVal), $vars)->execute();
+		self::query()->update(array(self::$_ID_KEYS[get_called_class()] => $this->_idVal), $vars);
 
 		//Merge variables to originals
 		$this->_merge();
