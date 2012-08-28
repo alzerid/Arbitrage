@@ -40,6 +40,8 @@ class CWebApplication extends CApplication
 		CKernel::getInstance()->requireFrameworkFile('Form.CForm');
 		CKernel::getInstance()->requireFrameworkFile('Form.CSubmittedForm');
 		CKernel::getInstance()->requireFrameworkFile('Form.CRenderableForm');
+		CKernel::getInstance()->requireFrameworkFile('HTML.CDataTable');
+		CKernel::getInstance()->requireFrameworkFile('HTML.CDivDataTable');
 
 		//Create router instance and route
 		$this->_router      = new CRouter($this->getConfig()->webApplication->routes);
