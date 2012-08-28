@@ -57,6 +57,7 @@ class CModelResults extends \Framework\Database\CModelResults
 	/* Iterator */
 	public function count()
 	{
+		$this->_executeQuery();
 		return $this->_results->count();
 	}
 
