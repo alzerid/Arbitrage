@@ -243,4 +243,8 @@ interface IErrorHandlerService
 }
 /** End Service Interfaces **/
 
+interface IArbitragePath
+{
+	public function apath($path);
+}
 ?>
