@@ -231,7 +231,7 @@ interface IHTMLDataTable
 
 interface IHTMLDataTableType
 {
-	public function render(IHTMLDataTable $table, array $entry);
+	public function render(IHTMLDataTable $table, $entry);
 }
 
 /** END HTML Interfaces **/
