@@ -5,20 +5,20 @@ class CDivDataTable extends \Framework\HTML\CDataTable
 {
 	public function render()
 	{
-		$attrs = CHTMLComponent::generateAttribs($this->_attrs);
+		$attrs = \Framework\DOM\CDOMGenerator::generateAttribs($this->_attrs);
 		$html  = "<div id=\"{$this->_id}\" $attrs>";
 			$html .= $this->_renderHeader();
 			$html .= $this->_renderData();
 		$html .= "</div>";
 
-		die("IMPLEMENT ME");
+		return $html;
 	}
 
 	protected function _renderHeader()
 	{
 		$html = '<div class="header">';
 		foreach($this->_headers as $title => $val)
-			$html = '<div class="entry">' . $val . '</div>';
+			$html .= '<div class="entry">' . $title. '</div>';
 
 		$html .= '</div>';
 
@@ -27,30 +27,34 @@ class CDivDataTable extends \Framework\HTML\CDataTable
 
 	protected function _renderData()
 	{
-		$html = '<div class="dataset">';
+		$html = '<div class="data">';
 			
 		//Go thorugh each entry
 		foreach($this->_data as $entry)
 		{
+			$html .= '<div class="row">';
+
 			//Add cell
 			foreach($this->_headers as $key => $val)
 			{
-				$html .= "<div class=\"cell\">";
-				/*if(gettype($val) === "string")
+				//Get value
+				if($val instanceof \Framework\Interfaces\IHTMLDataTableType)
 				{
-					$arr = new CArrayObject($entry);
-					$val = $this->_normalizeValue($arr->xpath($val));
+					die('DataType');
+					$val = $val->render($this, $entry);
 				}
-				else($val instanceof \Framework\Interfaces\IHTMLDataTableType)
-					$val = $val->render($this, $entry);*/
+				else
+					$val = $this->_normalizeValue($entry->apath($val));
 
-				$html .= "<div class=\"cell\">$val</div>";
+				$html .= '<div class="entry">' . $val . '</div>';
 			}
 
 			$html .= "</div>";
 		}
 		
 		$html .= "</div>";
+
+		return $html;
 	}
 }
 ?>
