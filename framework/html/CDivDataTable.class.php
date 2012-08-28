@@ -28,29 +28,31 @@ class CDivDataTable extends \Framework\HTML\CDataTable
 	protected function _renderData()
 	{
 		$html = '<div class="data">';
-			
-		//Go thorugh each entry
-		foreach($this->_data as $entry)
+		if(count($this->_data) > 0)
 		{
-			$html .= '<div class="row">';
-
-			//Add cell
-			foreach($this->_headers as $key => $val)
+			//Go thorugh each entry
+			foreach($this->_data as $entry)
 			{
-				//Get value
-				if($val instanceof \Framework\Interfaces\IHTMLDataTableType)
+				$html .= '<div class="row">';
+
+				//Add cell
+				foreach($this->_headers as $key => $val)
 				{
-					die('DataType');
-					$val = $val->render($this, $entry);
+					//Get value
+					if($val instanceof \Framework\Interfaces\IHTMLDataTableType)
+						$val = $val->render($this, $entry);
+					else
+						$val = $this->_normalizeValue($entry->apath($val));
+
+					$html .= '<div class="entry">' . $val . '</div>';
 				}
-				else
-					$val = $this->_normalizeValue($entry->apath($val));
 
-				$html .= '<div class="entry">' . $val . '</div>';
+				$html .= "</div>";
 			}
-
-			$html .= "</div>";
 		}
+		else
+			$html .= '<div class="row empty">There are no records.</div>';
+
 		
 		$html .= "</div>";
 
