@@ -9,9 +9,7 @@ class CArrayObject implements \ArrayAccess, \Iterator
 
 	public function __construct(&$arr=array())
 	{
-		$this->_data     = &$arr;
-		$this->_position = -1;
-		$this->_keys     = array();
+		$this->_setData($arr);
 	}
 
 	/* Start Property Access Methods */
@@ -258,6 +256,13 @@ class CArrayObject implements \ArrayAccess, \Iterator
 		}
 
 		return new CArrayObject($merged);
+	}
+
+	protected function _setData(&$arr=array())
+	{
+		$this->_data     = &$arr;
+		$this->_position = -1;
+		$this->_keys     = array();
 	}
 
 	protected function &_toArrayReference()
