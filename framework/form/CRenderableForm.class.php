@@ -3,8 +3,8 @@ namespace Framework\Forms;
 
 Class CRenderableForm extends CForm implements \Framework\Interfaces\IViewFileRenderableContext
 {
+	protected $_view;
 	private $_file;
-	private $_vars;
 
 	public function __construct($properties=array())
 	{
@@ -20,7 +20,10 @@ Class CRenderableForm extends CForm implements \Framework\Interfaces\IViewFileRe
 
 		//Set file and variables
 		$this->_file = $properties['render'];
-		$this->_vars = ((!empty($properties['variables']))? $properties['variables'] : NULL);
+
+		//Create view variables etc
+		$vars        = array('variables' => ((!empty($properties['variables']))? $properties['variables'] : array()));
+		$this->_view = new \Framework\Utils\CArrayObject($vars);
 
 		parent::__construct($properties);
 	}
@@ -63,9 +66,9 @@ Class CRenderableForm extends CForm implements \Framework\Interfaces\IViewFileRe
 	 */
 	public function renderContext($file, $_vars=NULL)
 	{
-		//Grab variables
-		if($_vars !== NULL)
-			extract($_vars);
+		//Extract _vars
+		$_vars = array_merge($this->_view->toArray(), $_vars);
+		extract($_vars);
 
 		//Require the file
 		require($file);
