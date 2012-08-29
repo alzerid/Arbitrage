@@ -122,7 +122,6 @@ class CModelData implements \ArrayAccess, \Framework\Interfaces\IArbitragePath
 	protected function _setModelData(array &$originals=array())
 	{
 		$class = get_called_class();
-		var_dump($class);
 		$types = self::$_TYPES[$class];
 		foreach($originals as $key=>$val)
 		{
