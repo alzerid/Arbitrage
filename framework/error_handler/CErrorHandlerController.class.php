@@ -8,7 +8,8 @@ class CErrorHandlerController extends \Framework\Base\CController
 
 	public function handleAction()
 	{
-		@ob_end_clean();
+		$buffer = @ob_get_clean();
+
 		//Unserialize event
 		$event = unserialize($this->_request['event']);
 
@@ -22,7 +23,7 @@ class CErrorHandlerController extends \Framework\Base\CController
 			//Setup content
 			$content = array();
 			$content['render']    = 'errors/exception';
-			$content['variables'] = array('event' => $event);
+			$content['variables'] = array('event' => $event, 'buffer' => $buffer);
 
 			//Setup renderable
 			$this->requireRenderable('Framework.Renderables.CViewFilePartialRenderable');
