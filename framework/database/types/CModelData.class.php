@@ -16,7 +16,7 @@ class CModelData implements \ArrayAccess, \Framework\Interfaces\IArbitragePath
 		$this->_variables = array();           //empty variable set
 
 		if($this->_originals === NULL)
-			throw new \Framework\Exceptions\EModelDataException("Unable to get default values for '" . get_called_class() . "'.");
+			throw new \Framework\Exceptions\EModelDataException("Unable to get default values for '\\" . get_called_class() . "'.");
 	}
 
 	/** Object Access Pattern **/
@@ -62,10 +62,9 @@ class CModelData implements \ArrayAccess, \Framework\Interfaces\IArbitragePath
 	{
 		unset($this->{$offset});
 	}
-
 	/* End ArrayAccess methods */
 
-	public function reset()
+	public function clear()
 	{
 		$this->_variables = array();
 	}
@@ -119,9 +118,9 @@ class CModelData implements \ArrayAccess, \Framework\Interfaces\IArbitragePath
 		return (($val === NULL)? $this->_apath($path, $this->_originals) : $val);
 	}
 
-	protected function _setModelData(array &$originals=array())
+	protected function _setModelData(array &$originals=array(), $class=NULL)
 	{
-		$class = get_called_class();
+		$class = (($class)? $class : "\\" . get_called_class());
 		$types = self::$_TYPES[$class];
 		foreach($originals as $key=>$val)
 		{
@@ -159,7 +158,7 @@ class CModelData implements \ArrayAccess, \Framework\Interfaces\IArbitragePath
 		}
 
 		//Reset _variables
-		$this->reset();
+		$this->clear();
 	}
 
 	static public function defaults()
@@ -168,7 +167,7 @@ class CModelData implements \ArrayAccess, \Framework\Interfaces\IArbitragePath
 
 		//Get defaults from CModelData
 		$defaults = static::defaults();
-		$class    = get_called_class();
+		$class    = "\\" . get_called_class();
 
 		//Get types if not set already
 		self::_generateTypes($class, $defaults);
@@ -199,7 +198,7 @@ class CModelData implements \ArrayAccess, \Framework\Interfaces\IArbitragePath
 
 	static protected function _types()
 	{
-		$class = get_called_class();
+		$class = "\\" . get_called_class();
 		return self::$_TYPES[$class];
 	}
 
