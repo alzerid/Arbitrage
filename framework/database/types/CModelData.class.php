@@ -8,14 +8,12 @@ class CModelData implements \ArrayAccess, \Framework\Interfaces\IArbitragePath
 
 	protected $_originals;    //The original values provided to the CModelData
 	protected $_variables;    //The updated variables that were set programatically
-	protected $_path;         //The array path from the root CModel class
 
 	public function __construct()
 	{
 		//Set originals 
 		$this->_originals = self::defaults();  //set defaults to originals
 		$this->_variables = array();           //empty variable set
-		$this->_path      = array();
 
 		if($this->_originals === NULL)
 			throw new \Framework\Exceptions\EModelDataException("Unable to get default values for '" . get_called_class() . "'.");
@@ -124,6 +122,7 @@ class CModelData implements \ArrayAccess, \Framework\Interfaces\IArbitragePath
 	protected function _setModelData(array &$originals=array())
 	{
 		$class = get_called_class();
+		var_dump($class);
 		$types = self::$_TYPES[$class];
 		foreach($originals as $key=>$val)
 		{
@@ -173,6 +172,18 @@ class CModelData implements \ArrayAccess, \Framework\Interfaces\IArbitragePath
 		$class    = get_called_class();
 
 		//Get types if not set already
+		self::_generateTypes($class, $defaults);
+
+		return $defaults;
+	}
+
+	/**
+	 * Method generates types of the particular class.
+	 * @param $class The class to generate types from.
+	 * @param $defaults The default variables.
+	 */
+	static protected function _generateTypes($class, $defaults)
+	{
 		if(!isset(self::$_TYPES[$class]))
 		{
 			self::$_TYPES[$class] = array();
@@ -185,8 +196,6 @@ class CModelData implements \ArrayAccess, \Framework\Interfaces\IArbitragePath
 				self::$_TYPES[$class][$key] = $type;
 			}
 		}
-
-		return $defaults;
 	}
 
 	static protected function _types()
