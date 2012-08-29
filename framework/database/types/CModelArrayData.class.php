@@ -16,10 +16,10 @@ class CModelArrayData extends CModelData implements \Iterator
 		$this->_idx       = 0;
 	}
 
-	public function reset()
+	public function clear()
 	{
 		$this->_unset = array();
-		parent::reset();
+		parent::clear();
 	}
 
 	public function toArray()
@@ -146,7 +146,7 @@ class CModelArrayData extends CModelData implements \Iterator
 			$this->_unset[(int) $idx] = true;
 	}
 
-	protected function _setModelData(array &$originals=array())
+	protected function _setModelData(array &$originals=array(), $class=NULL)
 	{
 		$this->_originals = $originals;
 	}
@@ -162,8 +162,7 @@ class CModelArrayData extends CModelData implements \Iterator
 		$originals        = array_values(array_merge($originals, $this->_variables));
 		$this->_originals = $this->toArray();
 
-		$this->reset();
+		$this->clear();
 	}
-
 }
 ?>
