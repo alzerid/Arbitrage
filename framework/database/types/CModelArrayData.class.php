@@ -12,7 +12,6 @@ class CModelArrayData extends CModelData implements \Iterator
 		$this->_originals = $defaults;
 		$this->_variables = array();
 		$this->_unset     = array();
-		$this->_path      = array();
 		$this->_iterate   = array();
 		$this->_idx       = 0;
 	}
@@ -119,7 +118,7 @@ class CModelArrayData extends CModelData implements \Iterator
 		{
 			$class = get_class($val);
 			if(!preg_match('/^mongo/i', $class) && !($val instanceof CModelData))
-				throw new EModelDataException("Value must be a primitive type, Mongo* class, or CModelData type");
+				throw new \Framework\Exceptions\EModelDataException("Value must be a primitive type, Mongo* class, or CModelData type");
 		}
 
 		if($idx === "")
@@ -130,7 +129,7 @@ class CModelArrayData extends CModelData implements \Iterator
 		elseif(array_key_exists($idx, $this->_originals) || array_key_exists($idx, $this->_variables))
 			$this->_variables[$idx] = $val;
 		else
-			throw new EModelDataException("Unknown index $idx.");
+			throw new \Framework\Exceptions\EModelDataException("Unknown index $idx.");
 	}
 
 	protected function _issetData($idx)
