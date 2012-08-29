@@ -27,6 +27,11 @@ foreach($event->trace as $entry)
 }
 ?>
 
+
+Buffer:
+++++++++++++++++++++++++++++++++++++
+<?=$buffer?>
+++++++++++++++++++++++++++++++++++++
 -->
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title>Arbitrage2 Error</title>
