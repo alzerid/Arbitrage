@@ -1,6 +1,10 @@
 <?
 namespace Framework\Interfaces;
 
+/*********************************/
+/** Start of Interface Patterns **/
+/*********************************/
+
 /**
  * ISingleton interface
  */
@@ -10,12 +14,23 @@ interface ISingleton
 }
 
 /**
+ * IInstantiate interface
+ */
+interface IInstantiate
+{
+	static public function instantiate($var);
+}
+
+/**
  * IFactory interface
  */
 interface IFactory
 {
 	static public function get($type);
 }
+/*******************************/
+/** End of Interface Patterns **/
+/*******************************/
 
 /**
  * IModuleLoader interface
