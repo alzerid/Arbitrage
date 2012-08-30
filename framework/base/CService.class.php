@@ -31,16 +31,28 @@ abstract class CService
 	 */
 	abstract public function initialize();
 
+	/**
+	 * Method returns the Service type.
+	 * @return Returns the service type.
+	 */
 	public function getServiceType()
 	{
 		return $this->_service_type;
 	}
 
+	/**
+	 * Method returns the namespace of the service.
+	 * @return Returns the namespace of the service.
+	 */
 	public function getNamespace()
 	{
 		return $this->_namespace;
 	}
 
+	/**
+	 * Method returns the configuration object.
+	 * @return Returns the configuration object for this service.
+	 */
 	public function getConfig()
 	{
 		return $this->_config;
@@ -63,9 +75,8 @@ abstract class CService
 	 */
 	public function requireServiceFile($namespace, $opt_variables=array())
 	{
-		$namespace = explode('.', $namespace);
-		$namespace = strtolower(implode('/', array_slice($namespace, 0, -1))) . '/' . $namespace[count($namespace)-1];
-		$path      = $this->_fs_path . "/{$namespace}.class.php";
+		$path = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPath($namespace);
+		$path = $this->_fs_path . "/{$path}.class.php";
 		if(!file_exists($path))
 			throw new EArbitrageServiceException("Unable to require service file '$namespace' ($path)");
 
