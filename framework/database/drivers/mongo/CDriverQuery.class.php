@@ -90,6 +90,13 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 		$class = $this->_class;
 		$prop  = array_merge($this->_driver->getConfig(), $class::properties());
 
+		//Ensure database and table is set
+		if(empty($prop['database']))
+			throw new EDatabaseDriverException("Database is not set.");
+
+		if(empty($prop['table']))
+			throw new EDatabaseDriverException("Table is not set.");
+
 		//Get handle
 		$handle = $this->_driver->getHandle();
 		$handle = $handle->{$prop['database']}->{$prop['table']};

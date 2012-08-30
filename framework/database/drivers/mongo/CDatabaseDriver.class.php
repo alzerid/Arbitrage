@@ -12,10 +12,6 @@ class CDatabaseDriver extends \Framework\Database\CDatabaseDriver
 		$this->_handle = new \Mongo($uri);
 	}
 
-	public function getForm(array $form)
-	{
-	}
-
 	public function getQuery($class)
 	{
 		return new CMongoModelQuery($this, $class);
@@ -23,7 +19,7 @@ class CDatabaseDriver extends \Framework\Database\CDatabaseDriver
 
 	public function getBatch()
 	{
-		die('batch');
+		die('Mongo\CDatabaseDriver::getBatch');
 	}
 }
 ?>
