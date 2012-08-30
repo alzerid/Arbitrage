@@ -4,12 +4,14 @@ namespace Framework\Database\Drivers\Mongo;
 /* Mongo */
 class CModelResults extends \Framework\Database\CModelResults
 {
+	private $_executed;
 	private $_raw;
 
 	public function __construct(\Framework\Database\CDriverQuery $query)
 	{
 		parent::__construct($query);
-		$this->_raw = NULL;
+		$this->_executed = false;
+		$this->_raw      = NULL;
 	}
 
 	/* Array Access */
@@ -58,6 +60,11 @@ class CModelResults extends \Framework\Database\CModelResults
 	public function count()
 	{
 		$this->_executeQuery();
+		if(!$this->_results)
+			return 0;
+		elseif(is_array($this->_results))
+			return count($this->_results);
+
 		return $this->_results->count();
 	}
 
@@ -91,11 +98,12 @@ class CModelResults extends \Framework\Database\CModelResults
 	
 	private function _executeQuery()
 	{
-		if($this->_results != NULL)
+		if($this->_results != NULL || $this->_executed)
 			return;
 
 		//Query
-		$this->_results = $this->_query->execute($this);
+		$this->_results  = $this->_query->execute($this);
+		$this->_executed = true;
 	}
 }
 ?>
