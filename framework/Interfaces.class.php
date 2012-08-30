@@ -54,6 +54,15 @@ interface IDriver
 }
 
 /**
+ * IDatabaseDriver
+ */
+interface IDatabaseDriver extends IDriver
+{
+	public function setDatabase($database);
+	public function setTable($table);
+}
+
+/**
  * IAutoLoadListener
  */
 interface IAutoLoadListener
@@ -165,6 +174,13 @@ interface IModel
 	public function findAll($condition = array());
 	public function findOne($condition = array());
 	public function remove($condition = array());*/
+}
+
+/**
+ * Database Model
+ */
+interface IDatabaseModel extends IModel
+{
 }
 
 /**
