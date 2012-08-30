@@ -189,6 +189,14 @@ interface IDatabaseModel extends IModel
 }
 
 /**
+ * Database Data type
+ */
+interface IModelDataType
+{
+	public function __construct($data=NULL);
+}
+
+/**
  * Remote Cache Interface
  */
 interface IRemoteCache
