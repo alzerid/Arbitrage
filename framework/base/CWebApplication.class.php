@@ -293,6 +293,9 @@ class CWebApplication extends CApplication
 	public function handleException(\Framework\Interfaces\IEvent $event)
 	{
 		//TODO: Handle HTTP Exceptions
+		if($event->exception instanceof EHTTPException)
+			die("CWebApplication::handleException -- EHTTPException");
+
 		//TODO: Handle Debug Mode Exceptions
 		$service = CKernel::getInstance()->getService($this, 'errorHandler');
 		if($service !== NULL)
