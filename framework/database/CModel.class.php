@@ -51,13 +51,10 @@ abstract class CModel extends \Framework\Database\Types\CModelData implements \F
 		return $object;
 	}
 
-	/* Called when a form wants to set the _varables to the form
-	   content. */
-	static public function form(array $form)
-	{
-		die("FORM");
-	}
-
+	/**
+	 * Static method that returns the Driver Query object.
+	 * @return Retuns the driver query object.
+	 */
 	static public function query()
 	{
 		return \Framework\Base\CKernel::getInstance()->getApplication()->getService('database')->getDriver(static::properties())->getQuery(get_called_class());
