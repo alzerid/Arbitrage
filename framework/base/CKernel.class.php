@@ -266,7 +266,7 @@ class CKernel implements ISingleton
 			foreach($services as $service => $value)
 			{
 				foreach($value as $namespace => $lconfig)
-					$this->createService($application, $service, $namespace, new \Framework\Config\CArbitrageConfigProperty($value[$namespace]));  //Create service with configuration
+					$this->createService($application, $service, $namespace, \Framework\Config\CArbitrageConfigProperty::instantiate($lconfig));  //Create service with configuration
 			}
 		}
 	}
@@ -292,7 +292,7 @@ class CKernel implements ISingleton
 	 * @param string $namespace The namespace to load.
 	 * @param \Framework\Config\CArbitrageConfig $config Configuration object to tie to the serivce.
 	 */
-	public function createService($application, $service, $namespace, $config)
+	public function createService($application, $service, $namespace, \Framework\Config\CArbitrageConfigProperty $config)
 	{
 		//TODO: Ensure service is not already loaded
 
