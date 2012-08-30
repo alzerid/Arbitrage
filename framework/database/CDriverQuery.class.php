@@ -55,5 +55,14 @@ abstract class CDriverQuery
 	{
 		return $this->_class;
 	}
+
+	/**
+	 * Method returns the associated driver to the query object.
+	 * @return \Framework\Database\CDatabaseDriver Returns the database driver.
+	 */
+	public function getDriver()
+	{
+		return $this->_driver;
+	}
 }
 ?>
