@@ -10,6 +10,8 @@ class CErrorHandlerController extends \Framework\Base\CController
 	{
 		$buffer = @ob_get_clean();
 
+		$this->setRenderable('Framework.Renderables.CViewFileRenderable');  //Set default renderable
+
 		//Unserialize event
 		$event = unserialize($this->_request['event']);
 
