@@ -334,7 +334,6 @@ abstract class CController implements \Framework\Interfaces\IController, \Framew
 			$class      = CKernel::getInstance()->convertArbitrageNamespaceToPHP($this->_renderable);
 			$renderable = new $class;
 
-			//if($renderable instanceof \Framework\Renderables\CViewFilePartialRenderable || $renderable instanceof \Framework\Interfaces\IViewFileRenderable)
 			if($renderable instanceof \Framework\Interfaces\IViewFileRenderable)
 			{
 				$path = preg_replace('/(controllers|ajax).*$/i', 'views', CKernel::getInstance()->convertArbitrageNamespaceToPath($this->_namespace));
