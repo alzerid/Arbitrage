@@ -1,15 +1,30 @@
 <?
 namespace Framework\Utils;
 
-class CArrayObject implements \ArrayAccess, \Iterator
+class CArrayObject implements \ArrayAccess, \Iterator, \Framework\Interfaces\IInstantiate
 {
 	protected $_data;
 	private $_position;
 	private $_keys;
 
-	public function __construct(&$arr=array())
+	public function __construct(array &$arr=array())
 	{
 		$this->_setData($arr);
+	}
+
+	/** IIstantiate Implementation **/
+	static public function instantiate($var)
+	{
+		$class = get_called_class();
+		if($var instanceof CArrayObject)
+		{
+			$arr = $var->toArray();
+			return new $class($arr);
+		}
+		elseif(is_array($var))
+			return new $class($var);
+		else
+			throw new \Framework\Exceptions\EArrayObjectException("Unknown type for instantiation.");
 	}
 
 	/* Start Property Access Methods */
@@ -96,7 +111,12 @@ class CArrayObject implements \ArrayAccess, \Iterator
 
 	public function current()
 	{
-		return $this->_data[$this->_keys[$this->_position]];
+		$val = $this->_data[$this->_keys[$this->_position]];
+
+		if(is_array($val) || $val instanceof \Framework\Utils\CArrayObject)
+			return CArrayObject::instantiate($val);
+
+		return $val;
 	}
 
 	public function key()
@@ -157,7 +177,7 @@ class CArrayObject implements \ArrayAccess, \Iterator
 		foreach($xpath as $x)
 		{
 			if(in_array($x, $exceptions))
-				throw new EArrayObjectException("XPath parsing for '$x' not implemented.");
+				throw new \Framework\Exceptions\EArrayObjectException("XPath parsing for '$x' not implemented.");
 
 			if($x === "/")
 				continue;
@@ -181,6 +201,13 @@ class CArrayObject implements \ArrayAccess, \Iterator
 
 	private function _setupIterator()
 	{
+		/*if(!is_array($this->_data))
+		{
+			var_dump($this->_data);
+			throw new \Exception();
+			die();
+		}*/
+
 		$this->_keys     = array_keys($this->_data);
 		$this->_position = 0;
 	}
