@@ -1,13 +1,12 @@
 <?
 namespace Framework\Config;
-use \Framework\Utils\CArrayObject;
 
 class CArbitrageConfig extends CArbitrageConfigProperty
 {
 	protected $_env;    //The current configuration environment
 	protected $_root;   //Root path for configuration
 
-	public function __construct($root, $env, &$config=array())
+	public function __construct($root, $env, array &$config=array())
 	{
 		$this->_root = $root . "/$env";
 		$this->_env  = $env;
@@ -36,7 +35,7 @@ class CArbitrageConfig extends CArbitrageConfigProperty
 	}
 }
 
-class CArbitrageConfigProperty extends CArrayObject
+class CArbitrageConfigProperty extends \Framework\Utils\CArrayObject
 {
 	/* Magic Methods */
 	protected function _get($name)
