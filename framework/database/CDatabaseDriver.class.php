@@ -1,9 +1,11 @@
 <?
 namespace Framework\Database;
-abstract class CDatabaseDriver implements \Framework\Interfaces\IDriver
+abstract class CDatabaseDriver implements \Framework\Interfaces\IDatabaseDriver
 {
 	protected $_handle;
 	protected $_config;
+	protected $_database;
+	protected $_table;
 
 	/**
 	 * Class holds the handle and other information for the driver connection.
@@ -11,7 +13,10 @@ abstract class CDatabaseDriver implements \Framework\Interfaces\IDriver
 	 */
 	public function __construct($config)
 	{
-		$this->_config = $config;
+		$this->_handle   = NULL;
+		$this->_config   = $config;
+		$this->_database = NULL;
+		$this->_table    = NULL;
 	}
 
 	/**
@@ -29,13 +34,37 @@ abstract class CDatabaseDriver implements \Framework\Interfaces\IDriver
 	 */
 	public function getConfig()
 	{
+		if($this->_database !== NULL)
+			$this->_config['database'] = $this->_database;
+
+		if($this->_table !== NULL)
+			$this->_config['table'] = $this->_table;
+
 		return $this->_config;
 	}
 
-	/*
-	 * Abstract method retuns the form object.
+	/** Start IDatabaseDriver Implementation **/
+
+	/**
+	 * Method sets the database.
+	 * @param $database The database to set the driver to.
 	 */
-	abstract public function getForm(array $form);
+	public function setDatabase($database)
+	{
+		$this->_database = $database;
+	}
+
+	/**
+	 * Method sets the table.
+	 * @param $table The table to set the driver to.
+	 */
+	public function setTable($table)
+	{
+		$this->_table = $table;
+	}
+
+	/** End IDatabaseDriver Implementation **/
+
 
 	/**
 	 * Abstract method returns the correct Query class.
