@@ -181,6 +181,11 @@ interface IModel
  */
 interface IDatabaseModel extends IModel
 {
+	public function save();
+	public function update();
+	public function insert();
+	public function remove();
+	public function getID();
 }
 
 /**
