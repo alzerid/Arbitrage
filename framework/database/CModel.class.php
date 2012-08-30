@@ -1,7 +1,7 @@
 <?
 namespace Framework\Database;
 
-abstract class CModel extends \Framework\Database\Types\CModelData implements \Framework\Interfaces\IModel
+abstract class CModel extends \Framework\Database\Types\CModelData implements \Framework\Interfaces\IDatabaseModel
 {
 	static private $_ID_KEYS = array();
 	private $_idVal          = NULL;
@@ -122,7 +122,12 @@ abstract class CModel extends \Framework\Database\Types\CModelData implements \F
 		self::query()->upsert($query, $this->toArray())->execute();
 	}
 
-	public function save()
+	public function insert()
+	{
+		die("CModel::insert");
+	}
+
+	public function save($database=NULL, $table=NULL)
 	{
 		$this->_merge();
 		$vars = $this->toArray();
@@ -132,7 +137,15 @@ abstract class CModel extends \Framework\Database\Types\CModelData implements \F
 			$vars[self::$_ID_KEYS[get_called_class()]] = $this->_idVal;
 
 		//Call
-		$id = self::query()->save($vars);
+		$query= self::query();
+		
+		if($database)
+			$query->getDriver()->setDatabase($database);
+
+		if($table)
+			$query->getDriver()->setTable($table);
+
+		$id = $query->save($vars);
 
 		if($this->_idVal === NULL)
 			$this->_idVal = $id;
@@ -146,6 +159,11 @@ abstract class CModel extends \Framework\Database\Types\CModelData implements \F
 			throw new EModelException("Cannot update without an ID");
 
 		self::query()->remove(array('_id' => $this->_idVal))->execute();
+	}
+
+	public function getID()
+	{
+		return $this->_idVal;
 	}
 
 	public function equals(UseModel $model)
