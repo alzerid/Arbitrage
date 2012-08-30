@@ -43,6 +43,9 @@ class CViewFileRenderable extends \Framework\Renderables\CViewFilePartialRendera
 		if(!file_exists($layout))
 			throw new EArbitrageRenderableException("Layout does not exist '($layout).");
 
+		//Set header
+		header("Content-Type: text/html");
+
 		//Extract the variables
 		return $this->renderPartial("/layout/{$this->_layout}", array_merge(array('content' => $content), $default['variables']));
 	}

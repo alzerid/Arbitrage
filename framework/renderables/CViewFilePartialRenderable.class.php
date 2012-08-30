@@ -42,6 +42,9 @@ class CViewFilePartialRenderable implements \Framework\Interfaces\IViewFileRende
 		$default['render']    = ((isset($this->_content['render']))? $this->_content['render'] : $default['render']);
 		$default['variables'] = array_merge($default['variables'], (isset($this->_content['variables'])? $this->_content['variables'] : array()));
 
+		//Set header
+		header("Content-Type: text/html");
+
 		//Get content from view
 		return $this->renderPartial($default['render'], $default['variables']);
 	}
