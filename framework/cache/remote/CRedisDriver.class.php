@@ -10,7 +10,7 @@ class CRedisDriver implements \Framework\Interfaces\IDriver, \Framework\Interfac
 	public function __construct($config)
 	{
 		$this->_config = $config;
-		$this->_cache = new redis();
+		$this->_cache = new \Redis();
 	}
 
 	/**
