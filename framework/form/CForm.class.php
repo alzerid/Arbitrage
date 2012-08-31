@@ -62,8 +62,7 @@ Class CForm extends CFormModel
 
 			//Convert to PHP
 			$class = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP($class);
-
-			return new CSubmittedForm(new $class(array('values' => $vals)));
+			return new CSubmittedForm(new $class(array('values' => $vals->toArray())));
 		}
 
 		return NULL;
