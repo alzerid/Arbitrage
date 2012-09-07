@@ -75,5 +75,33 @@ abstract class CDatabaseDriver implements \Framework\Interfaces\IDatabaseDriver
 	 * Abstract method reutns a batch object.
 	 */
 	abstract public function getBatch();
+
+	/**
+	 * Method converts native data types to model data types.
+	 * @param $data The data to convert.
+	 * @return Returns the the Model Data Type.
+	 */
+	abstract public function convertNativeDataTypeToModelDataType($data);
+
+	/**
+	 * Method converts model data types to native data types.
+	 * @param $data The data to convert.
+	 * @return Returns the the Native Data Type.
+	 */
+	abstract public function convertModelDataTypeToNativeDataType($data);
+
+	/**
+	 * Method converts model structure to native structure.
+	 * @param $data The data to convert.
+	 * @return Returns the the Model Structure.
+	 */
+	abstract public function convertModelStructureToNativeStructure($data);
+
+	/**
+	 * Method converts native structure to model structure.
+	 * @param $data The data to convert.
+	 * @return Returns the the Native Structure.
+	 */
+	abstract public function convertNativeStructureToModelStructure($data);
 }
 ?>

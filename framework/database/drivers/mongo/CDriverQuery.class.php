@@ -8,7 +8,7 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 		$this->_cmd   = 'findOne';
 		$this->_query = $query;
 
-		return new CModelResults($this);
+		return new CDatabaseModelCollection($this);
 	}
 
 	public function findAll($query=array())
@@ -16,7 +16,7 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 		$this->_cmd   = 'find';
 		$this->_query = $query;
 
-		return new CModelResults($this);
+		return new CDatabaseModelCollection($this);
 	}
 
 	public function count($query=array())
@@ -35,7 +35,7 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 		$this->_data  = $data;
 
 		//Create results class
-		$results = new CModelResults($this);
+		$results = new CDatabaseModelCollection($this);
 
 		//Execute
 		return $this->execute($results);
@@ -68,7 +68,7 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 		$this->_data  = $data;
 
 		//Create results class
-		$results = new CModelResults($this);
+		$results = new CDatabaseModelCollection($this);
 
 		//Execute
 		return $this->execute($results);
@@ -84,7 +84,7 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 		return $this;
 	}
 
-	public function execute(\Framework\Database\CModelResults $results)
+	public function execute(\Framework\Database\CDatabaseModelCollection $results)
 	{
 		//Execute command
 		$class = $this->_class;
@@ -128,6 +128,7 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 		}
 		elseif($this->_cmd == "update")
 		{
+			die(__METHOD__ . " UPDATE");
 			//Setup update
 			$update = array('$set' => $this->_smartFlatten($this->_data));
 

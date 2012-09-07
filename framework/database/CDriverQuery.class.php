@@ -42,10 +42,10 @@ abstract class CDriverQuery
 	//Actually execute
 	/**
 	 * Abstract method that must be defined in the driver.
-	 * @param \Framework\Database\CModelResults $results The result object to use for querying and setting the results.
-	 * @return \Framework\Database\CModelResults Retuns the result.
+	 * @param \Framework\Database\CDatabaseModelCollection $results The result object to use for querying and setting the results.
+	 * @return \Framework\Database\CDatabaseModelCollection Retuns the result.
 	 */
-	abstract public function execute(\Framework\Database\CModelResults $results);
+	abstract public function execute(\Framework\Database\CDatabaseModelCollection $results);
 
 	/**
 	 * Method returns the model class associated with this query object.

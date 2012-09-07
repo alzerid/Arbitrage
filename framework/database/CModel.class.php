@@ -1,193 +1,193 @@
 <?
 namespace Framework\Database;
 
-abstract class CModel extends \Framework\Database\Types\CModelData implements \Framework\Interfaces\IDatabaseModel
+abstract class CModel extends \Framework\Model\CMomentoModel implements \Framework\Interfaces\IDatabaseModelStructure
 {
-	static private $_ID_KEYS = array();
-	private $_idVal          = NULL;
+	static private $_TYPES = array();
+	private $_driver;
 
-	public function __construct(array &$originals=array(), array &$variables=array())
+	public function __construct()
 	{
+		$this->_driver = NULL;
 		parent::__construct();
-
-		$class      = get_called_class();
-		$properties = self::properties();
-		if(isset($properties['idKey']))
-			self::$_ID_KEYS[$class] = $properties['idKey'];
-
-		//Set model data
-		$this->_setModelData($originals);
-	}
-
-	//Loads the model specified into memory
-	static public function load($class=NULL)
-	{
-		if($class === NULL)
-			$class = get_called_class();
-
-		return new $class;
-	}
-
-	/* Called when one wants to create a model with the data
-	   from the DB. */
-	static public function model(array $data, $class=NULL)
-	{
-		if($class === NULL)
-			$class = get_called_class();
-
-		//Create new Model
-		$object = new $class();
-
-		//Unset the _id and set locally if exists
-		if(isset($data['_id']))
-		{
-			$object->_idVal = $data['_id'];
-			unset($data['_id']);
-		}
-
-		//Set database data into model
-		$object->_setModelData($data);
-
-		return $object;
 	}
 
 	/**
-	 * Static method that returns the Driver Query object.
-	 * @return Retuns the driver query object.
+	 * Skeleton method for default values of the model.
 	 */
-	static public function query()
+	static public function defaults()
 	{
-		return \Framework\Base\CKernel::getInstance()->getApplication()->getService('database')->getDriver(static::properties())->getQuery(get_called_class());
+		throw new \Framework\Exceptions\EModelDataException("Model must implement defaults static method");
 	}
 
-	static public function batch()
+	/**
+	 * Method defines the types associated with the Model.
+	 */
+	static public function types($class=NULL)
 	{
-		die("BATCH");
-		//Setup model object
-		$driver = static::properties();
-		$driver = $driver['driver'];
+		$class = (($class===NULL)? get_called_class() : $class);
+		if(!array_key_exists($class, self::$_TYPES))
+		{
+			$defaults = static::defaults();
+			$types    = array();
 
-		//Return Query Object
-		$class = 'Arbitrage2\Database\C' . $driver . "ModelBatch";
-		$batch = new $class(get_called_class());
+			foreach($defaults as $key=>$val)
+			{
+				$type = gettype($val);
+				switch($type)
+				{
+					case "object":
+						if(!($val instanceof \Framework\Model\CModel) && !($val instanceof \Framework\Interfaces\IModelDataType))
+							throw new \Framework\Exceptions\EModelDataException("Data point '$key' is not an object of type \\Framework\\Model\\CModel or \\Framework\\Interfaces\\IModelDataType but is of type '" . get_class($val) . "'.");
 
-		return $batch;
+						$type = "object:" . "\\". get_class($val);
+						break;
+
+					case "NULL":
+					case "unknown type":
+					case "array":
+					case "resource":
+						throw new \Framework\Exceptions\EModelDataException("Unable to handle assigned type '$type' for variable '$key'.");
+						break;
+				}
+				
+				//Set type
+				$types[$key] = $type;
+			}
+
+			//Set types
+			self::$_TYPES[$class] = $types;
+		}
+
+		return self::$_TYPES[$class];
 	}
 
-	//Static methods needed to be overridden
-	static public function properties()
+	/**
+	 * Method instantiates a Defined Model.
+	 * 
+	 */
+	static public function instantiate($data=NULL, \Framework\Database\CDatabaseDriver $driver=NULL)
 	{
-		//TODO: Get driver defaults from config --EMJ
-		return static::properties();
-	}
-
-	static public function upgrade(CModel $model)
-	{
+		//Instantiate new model object
 		$class = get_called_class();
-		var_dump($class);
-		die("UPGRADE");
+		$obj   = new $class;
+
+		//Set driver and data
+		$obj->_driver = $driver;
+		$obj->_setModelData($data);
+
+		return $obj;
 	}
 
-	/* Update Methods */
-	public function update()
+	/**
+	 * Method converts the model to an array.
+	 * @return array The array representing this model.
+	 */
+	public function toArray()
 	{
-		//Ensure _id is there
-		if(!isset($this->_idVal))
-			throw new EModelException("Cannot update without an ID.");
-
-		//Grab $variables not originals
-		$vars = $this->toArrayUpdated();
-		$key  = self::$_ID_KEYS[get_called_class()];
-		self::query()->update(array(self::$_ID_KEYS[get_called_class()] => $this->_idVal), $vars);
-
-		//Merge variables to originals
-		$this->_merge();
+		die(__METHOD__);
 	}
 
-	public function upsert(array $keys)
+	/**
+	 * Method returns the updated query.
+	 * @return array Retuns an array of the updated items.
+	 */
+	public function getUpdateQuery()
 	{
-		die("CModel::upsert");
-		if(count($keys) <= 0)
-			throw new EModelDataException("Keys must be specified for an upsert.");
+		//TODO: Handle ModelStructures
 
-		//Merge the variables
-		$this->_merge();
+		$ret = array();
+		foreach($this->_data as $key=>$val)
+		{
+			if(array_key_exists($key, $this->_variables))
+			{
+				//Figure out how to handle this data
+				if($val instanceof \Framework\Interfaces\IModelDataType)
+					$ret[$key] = $this->_driver->convertModelDataTypeToNativeDataType($this->_variables[$key]);
+				elseif(!is_object($val))
+				{
+					//TODO: set_type ?? Or set_type when we actually set the data in _setData ???
+					$ret[$key] = $val;
+				}
+				else
+				{
+					var_dump($key, $val);
+					throw new \Framework\Exceptions\EModelDataException("Unable to handle data type.");
+				}
+			}
+			elseif($val instanceof \Framework\Database\CModel)
+				$ret[$key] = $val->getUpdateQuery();
+			elseif($val instanceof \Framework\Interfaces\IDatabaseModelStructure)
+			{
+				//Convert the struct to the native driver type
+				$struct = $this->_driver->convertModelStructureToNativeStructure($this->_data[$key]);
+				$query  = $struct->getUpdateQuery();
 
-		//setup query
-		$query = array();
-		foreach($keys as $key)
-			$query[$key] = $this->_originals[$key];
-	
-		//Upsert
-		self::query()->upsert($query, $this->toArray())->execute();
+				//If query is NULL, there are no updates
+				if($query !== NULL)
+					$ret[$key] = $struct->getUpdateQuery();
+			}
+		}
+
+		return $ret;
 	}
 
-	public function insert()
+	/**
+	 * Method resets to original.
+	 */
+	public function clear()
 	{
-		die("CModel::insert");
+		$this->_variables = array();
 	}
 
-	public function save($database=NULL, $table=NULL)
+	/**
+	 * Method overloaded when setting items within the model.
+	 * @param $name The attribute name in the model.
+	 * @param $data The data to set.
+	 */
+	protected function _setData($name, $data)
 	{
-		$this->_merge();
-		$vars = $this->toArray();
+		//Ensure originals is set
+		if(!array_key_exists($name, $this->_data))
+			throw new \Framework\Exceptions\EModelDataException("Attribute '$key' is not defined in this model '\\" . get_class($this) . "'");
 
-		//Check if id is set
-		if($this->_idVal !== NULL)
-			$vars[self::$_ID_KEYS[get_called_class()]] = $this->_idVal;
-
-		//Call
-		$query= self::query();
-		
-		if($database)
-			$query->getDriver()->setDatabase($database);
-
-		if($table)
-			$query->getDriver()->setTable($table);
-
-		$id = $query->save($vars);
-
-		if($this->_idVal === NULL)
-			$this->_idVal = $id;
-	}
-	/* End Update Methods */
-
-	public function remove()
-	{
-		die("CModel::remove");
-		if(empty($this->_idVal))
-			throw new EModelException("Cannot update without an ID");
-
-		self::query()->remove(array('_id' => $this->_idVal))->execute();
+		//Check if data type and structure
+		if($this->_data[$name] instanceof \Framework\Interfaces\IModelDataType)
+		{
+			$class = get_class($this->_data[$name]);
+			$this->_variables[$name] = $class::instantiate($data);
+		}
+		elseif(!is_object($this->_data[$name]))
+			$this->_variables[$name] = $data;
+		else
+			throw new \Framework\Exceptions\EModelDataException("Unable to handle data!!");
 	}
 
-	public function getID()
+	/**
+	 * Method sets originals only if key exists in default.
+	 * @param $data The data to set.
+	 */
+	protected function _setModelData($data)
 	{
-		return $this->_idVal;
-	}
+		//TODO: Types cast everything
 
-	public function equals(UseModel $model)
-	{
-		//TODO: _id is mongo baseed, should not be! --EMJ
+		//Set data to defaults
+		$this->_data = static::defaults();
+		$types       = static::types();
+		$data        = (($data===NULL)? array() : $data);
+		foreach($this->_data as $key=>$val)
+		{
+			//TODO: Handle CModel instances of $val
+			if(!array_key_exists($key, $data) || $data[$key] === NULL)
+				continue;
 
-		return (($this->_id !== NULL && $model->_id !== NULL) && ($this->_id == $model->_id));
-	}
-
-	//Ovverride __get, __isset to ensure _id
-	protected function _getData($name)
-	{
-		if($name == "_id")
-			return $this->_idVal;
-
-		return parent::_getData($name);
-	}
-
-	protected function _issetData($name)
-	{
-		if($name == self::$_ID_KEYS[get_called_class()] && !empty($this->_idVal))
-			return true;
-
-		return parent::_issetData($name);
+			if($this->_data[$key] instanceof \Framework\Model\CModel)
+				$this->_data[$key]->_setModelData($data[$key]);
+			elseif($this->_data[$key] instanceof \Framework\Interfaces\IModelDataType)
+				$this->_data[$key]->setValue($this->_driver->convertNativeDataTypeToModelDataType($data[$key]));
+			else
+				$this->_data[$key] = $data[$key];
+		}
 	}
 }
 ?>

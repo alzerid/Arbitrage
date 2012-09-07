@@ -2,10 +2,10 @@
 namespace Framework\Database;
 
 /* Base DB Classes */
-abstract class CModelResults implements \ArrayAccess, \Iterator
+abstract class CDatabaseModelCollection implements \ArrayAccess, \Iterator
 {
 	protected $_query;    //The query object the results will work off of
-	protected $_results;  //The actual results from the query
+	protected $_collection;  //The actual results from the query
 	protected $_class;    //The model class to use for model wrapping
 
 	//Query properties
@@ -14,13 +14,13 @@ abstract class CModelResults implements \ArrayAccess, \Iterator
 	private $_skip;
 
 	/**
-	 * Constructor initializes the CModelResults object.
+	 * Constructor initializes the CDatabaseModelCollection object.
 	 */
 	public function __construct(\Framework\Database\CDriverQuery $query)
 	{
 		$this->_query   = $query;
 		$this->_class   = $query->getClass();
-		$this->_results = NULL;
+		$this->_collection = NULL;
 
 		//Query properties
 		$this->_sort  = NULL;
@@ -33,7 +33,7 @@ abstract class CModelResults implements \ArrayAccess, \Iterator
 	/**
 	 * Methos sets a sort on the query.
 	 * @param $sort The sorting property to set when querying.
-	 * @returns \Framework\Database\CModelResults Returns itself.
+	 * @returns \Framework\Database\CDatabaseModelCollection Returns itself.
 	 */
 	public function sort($sort)
 	{
@@ -44,7 +44,7 @@ abstract class CModelResults implements \ArrayAccess, \Iterator
 	/**
 	 * Methos sets a limit on the query.
 	 * @param $limit The limit property to set when querying.
-	 * @returns \Framework\Database\CModelResults Returns itself.
+	 * @returns \Framework\Database\CDatabaseModelCollection Returns itself.
 	 */
 	public function limit($limit)
 	{
@@ -55,7 +55,7 @@ abstract class CModelResults implements \ArrayAccess, \Iterator
 	/**
 	 * Methos sets a skip on the query.
 	 * @param $skip The skip property to set when querying.
-	 * @returns \Framework\Database\CModelResults Returns itself.
+	 * @returns \Framework\Database\CDatabaseModelCollection Returns itself.
 	 */
 	public function skip($skip)
 	{
@@ -96,11 +96,11 @@ abstract class CModelResults implements \ArrayAccess, \Iterator
 
 	/**
 	 * Method sets the results for this object.
-	 * @param mixed $results The results to manage.
+	 * @param mixed $collection The results to manage.
 	 */
-	public function setResults($results)
+	public function setCollection($collection)
 	{
-		$this->_results = $results;
+		$this->_collection = $collection;
 	}
 
 	/**
@@ -111,7 +111,7 @@ abstract class CModelResults implements \ArrayAccess, \Iterator
 	protected function _getModel(array $values)
 	{
 		$class = $this->_class;
-		$model = $class::model($values);
+		$model = $class::instantiate($values, $this->_query->getDriver());
 
 		return $model;
 	}

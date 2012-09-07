@@ -2,7 +2,7 @@
 namespace Framework\Database\Drivers\Mongo;
 
 /* Mongo */
-class CModelResults extends \Framework\Database\CModelResults
+class CDatabaseModelCollection extends \Framework\Database\CDatabaseModelCollection
 {
 	private $_executed;
 	private $_raw;
@@ -18,7 +18,7 @@ class CModelResults extends \Framework\Database\CModelResults
 	public function offsetExists($offset)
 	{
 		if($this->_raw == NULL)
-			$this->_raw = iterator_to_array($this->_results, false);
+			$this->_raw = iterator_to_array($this->_collection, false);
 
 		return isset($this->_raw[$offset]);
 	}
@@ -26,20 +26,20 @@ class CModelResults extends \Framework\Database\CModelResults
 	public function offsetGet($offset)
 	{
 		//Check if we even queried
-		if($this->_results == NULL)
+		if($this->_collection == NULL)
 			$this->_executeQuery();
 
-		if($this->_results != NULL)
+		if($this->_collection != NULL)
 		{
-			if(!is_array($this->_results) && $this->_raw == NULL)
-				$this->_raw = iterator_to_array($this->_results, false);
-			elseif(is_array($this->_results))
-				$this->_raw = $this->_results;
+			if(!is_array($this->_collection) && $this->_raw == NULL)
+				$this->_raw = iterator_to_array($this->_collection, false);
+			elseif(is_array($this->_collection))
+				$this->_raw = $this->_collection;
 
 			if(!isset($this->_raw[$offset]))
 				return NULL;
 
-			return$this->_getModel($this->_raw[$offset]);
+			return $this->_getModel($this->_raw[$offset]);
 		}
 
 		return NULL;
@@ -60,50 +60,50 @@ class CModelResults extends \Framework\Database\CModelResults
 	public function count()
 	{
 		$this->_executeQuery();
-		if(!$this->_results)
+		if(!$this->_collection)
 			return 0;
-		elseif(is_array($this->_results))
-			return count($this->_results);
+		elseif(is_array($this->_collection))
+			return count($this->_collection);
 
-		return $this->_results->count();
+		return $this->_collection->count();
 	}
 
 	public function current()
 	{
-		return $this->_getModel($this->_results->current());
+		return $this->_getModel($this->_collection->current());
 	}
 
 	public function key()
 	{
-		return $this->_results->key();
+		return $this->_collection->key();
 	}
 
 	public function next()
 	{
-		return $this->_results->next();
+		return $this->_collection->next();
 	}
 
 	public function rewind()
 	{
 		$this->_executeQuery();
-		return $this->_results->rewind();
+		return $this->_collection->rewind();
 	}
 
 	public function valid()
 	{
-		return $this->_results->valid();
+		return $this->_collection->valid();
 	}
 	/* End Iterator */
 
 	
 	private function _executeQuery()
 	{
-		if($this->_results != NULL || $this->_executed)
+		if($this->_collection != NULL || $this->_executed)
 			return;
 
 		//Query
-		$this->_results  = $this->_query->execute($this);
-		$this->_executed = true;
+		$this->_collection = $this->_query->execute($this);
+		$this->_executed   = true;
 	}
 }
 ?>
