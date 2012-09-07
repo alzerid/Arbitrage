@@ -32,6 +32,8 @@ class CDatabaseDriver extends \Framework\Database\CDatabaseDriver
 		//Convert Native Type to Model Type
 		if($data instanceof \MongoDate)
 			return \Framework\Model\DataTypes\CDateDataType::instantiate($data->sec);
+		elseif($data instanceof \MongoId)
+			return \Framework\Database\DataTypes\CDatabaseIDDataType::instantiate((string) $data);
 
 		throw new \Framework\Exceptions\EDatabaseDriverException("Unable to convert native data type '" . get_class($data) . " to model type.");
 	}
@@ -45,6 +47,8 @@ class CDatabaseDriver extends \Framework\Database\CDatabaseDriver
 	{
 		if($data instanceof \Framework\Model\DataTypes\CDateDataType)
 			return new \MongoDate($data->getTimestamp());
+		elseif($data instanceof \Framework\Database\DataTypes\CDatabaseIDDataType)
+			return new \MongoId($data->getID());
 
 		throw new \Framework\Exceptions\EDatabaseDriverException("Unable to convert model data type '" . get_class($data) . " to native type.");
 	}
@@ -76,6 +80,26 @@ class CDatabaseDriver extends \Framework\Database\CDatabaseDriver
 	public function convertNativeStructureToModelStructure($data)
 	{
 		die(__METHOD__);
+	}
+
+	/**
+	 * Method converts the native ID data type to a model id data type.
+	 * @param \MongoId $id The id to convert.
+	 * @param \Framework\Database\DataType\CDatabaseIDDataType Returns the Model ID data type.
+	 */
+	public function convertNativeIDtoModelID($id)
+	{
+		return \Framework\Database\DataTypes\CDatabaseIDDataType::instantiate((string) $id);
+	}
+
+	/**
+	 * Method converts the native ID data type to a model id data type.
+	 * @param \Framework\Database\DataType\CDatabaseIDDataType $id The id to convert.
+	 * @param \MongoId Returns the Model ID data type.
+	 */
+	public function convertModelIDtoNativeID(\Framework\Database\DataTypes\CDatabaseIDDataType $id)
+	{
+		return new \MongoId($id->getValue());
 	}
 }
 ?>

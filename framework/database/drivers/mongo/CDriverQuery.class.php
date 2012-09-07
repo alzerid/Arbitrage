@@ -128,7 +128,6 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 		}
 		elseif($this->_cmd == "update")
 		{
-			die(__METHOD__ . " UPDATE");
 			//Setup update
 			$update = array('$set' => $this->_smartFlatten($this->_data));
 
@@ -141,7 +140,7 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 		}
 		elseif($this->_cmd == "upsert")
 		{
-			die("CMongoModel::execute UPSERT");
+			die(__METHOD__ . " UPSERT");
 
 			//Setup update
 			$data = array('$set' => $this->_smartFlatten($this->_data));
