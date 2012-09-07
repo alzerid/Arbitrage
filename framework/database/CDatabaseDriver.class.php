@@ -103,5 +103,19 @@ abstract class CDatabaseDriver implements \Framework\Interfaces\IDatabaseDriver
 	 * @return Returns the the Native Structure.
 	 */
 	abstract public function convertNativeStructureToModelStructure($data);
+
+	/**
+	 * Method converts the native ID data type to a model id data type.
+	 * @param $id The id to convert.
+	 * @param \Framework\Database\DataTypte\CDatabaseIDDataType Returns the Model ID data type.
+	 */
+	abstract public function convertNativeIDtoModelID($id);
+
+	/**
+	 * Method converts the native ID data type to a model id data type.
+	 * @param \Framework\Database\DataTypes\CDatabaseIDDataType $id The id to convert.
+	 * @param \MongoId Returns the Model ID data type.
+	 */
+	abstract public function convertModelIDtoNativeID(\Framework\Database\DataTypes\CDatabaseIDDataType $id);
 }
 ?>

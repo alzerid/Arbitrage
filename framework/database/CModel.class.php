@@ -4,7 +4,7 @@ namespace Framework\Database;
 abstract class CModel extends \Framework\Model\CMomentoModel implements \Framework\Interfaces\IDatabaseModelStructure
 {
 	static private $_TYPES = array();
-	private $_driver;
+	protected $_driver;
 
 	public function __construct()
 	{
@@ -99,45 +99,58 @@ abstract class CModel extends \Framework\Model\CMomentoModel implements \Framewo
 		$ret = array();
 		foreach($this->_data as $key=>$val)
 		{
+			//Item in variables array
+			$value = NULL;
 			if(array_key_exists($key, $this->_variables))
 			{
 				//Figure out how to handle this data
 				if($val instanceof \Framework\Interfaces\IModelDataType)
-					$ret[$key] = $this->_driver->convertModelDataTypeToNativeDataType($this->_variables[$key]);
+					$value = $this->_driver->convertModelDataTypeToNativeDataType($this->_variables[$key]);
 				elseif(!is_object($val))
 				{
+					die("Unknown OBJECT: " . __METHOD__);
 					//TODO: set_type ?? Or set_type when we actually set the data in _setData ???
-					$ret[$key] = $val;
+					$ret[$key] = $this->_variables[$key];
 				}
 				else
 				{
-					var_dump($key, $val);
+					var_dump($key, $this->_variables[$key]);
 					throw new \Framework\Exceptions\EModelDataException("Unable to handle data type.");
 				}
 			}
 			elseif($val instanceof \Framework\Database\CModel)
-				$ret[$key] = $val->getUpdateQuery();
+				$value = $val->getUpdateQuery();
 			elseif($val instanceof \Framework\Interfaces\IDatabaseModelStructure)
 			{
 				//Convert the struct to the native driver type
 				$struct = $this->_driver->convertModelStructureToNativeStructure($this->_data[$key]);
-				$query  = $struct->getUpdateQuery();
-
-				//If query is NULL, there are no updates
-				if($query !== NULL)
-					$ret[$key] = $struct->getUpdateQuery();
+				$value  = $struct->getUpdateQuery();
 			}
+
+			//Set data point to ret
+			if($value !== NULL)
+				$ret[$key] = $value;
 		}
 
-		return $ret;
+		return ((count($ret)===0)? NULL : $ret);
 	}
 
 	/**
-	 * Method resets to original.
+	 * Method merges _variables into _data.
 	 */
-	public function clear()
+	public function merge()
 	{
-		$this->_variables = array();
+		//Iterate through and merge
+		foreach($this->_data as $key=>$val)
+		{
+			if($val instanceof \Framework\Interfaces\IDatabaseModelStructure)
+				$val->merge();
+			elseif(array_key_exists($key, $this->_variables))
+				$this->_data[$key] = $this->_variables[$key];
+		}
+
+		//Clear variables
+		$this->clear();
 	}
 
 	/**
@@ -152,6 +165,11 @@ abstract class CModel extends \Framework\Model\CMomentoModel implements \Framewo
 			throw new \Framework\Exceptions\EModelDataException("Attribute '$key' is not defined in this model '\\" . get_class($this) . "'");
 
 		//Check if data type and structure
+		if($this->_data[$name] instanceof \Framework\Interfaces\IDatabaseModelStructure)
+		{
+			echo "IDatabaseModelStructure";
+			die(__METHOD__);
+		}
 		if($this->_data[$name] instanceof \Framework\Interfaces\IModelDataType)
 		{
 			$class = get_class($this->_data[$name]);

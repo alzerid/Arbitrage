@@ -69,14 +69,14 @@ class CDatabaseModel extends \Framework\Database\CModel implements \Framework\In
 		//Grab $variables not originals
 		$vars = $this->getUpdateQuery();
 		$key  = self::$_ID_KEYS[get_called_class()];
+		$id   = $this->_driver->convertModelIDToNativeID($this->_idVal);
 
-		var_dump($key, $this->_idVal);
-		die(__METHOD__);
-
-		self::query()->update(array(self::$_ID_KEYS[get_called_class()] => $this->_idVal), $vars);
+		//Query
+		if($vars !== NULL)
+			self::query()->update(array($key => $id), $vars);
 
 		//Merge variables to originals
-		$this->_merge();
+		$this->merge();
 	}
 
 	public function upsert(array $keys)
@@ -182,19 +182,19 @@ class CDatabaseModel extends \Framework\Database\CModel implements \Framework\In
 
 		if($key && isset($data[$key]))
 		{
-			$id = $data[$key];
+			$id = (string) $data[$key];
 			unset($data[$key]);
 		}
 
 		//Unset the _id and set locally if exists
 		if($id !== NULL)
-			$this->_idVal = \Framework\Database\DataTypes\CDatabaseIDDataType::instantiate($id);
+			$this->_idVal = $this->_driver->convertNativeIDtoModelID($id);
 
 		//Call parent
 		parent::_setModelData($data);
 
 		//Set data to defaults
-		$this->_data = static::defaults();
+		/*$this->_data = static::defaults();
 		foreach($this->_data as $key=>$val)
 		{
 			//TODO: Handle CModel instances of $val
@@ -205,7 +205,7 @@ class CDatabaseModel extends \Framework\Database\CModel implements \Framework\In
 				$this->_data[$key]->_setModelData($data[$key]);
 			else
 				$this->_data[$key] = $val;
-		}
+		}*/
 	}
 }
 ?>
