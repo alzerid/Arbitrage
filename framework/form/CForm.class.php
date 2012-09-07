@@ -31,7 +31,7 @@ Class CForm extends CFormModel
 		//Get value and create a CFormMOdel
 		$values        = (($this->_values === NULL)? array() : (($this->_values instanceof \Framework\Interfaces\IModel)? $this->_values->toArray() : $this->_values));
 		$this->_model  = (($this->_values instanceof \Framework\Interfaces\IModel)? get_class($this->_values) : NULL);
-		$this->_values = new CFormModel($values);
+		$this->_values = CFormModel::instantiate($values);
 	}
 
 	static public function autoLoad($class_name)

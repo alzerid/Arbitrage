@@ -1,7 +1,7 @@
 <?
 namespace Framework\Forms;
 
-class CFormModel extends \Framework\Utils\CArrayObject
+class CFormModel extends \Framework\Model\CModel
 {
 	/**
 	 * Method converts the FormModel values to a \Framework\Interface\IModel.
