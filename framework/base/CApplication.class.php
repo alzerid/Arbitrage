@@ -21,6 +21,13 @@ abstract class CApplication extends CPackage implements \Framework\Interfaces\IE
 		//Register autoload
 		spl_autoload_register(array($this, 'handleAutoLoad'), true, true);
 
+		//Load model items
+		CKernel::getInstance()->requireFrameworkFile('Model.CModel');
+		CKernel::getInstance()->requireFrameworkFile('Model.CMomentoModel');
+		CKernel::getInstance()->requireFrameworkFile('Model.DataTypes.CDateDataType');
+		CKernel::getInstance()->requireFrameworkFile('Model.Structures.CArrayStructure');
+		//CKernel::getInstance()->requireFrameworkFile('Model.Structures.CHashStructure');
+
 		//Call CPackage::initialize
 		parent::initialize();
 	}

@@ -63,6 +63,7 @@ class CKernel implements ISingleton
 		$this->requireFrameworkFile('Events');                               //Events
 		$this->requireFrameworkFile('ErrorHandler.CErrorHandlerObserver');   //Error Handler Observer
 		$this->requireFrameworkFile('Utils.CArrayObject');                   //Array object used by most Arbitrage classes
+		$this->requireFrameworkFile('Utils.CObjectAccess');                  //Array object used by most Arbitrage classes
 		$this->requireFrameworkFile('Base.CService');                        //Base service class
 		$this->requireFrameworkFile('Base.CServiceContainer');               //Service container class
 		$this->requireFrameworkFile('Base.CExtension');                      //Extension class
