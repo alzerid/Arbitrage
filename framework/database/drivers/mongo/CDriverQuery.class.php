@@ -100,11 +100,14 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 		//Get handle
 		$handle = $this->_driver->getHandle();
 		$handle = $handle->{$prop['database']}->{$prop['table']};
+		
+		//Normalize the query
+		$query = $this->_normalizeQuery($this->_query);
 
 		//Query
 		if(in_array($this->_cmd, array('find', 'findOne', 'count')))
 		{
-			$res = $handle->{$this->_cmd}($this->_query);
+			$res = $handle->{$this->_cmd}($query);
 			if($res === NULL)
 				return NULL;
 
@@ -132,7 +135,7 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 			$update = array('$set' => $this->_smartFlatten($this->_data));
 
 			//Setup conditions
-			$query = new \Framework\Utils\CArrayObject($this->_query);
+			$query = new \Framework\Utils\CArrayObject($query);
 			$query = $query->flatten()->toArray();
 
 			//Update
@@ -144,7 +147,7 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 
 			//Setup update
 			$data = array('$set' => $this->_smartFlatten($this->_data));
-			$cond = new \CArrayObject($this->_query);
+			$cond = new \CArrayObject($query);
 			$cond = $cond->flatten()->toArray();
 
 			//Upsert
@@ -163,7 +166,7 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 		elseif($this->_cmd == "remove")
 		{
 			die("CMongoModel::execute REMOVE");
-			$handle->remove($this->_query);
+			$handle->remove($query);
 		}
 		else
 			throw new EModelException("Cannot do batch operation on '{$this->_cmd}'.");
@@ -181,6 +184,24 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 				$ret = array_merge($ret, $this->_smartFlatten($val, $key));
 			else
 				$ret[$key] = $val;
+		}
+
+		return $ret;
+	}
+
+	private function _normalizeQuery($query)
+	{
+		//TODO: Convert ALL structures and data types
+
+		$ret = array();
+		foreach($query as $key=>$val)
+		{
+			if($val instanceof \Framework\Interfaces\IModelDataType)
+				$value = $this->_driver->convertModelDataTypeToNativeDataType($val);
+			else
+				$value = $val;
+
+			$ret[$key] = $value;
 		}
 
 		return $ret;

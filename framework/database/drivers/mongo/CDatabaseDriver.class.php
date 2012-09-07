@@ -48,7 +48,7 @@ class CDatabaseDriver extends \Framework\Database\CDatabaseDriver
 		if($data instanceof \Framework\Model\DataTypes\CDateDataType)
 			return new \MongoDate($data->getTimestamp());
 		elseif($data instanceof \Framework\Database\DataTypes\CDatabaseIDDataType)
-			return new \MongoId($data->getID());
+			return new \MongoId($data->getValue());
 
 		throw new \Framework\Exceptions\EDatabaseDriverException("Unable to convert model data type '" . get_class($data) . " to native type.");
 	}
