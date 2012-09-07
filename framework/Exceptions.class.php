@@ -82,6 +82,7 @@ final class EDatabaseDriverException extends \Exception { }
 final class EModelException extends \Exception { };
 final class EModelDataException extends \Exception { };
 final class EModelDataTypeException extends \Exception { };
+final class EModelStructureException extends \Exception { };
 final class EArbitrageConfigException extends EArbitrageException { }
 final class EArbitrageRemoteCacheException extends EArbitrageException { }
 final class EArrayObjectException extends EArbitrageException { }
