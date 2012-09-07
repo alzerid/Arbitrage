@@ -200,6 +200,7 @@ interface IDatabaseModelStructure
 {
 	public function getUpdateQuery();
 	public function clear();
+	public function merge();
 }
 
 /**
