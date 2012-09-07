@@ -90,8 +90,6 @@ class CArrayStructure extends \Framework\Model\CModel implements \Iterator
 	 */
 	protected function _setData($name, $val)
 	{
-		//TODO: Handle with _unset variables
-
 		if($name === "")
 			$this->_data[] = $val;
 		elseif(is_numeric($name))
