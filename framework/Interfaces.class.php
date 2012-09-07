@@ -161,19 +161,24 @@ interface IAction
 	public function execute();
 }
 
+
 /**
- * IModel interface
+ * Model Structure Type
  */
 interface IModel
 {
-	/*public function save();
-	public function update();
-	public function getID();
+	public function __construct();
+	public function toArray();
+	//public function clear();
+}
 
-	//Bulk/Single operations
-	public function findAll($condition = array());
-	public function findOne($condition = array());
-	public function remove($condition = array());*/
+/**
+ * Model Data Type Interface
+ */
+interface IModelDataType extends IInstantiate
+{
+	//public function getValue();
+	public function setValue();
 }
 
 /**
@@ -189,11 +194,12 @@ interface IDatabaseModel extends IModel
 }
 
 /**
- * Database Data type
+ * IDatabaseModelStructure
  */
-interface IModelDataType
+interface IDatabaseModelStructure
 {
-	public function __construct($data=NULL);
+	public function getUpdateQuery();
+	public function clear();
 }
 
 /**
@@ -287,8 +293,19 @@ interface IErrorHandlerService
 }
 /** End Service Interfaces **/
 
-interface IArbitragePath
+/**
+ * IAPath similiar to XPATH
+ */
+interface IAPath
 {
 	public function apath($path);
+}
+
+/**
+ * IXPath implementation
+ */
+interface IXPath
+{
+	public function xpath($path);
 }
 ?>
