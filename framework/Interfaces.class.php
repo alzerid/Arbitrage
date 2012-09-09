@@ -33,6 +33,23 @@ interface IFactory
 /*******************************/
 
 /**
+ * Value Object Interface
+ */
+interface IValueObject
+{
+	public function getValue();
+	public function setValue();
+}
+
+/**
+ * To String Interface
+ */
+interface IStringable
+{
+	public function _toString();
+}
+
+/**
  * IModuleLoader interface
  * Interface used when loading modules (see CDatabaseDriverFactory)
  */
@@ -175,10 +192,8 @@ interface IModel
 /**
  * Model Data Type Interface
  */
-interface IModelDataType extends IInstantiate
+interface IModelDataType extends IInstantiate, IValueObject
 {
-	//public function getValue();
-	public function setValue();
 }
 
 /**
