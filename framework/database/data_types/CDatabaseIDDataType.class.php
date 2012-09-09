@@ -42,5 +42,13 @@ class CDatabaseIDDataType implements \Framework\Interfaces\IModelDataType
 	{
 		return $this->_id;
 	}
+
+	/**
+	 * Method that converts to string.
+	 */
+	public function __toString()
+	{
+		return $this->_id;
+	}
 }
 ?>
