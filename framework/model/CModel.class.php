@@ -23,6 +23,52 @@ class CModel extends \Framework\Utils\CObjectAccess
 		return $obj;
 	}
 
+	/**************************/
+	/** APath Implementation **/
+	/**************************/
+	
+	/**
+	 * Method traverses the values with Arbitrage Namespace Notation.
+	 * @param string $path The arbitrage path.
+	 * @param \Framework\Utils\CArrayObject $obj The object to traverse.
+	 * @return mixed Returns a value or a \Framework\Utils\CArrayObject.
+	 */
+	public function apath($path, \Framework\Utils\CObjectAccess $obj=NULL)
+	{
+		//Start iterating
+		if($obj===NULL)
+			return $this->apath($path, $this);
+
+		//Get key
+		$path = explode('.', $path);
+		$key  = array_splice($path, 0, 1);
+		$key  = $key[0];
+
+		//Select value
+		if(empty($obj[$key]))
+			return NULL;
+			
+		//Figure out if we recurse
+		$val = $obj[$key];
+		if(count($path))
+			return $this->apath(implode('.', $path), $val);
+
+		//If DataType then return
+		if($val instanceof \Framework\Interfaces\IModelDataType)
+		{
+			var_dump($val);
+			var_duMP("Code IModelDataType");
+			die(__METHOD__);
+			return $val->getValue();
+		}
+
+		return $val;
+	}
+
+	/******************************/
+	/** END APath Implementation **/
+	/******************************/
+
 	/****************************/
 	/** CObjectAccess Overload **/
 	/****************************/
