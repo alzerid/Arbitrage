@@ -52,5 +52,13 @@ class CDateDataType extends \DateTime implements \Framework\Interfaces\IModelDat
 	{
 		return $this;
 	}
+
+	/**
+	 * To string
+	 */
+	public function __toString()
+	{
+		return $this->format("r");
+	}
 }
 ?>
