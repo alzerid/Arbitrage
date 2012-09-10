@@ -121,7 +121,6 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 				if($results->getLimit() !== NULL)
 					$res = $res->limit($results->getLimit());
 
-				//Create ModelList
 				return $res;
 			}
 			elseif($this->_cmd == "findOne")
