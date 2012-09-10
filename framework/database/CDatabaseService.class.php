@@ -14,18 +14,9 @@ class CDatabaseService extends \Framework\Base\CService implements \Framework\In
 		//Require base service classes
 		$this->requireServiceFile("CDatabaseDriver");                              //Database driver base class
 		$this->requireServiceFile("CDatabaseModelCollection");                     //Wrapper class that keeps a collection of models
-		$this->requireServiceFile("DataTypes.CDatabaseIDDataType");
-		$this->requireServiceFile("Structures.CArrayStructure");
-
-		//$this->requireServiceFile("DataTypes.CDatabaseIDDataType");                //ID Datatype
-		//$this->requireServiceFile("DataTypes.CModelArrayDataType");                //Database model array data type
-		/*$this->requireServiceFile("DataTypes.ModelPrimitive");                   //Model Primitive data type
-		$this->requireServiceFile("DataTypes.ModelProxyPrimitive");                //Model Proxy primitive
-		$this->requireServiceFile("DataTypes.ModelID");                            //Model ID Data Type
-		$this->requireServiceFile("DataTypes.ModelDate");                          //Model Date type
-		$this->requireServiceFile("Types.CModelData");                             //Basic Model data type
-		$this->requireServiceFile("Types.CModelArrayData");                        //Array data type
-		$this->requireServiceFile("Types.CModelHashData");                         //Hash (key value pair) type*/
+		$this->requireServiceFile("DataTypes.CDatabaseIDDataType");                //Include database ID data type
+		$this->requireServiceFile("Structures.CArrayStructure");                   //Include array structure
+		$this->requireServiceFile("Structures.CHashStructure");                    //Include hash structure
 		$this->requireServiceFile("CDriverQuery");                                 //Driver query
 		$this->requireServiceFile("CDriverBatch");                                 //Driver batch
 		$this->requireServiceFile("CModel");                                       //Defined Model
