@@ -44,5 +44,13 @@ class CDateDataType extends \DateTime implements \Framework\Interfaces\IModelDat
 		//Set time zone
 		$this->setTimezone($tz);
 	}
+
+	/**
+	 * Method returns this.
+	 */
+	public function getValue()
+	{
+		return $this;
+	}
 }
 ?>
