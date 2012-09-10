@@ -3,8 +3,8 @@ namespace Framework\Database;
 
 abstract class CDriverQuery
 {
-	protected $_class;
-	protected $_driver;
+	protected $_class;    //Class to use when creating Models
+	protected $_driver;   //Driver object to use for querying
 
 	//Query
 	protected $_query;
