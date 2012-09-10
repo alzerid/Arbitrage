@@ -20,7 +20,10 @@ class CDatabaseIDDataType implements \Framework\Interfaces\IModelDataType
 		$class    = get_called_class();
 		$obj      = new $class;
 
-		$obj->setValue($id);
+		if($id instanceof \Framework\Database\DataTypes\CDatabaseIDDataType)
+			$obj->_id = $id->_id;
+		else
+			$obj->setValue($id);
 
 		return $obj;
 	}
@@ -31,7 +34,10 @@ class CDatabaseIDDataType implements \Framework\Interfaces\IModelDataType
 	 */
 	public function setValue($id=-1)
 	{
-		$this->_id = $id;
+		if($id instanceof \Framework\Database\DataTypes\CDatabaseIDDataType)
+			$this->_id = $id->_id;
+		else
+			$this->_id = $id;
 	}
 
 	/**
@@ -50,5 +56,6 @@ class CDatabaseIDDataType implements \Framework\Interfaces\IModelDataType
 	{
 		return $this->_id;
 	}
+
 }
 ?>
