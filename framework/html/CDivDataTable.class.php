@@ -47,6 +47,7 @@ class CDivDataTable extends \Framework\HTML\CDataTable
 					$html .= '<div class="entry">' . $val . '</div>';
 				}
 
+				$html .= "<div class=\"clear\"></div>";
 				$html .= "</div>";
 			}
 		}
