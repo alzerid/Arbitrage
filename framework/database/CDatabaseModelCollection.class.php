@@ -4,14 +4,16 @@ namespace Framework\Database;
 /* Base DB Classes */
 abstract class CDatabaseModelCollection implements \ArrayAccess, \Iterator
 {
-	protected $_query;    //The query object the results will work off of
+	protected $_query;       //The query object the results will work off of
 	protected $_collection;  //The actual results from the query
-	protected $_class;    //The model class to use for model wrapping
+	protected $_class;       //The model class to use for model wrapping
 
 	//Query properties
 	private $_sort;
 	private $_limit;
 	private $_skip;
+	private $_join;        //Join statement
+
 
 	/**
 	 * Constructor initializes the CDatabaseModelCollection object.
@@ -31,7 +33,7 @@ abstract class CDatabaseModelCollection implements \ArrayAccess, \Iterator
 	/** Query Property Modifiers **/
 
 	/**
-	 * Methos sets a sort on the query.
+	 * Methods sets a sort on the query.
 	 * @param $sort The sorting property to set when querying.
 	 * @returns \Framework\Database\CDatabaseModelCollection Returns itself.
 	 */
@@ -42,7 +44,7 @@ abstract class CDatabaseModelCollection implements \ArrayAccess, \Iterator
 	}
 
 	/**
-	 * Methos sets a limit on the query.
+	 * Methods sets a limit on the query.
 	 * @param $limit The limit property to set when querying.
 	 * @returns \Framework\Database\CDatabaseModelCollection Returns itself.
 	 */
@@ -53,7 +55,7 @@ abstract class CDatabaseModelCollection implements \ArrayAccess, \Iterator
 	}
 
 	/**
-	 * Methos sets a skip on the query.
+	 * Methods sets a skip on the query.
 	 * @param $skip The skip property to set when querying.
 	 * @returns \Framework\Database\CDatabaseModelCollection Returns itself.
 	 */
@@ -62,6 +64,16 @@ abstract class CDatabaseModelCollection implements \ArrayAccess, \Iterator
 		$this->_skip = $skip;
 		return $this;
 	}
+
+	/**
+	 * Method setss the join query.
+	 */
+	public function join(array $join)
+	{
+		$this->_join = $join;
+		return $this;
+	}
+
 	/** END Query Property Modifiers **/
 
 	/** Query Property Accessors Modifiers **/
@@ -91,6 +103,15 @@ abstract class CDatabaseModelCollection implements \ArrayAccess, \Iterator
 	public function getSkip()
 	{
 		return $this->_skip;
+	}
+
+	/**
+	 * Method returns the join property.
+	 * @returns mixed The join property.
+	 */
+	public function getJoin()
+	{
+		return $this->_join;
 	}
 	/** END Query Property Accessors Modifiers **/
 
