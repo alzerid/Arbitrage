@@ -154,6 +154,21 @@ abstract class CModel extends \Framework\Model\CMomentoModel implements \Framewo
 	}
 
 	/**
+	 * Method converts the database model to a simple \Framework\Model\CModel
+	 * @return Returns the \Framework\Model\CModel representation of this DatabaseModel.
+	 */
+	public function convertToBaseModel()
+	{
+		$model = new \Framework\Model\CModel;
+
+		//Set from data
+		foreach($this->_data as $key=>$val)
+			$model->$key = $this->$key;
+			
+		return $model;
+	}
+
+	/**
 	 * Method overloaded when setting items within the model.
 	 * @param $name The attribute name in the model.
 	 * @param $data The data to set.
