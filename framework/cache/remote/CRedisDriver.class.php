@@ -86,6 +86,11 @@ class CRedisDriver implements \Framework\Interfaces\IDriver, \Framework\Interfac
 		return $this->_cache->rPop($key);
 	}
 
+	public function length($key)
+	{
+		return $this->_cache->lSize($key);
+	}
+
 
 	/***********************/
 	/** IDriver Interface **/
