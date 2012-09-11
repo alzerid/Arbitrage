@@ -59,6 +59,14 @@ class CHashStructure extends \Framework\Model\CMomentoModel implements \Framewor
 		$this->_data = $this->_originals;
 	}
 
+	/**
+	 * Returns the array representation of this structure.
+	 */
+	public function toArray()
+	{
+		die(__METHOD__);
+	}
+
 	/*****************************/
 	/** Iterator Implementation **/
 	/*****************************/
