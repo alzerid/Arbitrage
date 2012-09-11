@@ -3,9 +3,9 @@ namespace Framework\Database\Drivers\Mongo;
 
 class CDriverBatch extends \Framework\Database\CDriverBatch
 {
-	public function execute(\Framework\Database\CModelResults $results)
+	public function execute()
 	{
-		die("CMongoModelBatch::execute");
+		die(__METHOD__);
 		//Execute command
 		$class = $this->_class;
 		$prop  = $class::properties();
