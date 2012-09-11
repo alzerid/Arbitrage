@@ -55,12 +55,7 @@ class CModel extends \Framework\Utils\CObjectAccess
 
 		//If DataType then return
 		if($val instanceof \Framework\Interfaces\IModelDataType)
-		{
-			var_dump($val);
-			var_duMP("Code IModelDataType");
-			die(__METHOD__);
 			return $val->getValue();
-		}
 
 		return $val;
 	}
@@ -136,6 +131,8 @@ class CModel extends \Framework\Utils\CObjectAccess
 				//Associative array
 				if(array_keys($val) !== range(0, count($val)-1))
 				{
+					$this->_data[$key] = $val;
+					var_dump($this->_data);
 					die(__METHOD__ . " HASH!!");
 				}
 				else
