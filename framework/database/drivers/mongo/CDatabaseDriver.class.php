@@ -12,12 +12,12 @@ class CDatabaseDriver extends \Framework\Database\CDatabaseDriver
 		$this->_handle = new \Mongo($uri);
 	}
 
-	public function getQuery($class)
+	public function getQueryDriver($class)
 	{
 		return new CMongoModelQuery($this, $class);
 	}
 
-	public function getBatch()
+	public function getBatchDriver()
 	{
 		die(__METHOD__);
 	}
