@@ -69,12 +69,12 @@ abstract class CDatabaseDriver implements \Framework\Interfaces\IDatabaseDriver
 	/**
 	 * Abstract method returns the correct Query class.
 	 */
-	abstract public function getQuery($class);
+	abstract public function getQueryDriver($class);
 
 	/**
 	 * Abstract method reutns a batch object.
 	 */
-	abstract public function getBatch();
+	abstract public function getBatchDriver();
 
 	/**
 	 * Method converts native data types to model data types.
