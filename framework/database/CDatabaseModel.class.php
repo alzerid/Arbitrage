@@ -5,6 +5,13 @@ class CDatabaseModel extends \Framework\Database\CModel implements \Framework\In
 {
 	static private $_ID_KEYS = array();
 	private $_idVal          = NULL;
+	private $_properties     = NULL;
+
+	public function __construct()
+	{
+		$this->_properties = self::properties();
+		parent::__construct();
+	}
 
 	static public function idKey()
 	{
@@ -31,7 +38,7 @@ class CDatabaseModel extends \Framework\Database\CModel implements \Framework\In
 	 */
 	static public function query()
 	{
-		return \Framework\Base\CKernel::getInstance()->getApplication()->getService('database')->getDriver(static::properties())->getQuery(get_called_class());
+		return \Framework\Base\CKernel::getInstance()->getApplication()->getService('database')->getDriver(static::properties())->getQueryDriver(get_called_class());
 	}
 
 	static public function batch()
@@ -53,6 +60,33 @@ class CDatabaseModel extends \Framework\Database\CModel implements \Framework\In
 	{
 		//TODO: Get driver defaults from config --EMJ
 		return static::properties();
+	}
+
+	/**
+	 * Method sets the database to use for this model.
+	 * @param string The database to use.
+	 */
+	public function setDatabase($database)
+	{
+		$this->_properties['database'] = $database;
+	}
+
+	/**
+	 * Method sets the table to use for this model.
+	 * @param string The table to use.
+	 */
+	public function setTable($table)
+	{
+		$this->_properties['table'] = $table;
+	}
+
+	/**
+	 * Method returns the properties for this Model.
+	 * @return array The model properties to return.
+	 */
+	public function getProperties()
+	{
+		return $this->_properties;
 	}
 
 	/***********************************/
@@ -102,27 +136,35 @@ class CDatabaseModel extends \Framework\Database\CModel implements \Framework\In
 		die(__METHOD__);
 	}
 
-	public function save($database=NULL, $table=NULL)
+	public function save()
 	{
-		die(__METHOD__);
-		$this->_merge();
-		$vars = $this->toArray();
+		//TODO: Remove database and table parameters. User model properties for these actions --EMJ
+
+		//Get query driver
+		$query = self::query();
+		$prop  = $this->getProperties();
+		
+		if(isset($prop['database']))
+			$query->getDriver()->setDatabase($prop['database']);
+
+		if(isset($prop['table']))
+			$query->getDriver()->setTable($prop['table']);
+
+		//Set driver for model
+		$this->_driver = $query->getDriver();
+
+		//Get variables
+		$this->merge();
+		$vars = $this->getQuery();
 
 		//Check if id is set
 		if($this->_idVal !== NULL)
 			$vars[self::$_ID_KEYS[get_called_class()]] = $this->_idVal;
 
-		//Call
-		$query= self::query();
-		
-		if($database)
-			$query->getDriver()->setDatabase($database);
-
-		if($table)
-			$query->getDriver()->setTable($table);
-
+		//Save using the Query Driver
 		$id = $query->save($vars);
 
+		//Get id an set it to model
 		if($this->_idVal === NULL)
 			$this->_idVal = $id;
 	}
