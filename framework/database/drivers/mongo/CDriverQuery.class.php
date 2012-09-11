@@ -8,7 +8,7 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 		$this->_cmd   = 'findOne';
 		$this->_query = $query;
 
-		return new CDatabaseModelCollection($this);
+		return $this;
 	}
 
 	public function findAll($query=array())
@@ -16,17 +16,17 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 		$this->_cmd   = 'find';
 		$this->_query = $query;
 
-		return new CDatabaseModelCollection($this);
+		return $this;
 	}
 
-	public function count($query=array())
+	/*public function count($query=array())
 	{
 		die('count');
 		$this->_cmd   = 'count';
 		$this->_query = $query;
 
 		return $this;
-	}
+	}*/
 
 	public function update($query, $data)
 	{
@@ -34,11 +34,8 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 		$this->_query = $query;
 		$this->_data  = $data;
 
-		//Create results class
-		$results = new CDatabaseModelCollection($this);
-
 		//Execute
-		return $this->execute($results);
+		return $this->execute();
 	}
 
 	public function upsert($query, $data)
@@ -67,11 +64,8 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 		$this->_query = NULL;
 		$this->_data  = $data;
 
-		//Create results class
-		$results = new CDatabaseModelCollection($this);
-
 		//Execute
-		return $this->execute($results);
+		return $this->execute();
 	}
 
 	public function remove($query)
@@ -84,7 +78,7 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 		return $this;
 	}
 
-	public function execute(\Framework\Database\CDatabaseModelCollection $results)
+	public function execute()
 	{
 		//Execute command
 		$class = $this->_class;
@@ -114,12 +108,12 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 			if($this->_cmd == "find")
 			{
 				//Sort
-				if($results->getSort() !== NULL)
-					$res = $res->sort($results->getSort());
+				if($this->_sort !== NULL)
+					$res->sort($this->_sort);
 
 				//Limit
-				if($results->getLimit() !== NULL)
-					$res = $res->limit($results->getLimit());
+				if($this->_limit !== NULL)
+					$res->limit($this->_limit);
 
 				return $res;
 			}
@@ -134,7 +128,7 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 			$update = array('$set' => $this->_smartFlatten($this->_data));
 
 			//Setup conditions
-			$query = new \Framework\Utils\CArrayObject($query);
+			$query = \Framework\Utils\CArrayObject::instantiate($query); //new \Framework\Utils\CArrayObject($query);
 			$query = $query->flatten()->toArray();
 
 			//Update
@@ -173,6 +167,40 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 		return NULL;
 	}
 
+	/* Array Access */
+	public function offsetExists($offset)
+	{
+		die(__METHOD__);
+	}
+
+	public function offsetGet($offset)
+	{
+		$this->_getCollection();
+		return $this->_collection[$offset];
+	}
+
+	public function offsetSet($offset, $value)
+	{
+		throw new \EArbitrageException("Unable to set offset for Model Results.");
+	}
+
+	public function offsetUnset($offset)
+	{
+		throw new \EArbitrageException("Unable to unset offset for Model Results.");
+	}
+	/* End Array Access */
+
+	protected function _getCollection()
+	{
+		//Check collection
+		if($this->_collection)
+			return $this->_collection;
+
+		//Get collection
+		$this->_collection = new \Framework\Database\Drivers\Mongo\CDatabaseModelCollection($this, $this->execute());
+		return $this->_collection;
+	}
+
 	private function _smartFlatten($arr, $namespace='')
 	{
 		$ret = array();
@@ -191,6 +219,10 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 	private function _normalizeQuery($query)
 	{
 		//TODO: Convert ALL structures and data types
+
+		//Check query
+		if($query === NULL)
+			return array();
 
 		$ret = array();
 		foreach($query as $key=>$val)
