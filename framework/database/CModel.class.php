@@ -85,7 +85,56 @@ abstract class CModel extends \Framework\Model\CMomentoModel implements \Framewo
 	 */
 	public function toArray()
 	{
-		die(__METHOD__);
+		$ret = array();
+		foreach($this->_data as $key=>$value)
+		{
+			if($value instanceof \Framework\Database\CModel)
+				$value = $value->toArray();
+			elseif($value instanceof \Framework\Interfaces\IDatabaseModelStructure)
+			{
+				//Convert the struct to the native driver type
+				$struct = $this->_driver->convertModelStructureToNativeStructure($this->_data[$key]);
+				$value  = $struct->toArray();
+			}
+			elseif($value instanceof \Framework\Interfaces\IModelDataType)
+				$value = (string) $value;
+
+			//Set key
+			$ret[$key] = $value;
+		}
+
+		return $ret;
+	}
+
+	/**
+	 * Method returns the query.
+	 */
+	public function getQuery()
+	{
+		$ret = array();
+		foreach($this->_data as $key=>$value)
+		{
+			$value = $this->$key;
+			if($value instanceof \Framework\Interfaces\IModelDataType)
+				$value = $this->_driver->convertModelDataTypeToNativeDataType($value);
+			elseif($value instanceof \Framework\Database\CModel)
+				$value = $this->getQuery();
+			elseif($value instanceof \Framework\Interfaces\IDatabaseModelStructure)
+			{
+				$struct = $this->_driver->convertModelStructureToNativeStructure($value);
+				$value  = $struct->getQuery();
+			}
+			elseif(is_object($value))
+			{
+				var_dump($key, $value);
+				throw new \Framework\Exceptions\EModelDataException("Unable to handle query conversion");
+			}
+
+			//Assign values
+			$ret[$key] = $value;
+		}
+
+		return ((count($ret)===0)? NULL : $ret);
 	}
 
 	/**
@@ -166,6 +215,15 @@ abstract class CModel extends \Framework\Model\CMomentoModel implements \Framewo
 			$model->$key = $this->$key;
 			
 		return $model;
+	}
+
+	/**
+	 * Method returns the driver.
+	 * @return Returns the driver.
+	 */
+	public function getDriver()
+	{
+		return $this->_driver;
 	}
 
 	/**
