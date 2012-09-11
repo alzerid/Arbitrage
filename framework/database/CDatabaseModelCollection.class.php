@@ -6,14 +6,6 @@ abstract class CDatabaseModelCollection implements \ArrayAccess, \Iterator
 {
 	protected $_query;       //The query object the results will work off of
 	protected $_collection;  //The actual results from the query
-	protected $_class;       //The model class to use for model wrapping
-
-	//Query properties
-	private $_sort;
-	private $_limit;
-	private $_skip;
-	private $_join;        //Join statement
-
 
 	/**
 	 * Constructor initializes the CDatabaseModelCollection object.
@@ -21,7 +13,6 @@ abstract class CDatabaseModelCollection implements \ArrayAccess, \Iterator
 	public function __construct(\Framework\Database\CDriverQuery $query)
 	{
 		$this->_query   = $query;
-		$this->_class   = $query->getClass();
 		$this->_collection = NULL;
 
 		//Query properties
@@ -30,51 +21,6 @@ abstract class CDatabaseModelCollection implements \ArrayAccess, \Iterator
 		$this->_skip  = NULL;
 	}
 
-	/** Query Property Modifiers **/
-
-	/**
-	 * Methods sets a sort on the query.
-	 * @param $sort The sorting property to set when querying.
-	 * @returns \Framework\Database\CDatabaseModelCollection Returns itself.
-	 */
-	public function sort($sort)
-	{
-		$this->_sort = $sort;
-		return $this;
-	}
-
-	/**
-	 * Methods sets a limit on the query.
-	 * @param $limit The limit property to set when querying.
-	 * @returns \Framework\Database\CDatabaseModelCollection Returns itself.
-	 */
-	public function limit($limit)
-	{
-		$this->_limit = $limit;
-		return $this;
-	}
-
-	/**
-	 * Methods sets a skip on the query.
-	 * @param $skip The skip property to set when querying.
-	 * @returns \Framework\Database\CDatabaseModelCollection Returns itself.
-	 */
-	public function skip($skip)
-	{
-		$this->_skip = $skip;
-		return $this;
-	}
-
-	/**
-	 * Method setss the join query.
-	 */
-	public function join(array $join)
-	{
-		$this->_join = $join;
-		return $this;
-	}
-
-	/** END Query Property Modifiers **/
 
 	/** Query Property Accessors Modifiers **/
 
@@ -131,7 +77,7 @@ abstract class CDatabaseModelCollection implements \ArrayAccess, \Iterator
 	 */
 	protected function _getModel(array $values)
 	{
-		$class = $this->_class;
+		$class = $this->_query->getClass();
 		$model = $class::instantiate($values, $this->_query->getDriver());
 
 		return $model;
