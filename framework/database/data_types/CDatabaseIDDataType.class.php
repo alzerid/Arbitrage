@@ -15,7 +15,7 @@ class CDatabaseIDDataType implements \Framework\Interfaces\IModelDataType
 	 * @param $id The id to instantiate.
 	 * @return \Framework\Database\DataTypes\CDatabaseIDDataType
 	 */
-	static public function instantiate($id)
+	static public function instantiate($id=NULL)
 	{
 		$class    = get_called_class();
 		$obj      = new $class;
