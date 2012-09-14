@@ -27,6 +27,34 @@ class CArrayObject implements \ArrayAccess, \Iterator, \Framework\Interfaces\IIn
 			throw new \Framework\Exceptions\EArrayObjectException("Unknown type for instantiation.");
 	}
 
+	/**
+	 * Method returns the first entry in the data array.
+	 * @return Returns the first entry in the object access.
+	 */
+	public function first()
+	{
+		$keys = array_keys($this->_data);
+		if(count($keys) <= 0)
+			return NULL;
+
+		return $this->_data[$keys[0]];
+	}
+
+	/**
+	 * Method returns the last entry in the data array.
+	 * @return Returns the last entry in the object access.
+	 */
+	public function last()
+	{
+		$keys = array_keys($this->_data);
+		$idx  = count($keys)-1;
+
+		if($idx<0)
+			return NULL;
+
+		return $this->_data[$keys[$idx]];
+	}
+
 	/* Start Property Access Methods */
 	public function __get($name)
 	{
@@ -62,7 +90,10 @@ class CArrayObject implements \ArrayAccess, \Iterator, \Framework\Interfaces\IIn
 
 	protected function _set($name, $value)
 	{
-		$this->_data[$name] = $value;
+		if($name === "")
+			$this->_data[] = $value;
+		else
+			$this->_data[$name] = $value;
 	}
 
 	protected function _isset($name)
@@ -85,21 +116,17 @@ class CArrayObject implements \ArrayAccess, \Iterator, \Framework\Interfaces\IIn
 
 	public function offsetGet($offset)
 	{
-		$data = $this->_data[$offset];
-		if(is_array($data))
-			$data = new CArrayObject($data);
-
-		return $data;
+		return $this->$offset;
 	}
 
 	public function offsetSet($offset, $val)
 	{
-		$this->_data[$offset] = $val;
+		$this->$offset = $val;
 	}
 
 	public function offsetUnset($offset)
 	{
-		unset($this->_data[$offset]);
+		$this->__unset($offset);
 	}
 	/* End Array Access Methods */
 
