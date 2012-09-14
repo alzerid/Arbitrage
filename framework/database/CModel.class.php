@@ -275,7 +275,12 @@ abstract class CModel extends \Framework\Model\CMomentoModel implements \Framewo
 			if($this->_data[$key] instanceof \Framework\Model\CModel)
 				$this->_data[$key]->_setModelData($data[$key]);
 			elseif($this->_data[$key] instanceof \Framework\Interfaces\IModelDataType)
-				$this->_data[$key]->setValue($this->_driver->convertNativeDataTypeToModelDataType($data[$key]));
+			{
+				if($this->_data[$key] instanceof \Framework\Interfaces\IModelDataType)
+					$this->_data[$key]->setValue($this->_driver->convertNativeDataTypeToModelDataType($data[$key]));
+				else
+					$this->_data[$key]->setValue(\Framework\Database\CDatabaseDriver::convertPrimitiveDataTypeToModelDataType($data[$key], get_class($this->_data[$key])));
+			}
 			else
 				$this->_data[$key] = $data[$key];
 		}
