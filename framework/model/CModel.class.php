@@ -23,6 +23,33 @@ class CModel extends \Framework\Utils\CObjectAccess
 		return $obj;
 	}
 
+	/**
+	 * Method sets the value via apath notation.
+	 * @param $path The path to set.
+	 * @param $value The value to set.
+	 * @param \Framework\Utils\CArrayObject $obj The object to traverse.
+	 * @return mixed Returns a value or a \Framework\Utils\CArrayObject.
+	 */
+	public function setAPathValue($path, $value, \Framework\Utils\CObjectAccess $obj=NULL)
+	{
+		if($obj === NULL)
+			return $this->setAPathValue($path, $value, $this);
+
+		//Get key
+		$path = explode('.', $path);
+		$key  = array_splice($path, 0, 1);
+		$key  = $key[0];
+
+		//Continue path
+		if(!isset($obj[$key]) && count($path))
+		{
+			$obj[$key] = new \Framework\Utils\CObjectAccess;
+			$this->setAPathValue(implode('.', $path), $value, $obj[$key]);
+		}
+		else
+			$this->$key = $value;
+	}
+
 	/**************************/
 	/** APath Implementation **/
 	/**************************/
