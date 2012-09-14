@@ -1,37 +1,41 @@
 <?
-namespace Framework\Forms;
+namespace Framework\Form;
 
-Class CRenderableForm extends CForm implements \Framework\Interfaces\IViewFileRenderableContext
+//TODO: Normalize values (checkbox on off to true false)
+
+Class CRenderableForm extends \Framework\Form\CForm implements \Framework\Interfaces\IViewFileRenderableContext
 {
-	protected $_view;
+	private $_initialized;
 	private $_file;
 
-	public function __construct($properties=array())
+	public function __construct($render, array $attributes=array())
 	{
-		/*if(empty($properties['render']))
-			throw new \Framework\Exceptions\EArbitrageException("Form render property not defined!");*/
-
-		//If render is not set, create the string
-		if(empty($properties['render']))
-		{
-			$properties['render'] = preg_replace('/([a-z0-9])([A-Z])/', '$1 $2', preg_replace('/.*\\\([^\\\]*)$/', '$1', get_called_class()));
-			$properties['render'] = strtolower(preg_replace('/ /', '_', $properties['render']));
-		}
+		//Call parent constructor
+		parent::__construct($attributes);
 
 		//Set file and variables
-		$this->_file = $properties['render'];
+		$this->_values      = new \Framework\Model\CModel;
+		$this->_initialized = false;
+		$this->_file        = $render;
 
-		//Create view variables etc
-		$vars        = array('variables' => ((!empty($properties['variables']))? $properties['variables'] : array()));
-		$this->_view = new \Framework\Utils\CArrayObject($vars);
-
-		parent::__construct($properties);
+		//Transfrom _vaolues into CTypedFormModel
+		$this->_initializeModel();
 	}
 
 	/**
-	 * Method renders the view file associated with the Form object.
+	 * Method returns the form file to render.
+	 * @return Returnst the file to render.
 	 */
-	public function render()
+	public function getFile()
+	{
+		return $this->_file;
+	}
+
+	/**
+	 * Method returns the path to the file to render.
+	 * @return string Returns a string to the path of the file.
+	 */
+	public function getRenderPath()
 	{
 		//Create path and render file
 		$namespace = \Framework\Base\CKernel::getInstance()->convertPHPNamespaceToArbitrage(get_called_class());
@@ -48,12 +52,20 @@ Class CRenderableForm extends CForm implements \Framework\Interfaces\IViewFileRe
 		//Implode
 		$path = implode('/', $path);
 
+		return $path;
+	}
+
+	/**
+	 * Method renders the view file associated with the Form object.
+	 */
+	public function render()
+	{
 		//Require renderable
 		\Framework\Base\CKernel::getInstance()->getApplication()->requireRenderable('Framework.Renderables.CViewFilePartialRenderable');
 
 		//Create renderer and render
 		$renderer = new \Framework\Renderables\CViewFilePartialRenderable;
-		$renderer->initialize($path, array('render' => $file));
+		$renderer->initialize($this->getRenderPath(), array('render' => $this->_file));
 		$renderer->setContext($this);
 
 		return $renderer->render();
@@ -67,11 +79,42 @@ Class CRenderableForm extends CForm implements \Framework\Interfaces\IViewFileRe
 	public function renderContext($file, $_vars=NULL)
 	{
 		//Extract _vars
-		$_vars = array_merge($this->_view->toArray(), $_vars);
+		//$_vars = array_merge($this->_view->toArray(), $_vars);
 		extract($_vars);
 
 		//Require the file
 		require($file);
+	}
+
+	/**
+	 * Method populates elements and initializes the model
+	 */
+	protected function _initializeModel()
+	{
+		ob_start();
+		$this->render();
+		ob_clean();
+		
+		//Create model
+		$this->_values      = \Framework\Forms\CFormModel::instantiate($this->_values);
+		$this->_initialized = true;
+	}
+
+	/**
+	 * Method creates HTML Form Element Objects.
+	 */
+	protected function _createElement($name, $args)
+	{
+		//TODO: Return object from model if already initialized
+
+		$element = parent::_createElement($name, $args);
+		if(!$this->_initialized)
+		{
+			$key = $element->getElementArbitragePath();
+			$this->_values->setAPathValue($key, $element);
+		}
+
+		return $element;
 	}
 }
 ?>
