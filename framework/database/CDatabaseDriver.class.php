@@ -20,6 +20,14 @@ abstract class CDatabaseDriver implements \Framework\Interfaces\IDatabaseDriver
 	}
 
 	/**
+	 * Method converts a primitive PHP type to a specific Model data type.
+	 */
+	static public function convertPrimitiveDataTypeToModelDataType($primitive, $type)
+	{
+		return $type::instantiate($primitive);
+	}
+
+	/**
 	 * Method returns the raw handle of the driver.
 	 * @return Returns the handle.
 	 */
