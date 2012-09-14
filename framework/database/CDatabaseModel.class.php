@@ -234,20 +234,6 @@ class CDatabaseModel extends \Framework\Database\CModel implements \Framework\In
 
 		//Call parent
 		parent::_setModelData($data);
-
-		//Set data to defaults
-		/*$this->_data = static::defaults();
-		foreach($this->_data as $key=>$val)
-		{
-			//TODO: Handle CModel instances of $val
-			if(!array_key_exists($key, $data))
-				continue;
-
-			if($this->_data[$key] instanceof \Framework\Model\CModel)
-				$this->_data[$key]->_setModelData($data[$key]);
-			else
-				$this->_data[$key] = $val;
-		}*/
 	}
 }
 ?>
