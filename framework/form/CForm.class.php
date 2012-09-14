@@ -1,39 +1,31 @@
 <?
-namespace Framework\Forms;
+namespace Framework\Form;
 use \Framework\DOM\CDomGenerator;
 
-Class CForm extends CFormModel
+Class CForm
 {
-	protected $_values;
-	private $_attributes;
-	private $_prepend_name;
-	private $_model;
+	protected $_attributes;
+	protected $_values; 
 
-	public function __construct($properties=array())
+	public function __construct(array $attributes=array())
 	{
-		//Set default attributes
-		$defaults = array('attributes' => array('id'           => 'form-noname',
-		                                        'method'       => 'POST',
-		                                        'enctype'      => 'application/x-www-form-urlencoded',
-		                                        'autocomplete' => 'on'),
-		                  'values' => array());
+		static $dattributes = array('id'           => 'form-noname',
+		                            'method'       => 'POST',
+		                            'enctype'      => 'application/x-www-form-urlencoded');
+		                            /*'autocomplete' => 'on');*/
 
+		//Set attributes and value
+		$this->_attributes = \Framework\Utils\CArrayObject::mergeArray($dattributes, $attributes);
+		$this->_values     = \Framework\Model\CModel::instantiate();
 
-		//Merge properties
-		$properties          = \Framework\Utils\CArrayObject::mergeArray($defaults, $properties);
-		$this->_attributes   = $properties['attributes'];
-		$this->_values       = $properties['values'];
-		$this->_prepend_name = false;
-		
-		//Normalize name
+		//Normalize id
 		$this->_attributes['id'] = preg_replace('/\\\/', '_', $this->_attributes['id']);
-
-		//Get value and create a CFormMOdel
-		$values        = (($this->_values === NULL)? array() : (($this->_values instanceof \Framework\Interfaces\IModel)? $this->_values->toArray() : $this->_values));
-		$this->_model  = (($this->_values instanceof \Framework\Interfaces\IModel)? get_class($this->_values) : NULL);
-		$this->_values = CFormModel::instantiate($values);
 	}
 
+	/**
+	 * Method auto loads any class that contains Form$.
+	 * @param $class_name The class name to load.
+	 */
 	static public function autoLoad($class_name)
 	{
 		if(preg_match('/Form$/', $class_name))
@@ -43,82 +35,41 @@ Class CForm extends CFormModel
 
 			//Throw exception if unable to load form
 			if(!$ret)
-				throw new \Framework\Exceptions\EArbitrageException("Unable to load form '$namespace'.");
+				throw new \Framework\Exceptions\EFormException("Unable to load form '$namespace'.");
 		}
-	}
-
-	static public function getSubmittedForm($class="Framework.Forms.CForm")
-	{
-		$controller = \Framework\Base\CKernel::getInstance()->getApplication()->getController();
-		$request    = $controller->getRequest();
-		if(!empty($request->_form))
-		{
-			//Parse form properties
-			list($vals, $model) = self::_parseFormProperties(preg_replace('/\-form$/', '', $request->_form), $request);
-
-			//Create model if the form was attached to one
-			if($model !== NULL)
-				$vals = new $model($vals);
-
-			//Convert to PHP
-			$class = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP($class);
-			return new CSubmittedForm(new $class(array('values' => $vals->toArray())));
-		}
-
-		return NULL;
-	}
-
-	static private function _parseFormProperties($form_id, $properties)
-	{
-		$vals  = array();
-		$model = NULL;
-
-		//Get properties
-		foreach($properties as $form=>$entries)
-		{
-			if($form_id == $form)
-			{
-				$vals = $entries;
-				break;
-			}
-			
-			/*if(preg_match('/^' . $form_id . '_/i', $key) && $key !== "{$form_id}__model")
-				$vals[preg_replace('/^' . $form_id . '_/i', '', $key)] = $val;
-			elseif($key === "{$form_id}__model")
-				$model = $val;*/
-		}
-
-		return array($vals, $model);
 	}
 
 	/**
-	 * Method returns the form model.
-	 * @return \Framework\Froms\FormModel Returns the values in Form Model format.
+	 * Method converts the form namespace to arbitrage namespace.
+	 * @param $namespace The namespace to convert.
+	 * @return Returns the Arbitrage namespace representation.
 	 */
-	public function getFormModel()
+	static public function convertFormNamespaceToArbitrage($namespace)
+	{
+		$name     = preg_replace('/^([^\[]*).*/', '$1', $namespace);
+		$notation = str_replace($name, '', $namespace);
+		$notation = preg_replace('/\[/', '.', $notation);
+		$notation = preg_replace('/\]/', '', $notation);
+		$name     = preg_replace('/_/', '.', $name);
+
+		return $name . $notation;
+	}
+
+	/**
+	 * Magic method that intercepts to create tags.
+	 */
+	public function __call($name, $args)
+	{
+		return $this->_createElement($name, $args);
+	}
+
+	/**
+	 * Method returnst he model associated with this form.
+	 * @return \Framework\Forms\CFormModel The model associated with this form.
+	 */
+	public function getModel()
 	{
 		return $this->_values;
-	}
-
-	/**
-	 * Method converts form values to a Model.
-	 * @param string $opt_namespace The namespace where the Model resides.
-	 * @returns Returns the model.
-	 */
-	public function getDatabaseModel($opt_namespace="")
-	{
-		//If namespace is not set, use internal namespace
-		if($opt_namespace == "")
-		{
-			die("CForm::convertToDatabaseModel");
-		}
-
-		//Get class
-		$class  = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP($opt_namespace);
-		$values = $this->_values;
-
-		//Convert values to model values
-		return $this->_values->convertToDatabaseModel($opt_namespace);
 	}
 
 	/**
@@ -142,37 +93,9 @@ Class CForm extends CFormModel
 		return CDomGenerator::labelTag($label, $attribs);
 	}
 
-	public function text($id, $attribs=array())
-	{
-		$value   = $this->_getValue($id);
-		$value   = ((isset($value))? $value: '');
-		$attribs = array_merge($attribs, array('value' => $value));
-		$id      = $this->_normalizeName($id);
-		return CDomGenerator::inputText($this->_prependFormID($id), $attribs);
-	}
-
-	public function password($id, $attribs=array())
-	{
-		$value   = $this->_getValue($id);
-		$value   = ((isset($value))? $value: '');
-		$attribs = array_merge($attribs, array('value' => $value));
-		$id      = $this->_normalizeName($id);
-		return CDomGenerator::inputPassword($this->_prependFormID($id), $attribs);
-	}
-
-	public function select($id, $values, $attribs=array(), $default=array())
-	{
-		$d = $this->_getValue($id);
-		if(!is_array($d))
-			$d = array($d);
-
-		$default = array_merge($default, $d);
-		$id      = $this->_normalizeName($id);
-		return CDomGenerator::inputSelect($this->_prependFormID($id), $values, $attribs, $default);
-	}
-
 	public function multiSelect($id, $values, $attribs=array(), $default=array())
 	{
+		die(__METHOD__);
 		$s = $this->_getValue($id);
 		if(isset($s))
 		{
@@ -188,43 +111,11 @@ Class CForm extends CFormModel
 		return CDomGenerator::inputMultiSelect($this->_prependFormID($id), $values, $attribs, $selected);
 	}
 
-	public function selectState($id, $attribs=array(), $default=array())
+	/*public function selectState($id, $attribs=array(), $default=array())
 	{
 		$default = ((count($default) == 0)? $this->_getValue($id) : $default);
 		$id = $this->_normalizeName($id);
 		return CDomGenerator::inputStateSelector($id, $attribs, $default);
-	}
-
-	public function textArea($id, $value=NULL, $attribs=array())
-	{
-		$value   = (($value === NULL)? $this->_getValue($id) : $value);
-		$id      = $this->_normalizeName($id);
-		return CDomGenerator::inputTextArea($this->_prependFormID($id), $value, $attribs);
-	}
-
-	public function file($id, $attribs=array())
-	{
-		$value   = $this->_getValue($id);
-		$value   = ((isset($value))? $value: '');
-		$attribs = array_merge($attribs, array('value' => $value));
-		$id      = $this->_normalizeName($id);
-
-		return CDomGenerator::inputFile($this->_prependFormID($id), $attribs);
-	}
-
-	public function checkbox($id, $attribs=array())
-	{
-		$checked = $this->_getValue($id);
-		if($checked == true)
-			$attribs = array_merge($attribs, array('checked' => 'checked'));
-
-		$id = $this->_normalizeName($id);
-		return CDomGenerator::inputCheckbox($this->_prependFormID($id), $attribs);
-	}
-
-	public function button($id, $value, $attribs=array())
-	{
-		return CDomGenerator::inputButton($this->_prependFormID($id), $value, $attribs);
 	}
 
 	public function submit($id, $value, $attribs=array())
@@ -235,55 +126,74 @@ Class CForm extends CFormModel
 	public function imageSubmit($id, $valid, $src, $attribs=array())
 	{
 		return CDomGenerator::imageSubmitButton($this->_prependFormID($id), $value, $src, $attribs);
-	}
-
-	public function hidden($id, $value=NULL, $attribs=array())
-	{
-		if($value == NULL)
-			$value = $this->_getValue($id);
-
-		$id = $this->_normalizeName($id);
-		return CDomGenerator::inputHidden($this->_prependFormID($id), $value, $attribs);
-	}
+	}*/
 
 	public function end()
 	{
-		if(isset($this->_model))
-		{
-			//TODO: Recode to use idVal
-			die("CForm::end -- code idVal");
-			echo $this->hidden('_id', (string) $this->_values['_id']);
-			echo $this->hidden('_model', $this->_model);
-		}
-
 		echo "<input type=\"hidden\" name=\"_form\" id=\"_form\" value=\"{$this->_attributes['id']}-form\" />\n";
 		echo "</form>\n";
 	}
 
-	private function _getValue($id)
+	/**
+	 * Method creates HTML Form Element Objects.
+	 */
+	protected function _createElement($name, $args)
 	{
-		//Dot notation to array notation
-		$key = explode(".", $id);
-		if(count($key) > 1)
+		$inputs = array('text', 'password', 'checkbox', 'submit', 'reset', 'file');
+		$valued = array('hidden', 'textarea', 'button');
+
+		$name  = strtolower($name);
+		if(in_array($name, $inputs))
 		{
-			$value = $this->_values;
-			for($i=0; $i<count($key); $i++)
-			{
-				if(isset($value[$key[$i]]))
-					$value = $value[$key[$i]];
-				else
-					$value = NULL;
-			}
+			//Get parameters
+			$id      = $args[0];
+			$attribs = ((empty($args[1]))? array() : $args[1]);
+			$class   = "\\Framework\\Form\\Elements\\C" . ucwords($name) . "FormElement";
+
+			//Create element and return
+			return new $class($this->_normalizeName($id), $this->_getValue($id, $attribs), $attribs);
+		}
+		elseif(in_array($name, $valued))
+		{
+			//Get parameters
+			$id      = $args[0];
+			$value   = ((empty($args[1]))? NULL : $args[1]);
+			$attribs = ((empty($args[2]))? array() : $args[2]);
+			$class   = "\\Framework\\Form\\Elements\\C" . ucwords($name) . "FormElement";
+
+			return new $class($this->_normalizeName($id), $this->_getValue($id, $attribs, $value), $attribs);
+
+		}
+		elseif($name === "select")
+		{
+			//Get parameters
+			$id       = $args[0];
+			$options  = $args[1];
+			$attribs  = ((empty($args[2]))? array() : $args[2]);
+			$selected = ((empty($args[3]))? array() : $args[3]);
+
+			//Create element and return
+			return new \Framework\Form\Elements\CSelectFormElement($this->_normalizeName($id), $options, $attribs, $this->_getValue($id, $attribs), $attribs);
 		}
 		else
-		{
-			if(isset($this->_values[$key[0]]))
-				$value = $this->_values[$key[0]];
-			else
-				$value = NULL;
-		}
+			throw new \Framework\Exceptions\EFormException("Unknown element '$name'.");
+	}
 
-		return $value;
+	/** 
+	 * Method returns the proper value by order.
+	 */
+	private function _getValue($id, $attribs=NULL, $val=NULL)
+	{
+		//Get model first
+		$aval = $this->getModel()->apath($id);
+		if($aval !== NULL)
+			return $aval;
+
+		//get attribs
+		if(!empty($attribs['value']))
+			return $attribs['value'];
+
+		return $val;
 	}
 
 	private function _normalizeName($name)
@@ -302,10 +212,11 @@ Class CForm extends CFormModel
 
 	private function _prependFormID($id)
 	{
-		return (($this->_prepend_name)? "{$this->_attributes['id']}_$id" : $id);
+		//return (($this->_prepend_name)? "{$this->_attributes['id']}_$id" : $id);
+		return $id;
 	}
 }
 
 //Register autoload for form
-spl_autoload_register('\Framework\Forms\CForm::autoLoad', true);
+spl_autoload_register('\Framework\Form\CForm::autoLoad', true);
 ?>
