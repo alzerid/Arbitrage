@@ -210,7 +210,7 @@ class CDOMGenerator
 		return $html;	
 	}
 
-	public static function inputTextArea($id, $value = "", $attribs=array())
+	public static function inputTextArea($id, $value="", $attribs=array())
 	{
 		$attribs = CDOMGenerator::generateAttribs($attribs);
 		$html    = "<textarea name=\"$id\" id=\"$id\" $attribs >$value</textarea>\n";
