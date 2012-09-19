@@ -38,7 +38,6 @@ class CWebApplication extends CApplication
 		CKernel::getInstance()->requireFrameworkFile('DOM.CDOMGenerator');
 		CKernel::getInstance()->requireFrameworkFile('Form.Elements.CBaseFormElement');
 		CKernel::getInstance()->requireFrameworkFile('Form.CFormModel');
-		CKernel::getInstance()->requireFrameworkFile('Form.CTypedFormModel');
 		CKernel::getInstance()->requireFrameworkFile('Form.CForm');
 		CKernel::getInstance()->requireFrameworkFile('Form.CSubmittedForm');
 		CKernel::getInstance()->requireFrameworkFile('Form.CRenderableForm');
