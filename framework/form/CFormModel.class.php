@@ -67,6 +67,34 @@ class CFormModel extends \Framework\Model\CModel
 	}
 
 	/**
+	 * Method returns the actual element from the value model.
+	 * @param $path The path where the element is located.
+	 * @param $obj The array object to use.
+	 * @return Returns the element.
+	 */
+	public function getElement($path, \Framework\Utils\CObjectAccess $obj=NULL)
+	{
+		if($obj===NULL)
+			return $this->getElement($path, $this);
+
+		//Get key
+		$path = explode('.', $path);
+		$key  = array_splice($path, 0, 1);
+		$key  = $key[0];
+
+		//Check if key even exists
+		if(!isset($obj->_data[$key]))
+			return NULL;
+
+		//Return element
+		if(count($path))
+			return $this->getElement(implode('.', $path), $obj->$key);
+
+		//Return element
+		return $obj->_data[$key];
+	}
+
+	/**
 	 * Method sets the data.
 	 * @param $name The name of the attribute to set.
 	 * @param $val The value to set the attribute to.
