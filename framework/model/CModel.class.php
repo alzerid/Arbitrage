@@ -50,6 +50,17 @@ class CModel extends \Framework\Utils\CObjectAccess
 			$this->$key = $value;
 	}
 
+	/**
+	 * Method returns the value via apath notation.
+	 * @param $path The path to set.
+	 * @param \Framework\Utils\CArrayObject $obj The object to traverse.
+	 * @return mixed Returns a value or a \Framework\Utils\CArrayObject.
+	 */
+	public function getAPathValue($path, \Framework\Utils\CObjectAccess $obj=NULL)
+	{
+		return $this->apath($path);
+	}
+
 	/**************************/
 	/** APath Implementation **/
 	/**************************/
@@ -72,7 +83,7 @@ class CModel extends \Framework\Utils\CObjectAccess
 		$key  = $key[0];
 
 		//Select value
-		if(empty($obj[$key]))
+		if(!isset($obj->$key))
 			return NULL;
 			
 		//Figure out if we recurse
