@@ -11,11 +11,14 @@ class CCheckBoxFormElement extends \Framework\Form\Elements\CBaseFormElement
 	{
 		//Ensures boolean
 		if($value === NULL)
+		{
+			die(__METHOD__);
 			$this->_value = false;
+		}
 		elseif(is_string($value))
 		{
 			$value = strtolower($value);
-			if($value === "on")
+			if($value === "on" || strtolower($value) === "checked")
 				$this->_value = true;
 			elseif($value === "off")
 				$this->_value = false;
@@ -26,8 +29,6 @@ class CCheckBoxFormElement extends \Framework\Form\Elements\CBaseFormElement
 			$this->_value = $value;
 		else
 			throw new \Framework\Exceptions\EFormException("Cannot assign value '$value' to combo box.");
-
-		parent::setValue($value);
 	}
 
 	/**
@@ -38,9 +39,10 @@ class CCheckBoxFormElement extends \Framework\Form\Elements\CBaseFormElement
 	{
 		if($this->getValue())
 			$this->_attributes['checked'] = 'checked';
+		else
+			unset($this->_attributes['checked']);
 
 		return \Framework\DOM\CDomGenerator::inputCheckbox($this->_id, $this->_attributes);
 	}
-
 }
 ?>
