@@ -19,6 +19,11 @@ class CSelectFormElement extends \Framework\Form\Elements\CBaseFormElement
 	{
 		if(!is_array($value))
 			$value = array($value);
+		elseif($value instanceof \Framework\Form\Elements\CSelectFormElement)
+		{
+			$this->setOptions($value->_options);
+			$value = $value->getValue();
+		}
 
 		//Ensure $value is part of $options
 		$options = array_keys($this->_options);
@@ -28,6 +33,7 @@ class CSelectFormElement extends \Framework\Form\Elements\CBaseFormElement
 				throw new \Framework\Exceptions\EFormException("Select value '$val' is not in enum.");
 		}
 
+		//Call parent
 		parent::setValue($value);
 	}
 
@@ -37,6 +43,15 @@ class CSelectFormElement extends \Framework\Form\Elements\CBaseFormElement
 	public function clearOptions()
 	{
 		$this->_options = array();
+	}
+
+	/**
+	 * Method sets the options.
+	 * @param array $options The options to set.
+	 */
+	public function setOptions(array $options)
+	{
+		$this->_options = $options;
 	}
 
 	/**
