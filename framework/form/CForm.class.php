@@ -168,9 +168,9 @@ Class CForm
 		{
 			//Get parameters
 			$id       = $args[0];
-			$options  = $args[1];
+			$options  = ((empty($args[1]))? array('') : $args[1]);
 			$attribs  = ((empty($args[2]))? array() : $args[2]);
-			$selected = ((empty($args[3]))? array() : $args[3]);
+			$selected = ((empty($args[3]))? array('') : $args[3]);
 
 			//Create element and return
 			return new \Framework\Form\Elements\CSelectFormElement($this->_normalizeName($id), $options, $attribs, $this->_getValue($id, $attribs), $attribs);
