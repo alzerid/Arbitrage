@@ -30,7 +30,12 @@ foreach($event->trace as $entry)
 
 Buffer:
 ++++++++++++++++++++++++++++++++++++
-<?=$buffer?>
+<?
+$buffer = preg_replace('/<--/', '<- -', $buffer);
+$buffer = preg_replace('/-->/', '- ->', $buffer);
+
+echo $buffer;
+?>
 ++++++++++++++++++++++++++++++++++++
 -->
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
