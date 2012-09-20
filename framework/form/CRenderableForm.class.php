@@ -1,8 +1,6 @@
 <?
 namespace Framework\Form;
 
-//TODO: Normalize values (checkbox on off to true false)
-
 Class CRenderableForm extends \Framework\Form\CForm implements \Framework\Interfaces\IViewFileRenderableContext
 {
 	private $_initialized;
@@ -107,20 +105,20 @@ Class CRenderableForm extends \Framework\Form\CForm implements \Framework\Interf
 	{
 		//TODO: Return object from model if already initialized
 
-		$element = parent::_createElement($name, $args);
 		if(!$this->_initialized)
 		{
-			$key = $element->getElementArbitragePath();
+			//Create element
+			$element = parent::_createElement($name, $args);
+			$key     = $element->getElementArbitragePath();
+
+			//Set arbitrage path value
 			$this->_values->setAPathValue($key, $element);
 		}
 		else
 		{
-			//Set value from model
-			$key = $element->getElementArbitragePath();
-			$val = $this->_values->getAPathValue($key);
-
-			//Set value of new element
-			$element->setValue($val);
+			//Get element
+			$id      = $args[0];
+			$element = $this->_values->getElement($id);
 		}
 
 		return $element;
