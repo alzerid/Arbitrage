@@ -47,6 +47,9 @@ class CBaseFormElement
 	 */
 	public function setValue($value)
 	{
+		if($value instanceof \Framework\Form\Elements\CBaseFormElement)
+			$value = $this->_value->getValue();
+
 		$this->_value = $value;
 	}
 	
