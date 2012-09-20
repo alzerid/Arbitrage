@@ -193,6 +193,9 @@ Class CForm
 		if(!empty($attribs['value']))
 			return $attribs['value'];
 
+		if(!empty($attribs['checked']))
+			return $attribs['checked'];
+
 		return $val;
 	}
 
