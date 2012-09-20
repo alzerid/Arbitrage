@@ -113,6 +113,15 @@ Class CRenderableForm extends \Framework\Form\CForm implements \Framework\Interf
 			$key = $element->getElementArbitragePath();
 			$this->_values->setAPathValue($key, $element);
 		}
+		else
+		{
+			//Set value from model
+			$key = $element->getElementArbitragePath();
+			$val = $this->_values->getAPathValue($key);
+
+			//Set value of new element
+			$element->setValue($val);
+		}
 
 		return $element;
 	}
