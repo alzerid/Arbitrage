@@ -21,6 +21,15 @@ Class CRenderableForm extends \Framework\Form\CForm implements \Framework\Interf
 	}
 
 	/**
+	 * Method returns the form in string format.
+	 * @return string Returns the form.
+	 */
+	public function __toString()
+	{
+		return $this->_toString();
+	}
+
+	/**
 	 * Method returns the form file to render.
 	 * @return Returnst the file to render.
 	 */
@@ -85,6 +94,31 @@ Class CRenderableForm extends \Framework\Form\CForm implements \Framework\Interf
 	}
 
 	/**
+	 * Method creates a subform.
+	 * $param $name The name of the subform to associate to.
+	 * @param $class The class of the subform.
+	 * @return Returns the subform.
+	 */
+	public function subform($name, $class)
+	{
+		if(!$this->_initialized)
+		{
+			//Ensure class is subclsas of \Framework\Form\CRenderableForm
+			$class = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP($class);
+			if(!is_subclass_of($class, "\\Framework\\Form\\CRenderableForm", true))
+				throw new \Framework\Exceptions\EFormException("subform '$class' must be of inherit \\Framework\\Form\\CRenderableForm");
+
+			//Create new form
+			$element = new $class($name, $this);
+			$this->_values->setAPathValue($name, $element);
+		}
+		else
+			$element = $this->_values->getElement($name);
+
+		return $element;
+	}
+
+	/**
 	 * Method populates elements and initializes the model
 	 */
 	protected function _initializeModel()
@@ -94,7 +128,7 @@ Class CRenderableForm extends \Framework\Form\CForm implements \Framework\Interf
 		ob_clean();
 		
 		//Create model
-		$this->_values      = \Framework\Forms\CFormModel::instantiate($this->_values);
+		$this->_values      = \Framework\Form\CFormModel::instantiate($this->_values);
 		$this->_initialized = true;
 	}
 
@@ -122,6 +156,15 @@ Class CRenderableForm extends \Framework\Form\CForm implements \Framework\Interf
 		}
 
 		return $element;
+	}
+
+	/**
+	 * Method that can be overridden that converts the object to a string.
+	 * return string Returns the string representing the object.
+	 */
+	protected function _toString()
+	{
+		return $this->render();
 	}
 }
 ?>
