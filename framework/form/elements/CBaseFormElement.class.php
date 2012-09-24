@@ -1,7 +1,7 @@
 <?
 namespace Framework\Form\Elements;
 
-class CBaseFormElement
+class CBaseFormElement implements \Framework\Interfaces\IFormElement
 {
 	protected $_attributes;
 	protected $_value;
