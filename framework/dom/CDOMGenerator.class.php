@@ -286,7 +286,7 @@ class CDOMGenerator
 	public static function generateAttribs($attribs)
 	{
 		$ret = '';
-		if(count($attribs))
+		if(!empty($attribs))
 		{
 			foreach($attribs as $k=>$v)
 				$ret .= "$k=\"$v\" ";
