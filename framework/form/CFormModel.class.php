@@ -1,5 +1,5 @@
 <?
-namespace Framework\Forms;
+namespace Framework\Form;
 
 class CFormModel extends \Framework\Model\CModel
 {
@@ -56,9 +56,7 @@ class CFormModel extends \Framework\Model\CModel
 			if($data instanceof \Framework\Form\Elements\CBaseFormElement)
 				$ret[$key] = $data->getValue();
 			elseif($data instanceof \Framework\Model\CModel)
-			{
-				die(__METHOD__);
-			}
+				$ret[$key] = $data->toArray();
 			else
 				$ret[$key] = $data;
 		}
@@ -105,7 +103,7 @@ class CFormModel extends \Framework\Model\CModel
 			throw new \Framework\Exceptions\EFormException("Attribute '$name' not in form.");
 
 		//Check what to do
-		if($this->_data[$name] instanceof \Framework\Form\Elements\CBaseFormElement)
+		if($this->_data[$name] instanceof \Framework\Interfaces\IFormElement)
 			$this->_data[$name]->setValue($val);
 		else
 			parent::_setData($name, $val);
@@ -121,8 +119,8 @@ class CFormModel extends \Framework\Model\CModel
 			throw new \Framework\Exceptions\EFormException("Attribute '$name' not in form.");
 		
 		//Check what to do
-		if($this->_data[$name] instanceof \Framework\Form\Elements\CBaseFormElement)
-			return $this->_data[$name]->getValue();
+		if($this->_data[$name] instanceof \Framework\Interfaces\IFormElement)
+			return $this->_data[$name]->getValue($name);
 
 		return parent::_getData($name);
 	}
