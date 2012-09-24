@@ -47,7 +47,6 @@ abstract class CObjectAccess implements \ArrayAccess, \Framework\Interfaces\IAPa
 	}
 	/* End ArrayAccess methods */
 
-
 	abstract protected function _getData($name);          //Used with __get magic method
 	abstract protected function _setData($name, $val);    //Used with __set magic method
 	abstract protected function _issetData($name);        //Used with the __isset magic method
