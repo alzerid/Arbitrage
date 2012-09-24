@@ -4,6 +4,7 @@ use \Framework\DOM\CDomGenerator;
 
 Class CForm
 {
+	static protected $_CUSTOM = array();
 	protected $_attributes;
 	protected $_values; 
 
@@ -56,6 +57,16 @@ Class CForm
 	}
 
 	/**
+	 * Method adds tag element.
+	 * @param $name The tag name to use.
+	 * @param $class The class to use.
+	 */
+	static public function addCustomElementTag($name, $class)
+	{
+		self::$_CUSTOM[$name] = $class;
+	}
+
+	/**
 	 * Magic method that intercepts to create tags.
 	 */
 	public function __call($name, $args)
@@ -64,12 +75,22 @@ Class CForm
 	}
 
 	/**
-	 * Method returnst he model associated with this form.
+	 * Method returns the model associated with this form.
 	 * @return \Framework\Forms\CFormModel The model associated with this form.
 	 */
 	public function getModel()
 	{
 		return $this->_values;
+	}
+
+	/**
+	 * Method returns the attribute value.
+	 * @param $key The attribute to retreive the value for.
+	 * @return Returns the value of the attribute or NULL.
+	 */
+	public function getAttribute($key)
+	{
+		return (($this->_attributes !== NULL && array_key_exists($key, $this->_attributes))? $this->_attributes[$key] : NULL);
 	}
 
 	/**
@@ -162,7 +183,6 @@ Class CForm
 			$class   = "\\Framework\\Form\\Elements\\C" . ucwords($name) . "FormElement";
 
 			return new $class($this->_normalizeName($id), $this->_getValue($id, $attribs, $value), $attribs);
-
 		}
 		elseif($name === "select")
 		{
@@ -175,8 +195,35 @@ Class CForm
 			//Create element and return
 			return new \Framework\Form\Elements\CSelectFormElement($this->_normalizeName($id), $options, $attribs, $this->_getValue($id, $attribs), $attribs);
 		}
+		elseif(array_key_exists(strtolower($name), self::$_CUSTOM))
+		{
+			$id    = $args[0];
+			$args  = array_slice($args, 1);
+			$class = self::$_CUSTOM[strtolower($name)];
+
+			//Create element and return
+			return new $class($this->_normalizeName($id), $this->_getValue($id), $args);
+		}
 		else
 			throw new \Framework\Exceptions\EFormException("Unknown element '$name'.");
+	}
+
+	/**
+	 * Method normalized the name from an arbitrage path to [] form notatoin.
+	 * @param $name The arbitrage path name to convert.
+	 */
+	protected function _normalizeName($name)
+	{
+		//Dot notation to array notation
+		$key   = explode(".", $name);
+		$value = "";
+		for($i=0; $i<count($key); $i++)
+			$value .= "[{$key[$i]}]";
+
+		//Prepend form name
+		$value = "{$this->_attributes['id']}$value";
+
+		return $value;
 	}
 
 	/** 
@@ -197,26 +244,6 @@ Class CForm
 			return $attribs['checked'];
 
 		return $val;
-	}
-
-	private function _normalizeName($name)
-	{
-		//Dot notation to array notation
-		$key   = explode(".", $name);
-		$value = "";
-		for($i=0; $i<count($key); $i++)
-			$value .= "[{$key[$i]}]";
-
-		//Prepend form name
-		$value = "{$this->_attributes['id']}$value";
-
-		return $value;
-	}
-
-	private function _prependFormID($id)
-	{
-		//return (($this->_prepend_name)? "{$this->_attributes['id']}_$id" : $id);
-		return $id;
 	}
 }
 
