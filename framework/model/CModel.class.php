@@ -33,21 +33,31 @@ class CModel extends \Framework\Utils\CObjectAccess
 	public function setAPathValue($path, $value, \Framework\Utils\CObjectAccess $obj=NULL)
 	{
 		if($obj === NULL)
-			return $this->setAPathValue($path, $value, $this);
+		{
+			$this->setAPathValue($path, $value, $this);
+			return;
+		}
 
 		//Get key
 		$path = explode('.', $path);
 		$key  = array_splice($path, 0, 1);
 		$key  = $key[0];
 
-		//Continue path
+		//Check if we continue the path
 		if(!isset($obj[$key]) && count($path))
 		{
-			$obj[$key] = new \Framework\Utils\CObjectAccess;
-			$this->setAPathValue(implode('.', $path), $value, $obj[$key]);
+			$class     = get_called_class();
+			$obj[$key] = new $class;
+		}
+
+		//Set values
+		if(count($path))
+		{
+			$path      = implode('.', $path);
+			$obj[$key]->setAPathValue($path, $value, $obj[$key]);
 		}
 		else
-			$this->$key = $value;
+			$obj[$key] = $value;
 	}
 
 	/**
@@ -101,6 +111,41 @@ class CModel extends \Framework\Utils\CObjectAccess
 	/******************************/
 	/** END APath Implementation **/
 	/******************************/
+
+	/**
+	 * Method returns the raw data.
+	 * @return array Returns the raw data.
+	 */
+	public function getData()
+	{
+		return $this->_data;
+	}
+
+	/**
+	 * Method returns the array key value pairs.
+	 */
+	public function toArray()
+	{
+		$ret = array();
+		foreach($this->_data as $key=>$data)
+		{
+			if($data instanceof \Framework\Model\CModel)
+				$ret[$key] = $data->toArray();
+			else
+				$ret[$key] = $data;
+		}
+
+		return $ret;
+	}
+
+	/**
+	 * Method retuns the iterator for this Model.
+	 * @return \Framework\Model\CModelIterator Returns the iterator for this model.
+	 */
+	public function getIterator()
+	{
+		return new \Framework\Model\CModelIterator($this);
+	}
 
 	/****************************/
 	/** CObjectAccess Overload **/
