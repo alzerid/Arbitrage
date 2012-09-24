@@ -32,6 +32,21 @@ interface IFactory
 /** End of Interface Patterns **/
 /*******************************/
 
+/*********************/
+/** Form Interfaces **/
+/*********************/
+
+interface IFormElement
+{
+	public function __toString();
+	public function setValue($value);
+	public function getValue();
+}
+
+/*************************/
+/** End Form Interfaces **/
+/*************************/
+
 /**
  * Value Object Interface
  */
