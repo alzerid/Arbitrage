@@ -3,17 +3,12 @@ namespace Framework\Form;
 
 class CFormModel extends \Framework\Model\CModel
 {
-	/**
-	 * Method instantiates the model.
-	 */
-	static public function instantiate($data=NULL)
+	public function __construct($data=NULL)
 	{
 		if($data instanceof \Framework\Model\CModel)
-			$obj = parent::instantiate($data->_data);
-		else
-			throw new \Framework\Exceptions\EModelException("Unable to handle instantiation of the data.");
+			$data = $data->_data;
 
-		return $obj;
+		parent::__construct($data);
 	}
 
 	/**
@@ -28,19 +23,7 @@ class CFormModel extends \Framework\Model\CModel
 			throw new \Framework\Exceptions\EModelException("Database model '$class' does not exist!");
 
 		//Create object
-		$obj = $class::instantiate();
-		foreach($this->_data as $key=>$val)
-		{
-			if(isset($obj->$key))
-			{
-				if($val instanceof \Framework\Form\Elements\CBaseFormElement)
-					$val = $val->getValue();
-
-				$obj->$key = $val;
-			}
-		}
-
-		return $obj;
+		return new $class($this->toArray());
 	}
 
 	/**
@@ -53,7 +36,9 @@ class CFormModel extends \Framework\Model\CModel
 		$ret = array();
 		foreach($this->_data as $key=>$data)
 		{
-			if($data instanceof \Framework\Form\Elements\CBaseFormElement)
+			if($data instanceof \Framework\Form\CForm)
+				$ret[$key] = $data->getModel()->toArray();
+			elseif($data instanceof \Framework\Form\Elements\CBaseFormElement)
 				$ret[$key] = $data->getValue();
 			elseif($data instanceof \Framework\Model\CModel)
 				$ret[$key] = $data->toArray();
@@ -90,6 +75,56 @@ class CFormModel extends \Framework\Model\CModel
 
 		//Return element
 		return $obj->_data[$key];
+	}
+
+	/**
+	 * Method flattens the model array.
+	 * @param $arr_key The current key.
+	 * @param $obj The model object to set.
+	 * @return \Framework\Form\CFormModel Returns the newly created flattened CFormModel.
+	 */
+	public function flatten($arr_key=NULL, $obj=NULL)
+	{
+		//If object is not set, set it
+		if($obj===NULL)
+		{
+			$class = get_called_class();
+			$obj   = new $class;
+
+			return $this->flatten($arr_key, $this);
+		}
+
+		//Iterate through object
+		$iterator = $obj->getIterator();
+		$ret      = array();
+		foreach($iterator as $key=>$value)
+		{
+			//Set array key
+			$element = $this->getElement($key);
+			$key     = ((!empty($arr_key))? "$arr_key.$key" : $key);
+
+			//Check to see if it is a subform
+			if($value instanceof \Framework\Form\CForm)
+				$ret = array_merge($ret, $value->getModel()->flatten($key));
+			elseif($element instanceof \Framework\Interfaces\IFormElement)
+				$ret[$key] = $element;
+			elseif(is_array($value))
+			{
+				$temp        = new \Framework\Form\CFormModel();
+				$temp->_data = $value;
+				$ret         = array_merge($ret, $temp->flatten($key, $temp));
+			}
+			else
+			{
+				//$obj->setAPathValue($key, $value);
+				echo "Simple set: ";
+				var_dump($arr_key, $key, $value, $element);
+				var_dump($obj);
+				die(__METHOD__);
+			}
+		}
+
+		return $ret;
 	}
 
 	/**
