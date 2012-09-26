@@ -7,33 +7,23 @@ class CArrayStructure extends \Framework\Model\CModel implements \Iterator
 	protected $_class;
 	protected $_idx;
 
-	public function __construct()
-	{
-		$this->_data  = array();
-		$this->_class = NULL;
-		$this->_idx   = -1;
-	}
-	
 	/**
 	 * Method instantiates the data type.
 	 * @param $data The variables to set as default data for this Model.
 	 * @param $class The class associated with the values.
 	 */
-	static public function instantiate($data=array(), $class=NULL)
+	public function __construct($data=array(), $class=NULL)
 	{
-		$cls = "\\" . get_called_class();
-		$obj = new $cls;
-		$obj->_class = $class;
+		$this->_idx   = -1;
+		$this->_class = $class;
 
 		//Set data
 		if(is_array($data))
-			$obj->_data = $data;
+			$this->_data = $data;
 		elseif($data instanceof \Framework\Model\Structures\CArrayStructure)
-			$obj->_data = $data->_data;
+			$this->_data = $data->_data;
 		else
 			throw new \Framework\Exceptions\EModelStructureException("Unable to handle data conversion.");
-
-		return $obj;
 	}
 
 	/**
