@@ -27,7 +27,6 @@ abstract class CApplication extends CPackage implements \Framework\Interfaces\IE
 		CKernel::getInstance()->requireFrameworkFile('Model.CMomentoModel');
 		CKernel::getInstance()->requireFrameworkFile('Model.DataTypes.CDateDataType');
 		CKernel::getInstance()->requireFrameworkFile('Model.Structures.CArrayStructure');
-		//CKernel::getInstance()->requireFrameworkFile('Model.Structures.CHashStructure');
 
 		//Call CPackage::initialize
 		parent::initialize();
