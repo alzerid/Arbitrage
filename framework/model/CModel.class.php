@@ -5,22 +5,14 @@ class CModel extends \Framework\Utils\CObjectAccess
 {
 	protected $_data;
 
-	public function __construct()
-	{
-		$this->_data = array();
-	}
-
 	/**
-	 * Method overloaded from CObjectAccess used for creating and returning new models.
+	 * Constructor for the model class.
 	 * @param $data The variables to set as default data for this Model.
 	 */
-	static public function instantiate($data=NULL)
+	public function __construct($data=NULL)
 	{
-		$class = get_called_class();
-		$obj   = new $class;
-		$obj->_setModelData($data);
-
-		return $obj;
+		$this->_data = array();
+		$this->_setModelData($data);
 	}
 
 	/**
@@ -219,7 +211,7 @@ class CModel extends \Framework\Utils\CObjectAccess
 					die(__METHOD__ . " HASH!!");
 				}
 				else
-					$this->_data[$key] = \Framework\Model\Structures\CArrayStructure::instantiate($val);
+					$this->_data[$key] = new \Framework\Model\Structures\CArrayStructure($val);
 			}
 			else
 				$this->_data[$key] = $val;
