@@ -103,14 +103,14 @@ abstract class CDatabaseDriver implements \Framework\Interfaces\IDatabaseDriver
 	 * @param $data The data to convert.
 	 * @return Returns the the Model Structure.
 	 */
-	abstract public function convertModelStructureToNativeStructure($data);
+	abstract public function convertModelStructureToNativeStructure(\Framework\Interfaces\IDatabaseModelStructure $data);
 
 	/**
 	 * Method converts native structure to model structure.
 	 * @param $data The data to convert.
 	 * @return Returns the the Native Structure.
 	 */
-	abstract public function convertNativeStructureToModelStructure($data);
+	abstract public function convertNativeStructureToModelStructure(\Framework\Interfaces\IDatabaseModelStructure $data);
 
 	/**
 	 * Method converts the native ID data type to a model id data type.
