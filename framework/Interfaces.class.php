@@ -199,7 +199,6 @@ interface IAction
  */
 interface IModel
 {
-	public function __construct();
 	public function toArray();
 	//public function clear();
 }
@@ -207,7 +206,7 @@ interface IModel
 /**
  * Model Data Type Interface
  */
-interface IModelDataType extends IInstantiate, IValueObject
+interface IModelDataType extends IValueObject
 {
 }
 
@@ -216,6 +215,7 @@ interface IModelDataType extends IInstantiate, IValueObject
  */
 interface IDatabaseModel extends IModel
 {
+	public function __construct($data=NULL, \Framework\Interfaces\IDatabaseDriver $driver=NULL);
 	public function save();
 	public function update();
 	public function insert();
@@ -229,6 +229,9 @@ interface IDatabaseModel extends IModel
 interface IDatabaseModelStructure
 {
 	public function getUpdateQuery();
+	public function getQuery();
+	public function toArray();
+	public function setDriver(\Framework\Interfaces\IDatabaseDriver $driver);
 	public function clear();
 	public function merge();
 }
