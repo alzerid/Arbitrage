@@ -49,7 +49,7 @@ class CModelIterator implements \Iterator
 	 */
 	public function rewind()
 	{
-		$this->_array = $this->_model->toArray();
+		$this->_array = $this->_model->getData();
 		$this->_keys  = array_keys($this->_array);
 		$this->_idx   = 0;
 	}
