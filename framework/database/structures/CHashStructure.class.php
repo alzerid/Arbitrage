@@ -3,33 +3,18 @@ namespace Framework\Database\Structures;
 
 //TODO: Code CLASS strictness when setting a CHashStructure with a class assigned to it --EMJ
 
-class CHashStructure extends \Framework\Model\CMomentoModel implements \Framework\Interfaces\IDatabaseModelStructure, \Iterator
+class CHashStructure extends \Framework\Model\CMomentoModel implements \Framework\Interfaces\IDatabaseModelStructure
 {
-	private $_class;
-	private $_keys;
-	private $_idx;
+	protected $_driver;
+	protected $_class;
 
-	public function __construct()
+	public function __construct($class=NULL, $data=NULL)
 	{
-		$this->_class = NULL;
-		parent::__construct();
-	}
+		if($class !== NULL)
+			$class = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP($class);
 
-	/**
-	 * Method instantiates the data type.
-	 * @param $data The variables to set as default data for this Model.
-	 * @param $class The class associated with the values.
-	 */
-	static public function instantiate($data=array(), $class=NULL)
-	{
-		//Instantiate
-		$data = (($data===NULL)? array() : $data);
-		$obj  = parent::instantiate($data);
-
-		//Set class
-		$obj->_class = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP($class);
-
-		return $obj;
+		$this->_class = $class;
+		parent::__construct($data);
 	}
 
 	/**
@@ -38,70 +23,26 @@ class CHashStructure extends \Framework\Model\CMomentoModel implements \Framewor
 	 */
 	public function getUpdateQuery()
 	{
-		die(__METHOD__);
-		//TODO: Code smarter differences
-		if(count($this->_data) == 0)
-			return $this->_data;
-
-		$ret = array_diff($this->_data, $this->_originals);
-		if(count($ret) == 0)
-			return NULL;
-
-		return $this->_data;
+		throw new \Framework\Exceptions\EModelStructureException("Unable to get query without specific driver structure.");
 	}
 
 	/**
-	 * Method clears the array back to it's original contents.
+	 * Method returns the query expression.
+	 * @return array Returns an array of the items.
 	 */
-	public function clear()
+	public function getQuery()
 	{
-		die(__METHOD__);
-		$this->_data = $this->_originals;
+		throw new \Framework\Exceptions\EModelStructureException("Unable to get query without specific driver structure.");
 	}
 
 	/**
-	 * Returns the array representation of this structure.
+	 * Method sets the driver being used.
+	 * @param \Framework\Interfaces\IDatabaseDriver $driver The driver to set to.
 	 */
-	public function toArray()
+	public function setDriver(\Framework\Interfaces\IDatabaseDriver $driver=NULL)
 	{
-		die(__METHOD__);
+		$this->_driver = $driver;
 	}
-
-	/*****************************/
-	/** Iterator Implementation **/
-	/*****************************/
-	public function current()
-	{
-		$key = $this->_keys[$this->_idx];
-		if(array_key_exists($key, $this->_variables))
-			return $this->_variables[$key];
-
-		return $this->_data[$key];
-	}
-
-	public function key()
-	{
-		return $this->_keys[$this->_idx];
-	}
-
-	public function next()
-	{
-		$this->_idx++;
-	}
-
-	public function rewind()
-	{
-		$this->_keys = array_merge(array_keys($this->_data), array_keys($this->_variables));
-		$this->_idx  = 0;
-	}
-
-	public function valid()
-	{
-		return array_key_exists($this->_idx, $this->_keys);
-	}
-	/*********************************/
-	/** End Iterator Implementation **/
-	/*********************************/
 
 	/**
 	 * Method sets model data and converts special cases to objects.
@@ -109,6 +50,9 @@ class CHashStructure extends \Framework\Model\CMomentoModel implements \Framewor
 	 */
 	protected function _setModelData($data)
 	{
+		if($data === NULL)
+			return;
+
 		foreach($data as $key=>$val)
 		{
 			if(is_array($val))
@@ -119,7 +63,14 @@ class CHashStructure extends \Framework\Model\CMomentoModel implements \Framewor
 					throw new \Framework\Exceptions\EModelDataTypeException("Unknown class type!");
 
 				//Create class
-				$this->_data[$key] = $class::instantiate($val);
+				if(preg_match('/Framework\\\Database\\\Structures\\\CHashStructure/', $class))
+					$this->_data[$key] = new $class(NULL, $val);
+				else
+					$this->_data[$key] = new $class($val);
+
+				//Set driver for Model and Structures
+				if(is_subclass_of($class, "\\Framework\\Interfaces\\IDatabaseModelStructure", true))
+					$this->_data[$key]->setDriver($this->_driver);
 			}
 			else
 				$this->_data[$key] = $val;
