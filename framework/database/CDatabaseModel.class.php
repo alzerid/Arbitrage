@@ -7,10 +7,13 @@ class CDatabaseModel extends \Framework\Database\CModel implements \Framework\In
 	private $_idVal          = NULL;
 	private $_properties     = NULL;
 
-	public function __construct()
+	public function __construct($data=NULL, \Framework\Interfaces\IDatabaseDriver $driver=NULL)
 	{
 		$this->_properties = self::properties();
-		parent::__construct();
+		$this->setDriver($driver);
+
+		//Call parent constructor
+		parent::__construct($data);
 	}
 
 	static public function idKey()
@@ -102,6 +105,7 @@ class CDatabaseModel extends \Framework\Database\CModel implements \Framework\In
 
 		//Grab $variables not originals
 		$vars = $this->getUpdateQuery();
+
 		$key  = self::$_ID_KEYS[get_called_class()];
 		$id   = $this->_driver->convertModelIDToNativeID($this->_idVal);
 
@@ -172,13 +176,16 @@ class CDatabaseModel extends \Framework\Database\CModel implements \Framework\In
 
 	public function remove()
 	{
-		die(__METHOD__);
 		if(empty($this->_idVal))
 			throw new EModelException("Cannot update without an ID");
 
 		self::query()->remove(array('_id' => $this->_idVal))->execute();
 	}
 
+	/**
+	 * Method returns the ID of the model.
+	 * @return Returns the id of the model.
+	 */
 	public function getID()
 	{
 		return $this->_idVal;
@@ -188,12 +195,28 @@ class CDatabaseModel extends \Framework\Database\CModel implements \Framework\In
 	/** END IDatabaseModel Implementation **/
 	/***************************************/
 
-	public function equals(UseModel $model)
+	/**
+	 * Method converts the database model to a simple \Framework\Model\CModel
+	 * @return Returns the \Framework\Model\CModel representation of this DatabaseModel.
+	 */
+	public function convertToBaseModel()
+	{
+		//Get model
+		$model = parent::convertToBaseModel();
+
+		//Set ID
+		$key = self::$_ID_KEYS[get_called_class()];
+		$model[$key] = $this->getID();
+
+		return $model;
+	}
+
+	/*public function equals(UseModel $model)
 	{
 		//TODO: _id is mongo baseed, should not be! --EMJ
-
 		return (($this->_id !== NULL && $model->_id !== NULL) && ($this->_id == $model->_id));
-	}
+	}*/
+
 
 	//Ovverride __get, __isset to ensure _id
 	protected function _getData($name)
