@@ -93,7 +93,7 @@ class CDOMGenerator
 		return $html;
 	}
 
-	public static function inputSelect($id, $values, $attribs=array(), $selected=array())
+	public static function inputSelect($id, $values, $attribs=array(), $selected=-1)
 	{
 		$attribs = CDOMGenerator::generateAttribs($attribs);
 		$html  = "<select name=\"$id\" id=\"$id\" $attribs>\n";
@@ -103,7 +103,7 @@ class CDOMGenerator
 			foreach($values as $k=>$v)
 			{
 				$s = '';
-				if(in_array($k, $selected))
+				if($k == $selected)
 					$s = "selected";
 				$html .= "<option value=\"$k\" $s>$v</option>\n";
 			}
