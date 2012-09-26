@@ -17,8 +17,8 @@ class CSelectFormElement extends \Framework\Form\Elements\CBaseFormElement
 	 */
 	public function setValue($value)
 	{
-		if(!is_array($value))
-			$value = array($value);
+		if($value === NULL)
+			$value = 0;
 		elseif($value instanceof \Framework\Form\Elements\CSelectFormElement)
 		{
 			$this->setOptions($value->_options);
@@ -27,11 +27,8 @@ class CSelectFormElement extends \Framework\Form\Elements\CBaseFormElement
 
 		//Ensure $value is part of $options
 		$options = array_keys($this->_options);
-		foreach($value as $val)
-		{
-			if(!in_array($val, $options))
-				throw new \Framework\Exceptions\EFormException("Select value '$val' is not in enum.");
-		}
+		if(!in_array($value, $options))
+			throw new \Framework\Exceptions\EFormException("Select value '$val' is not in enum.");
 
 		//Call parent
 		parent::setValue($value);
