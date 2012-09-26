@@ -17,7 +17,7 @@ Class CForm
 
 		//Set attributes and value
 		$this->_attributes = \Framework\Utils\CArrayObject::mergeArray($dattributes, $attributes);
-		$this->_values     = \Framework\Model\CModel::instantiate();
+		$this->_values     = new \Framework\Model\CModel;
 
 		//Normalize id
 		$this->_attributes['id'] = preg_replace('/\\\/', '_', $this->_attributes['id']);
