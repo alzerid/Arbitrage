@@ -4,11 +4,13 @@ namespace Framework\Database\Structures;
 class CArrayStructure extends \Framework\Model\Structures\CArrayStructure implements \Framework\Interfaces\IDatabaseModelStructure
 {
 	protected $_originals;
+	private $_driver;
 
 	public function __construct()
 	{
 		parent::__construct();
 		$this->_originals = array();
+		$this->_driver    = NULL;
 	}
 
 	/**
@@ -30,20 +32,30 @@ class CArrayStructure extends \Framework\Model\Structures\CArrayStructure implem
 	}
 
 	/**
+	 * Method sets the driver being used.
+	 * @param \Framework\Interfaces\IDatabaseDriver $driver The driver to set to.
+	 */
+	public function setDriver(\Framework\Interfaces\IDatabaseDriver $driver)
+	{
+		$this->_driver = $driver;
+	}
+
+	/**
 	 * Method returns the updated query.
 	 * @return array Retuns an array of the updated items.
 	 */
 	public function getUpdateQuery()
 	{
-		//TODO: Code smarter differences
-		if(count($this->_data) == 0)
-			return $this->_data;
+		throw new \Framework\Exceptions\EModelStructureException("Unable to get query without specific driver structure.");
+	}
 
-		$ret = array_diff($this->_data, $this->_originals);
-		if(count($ret) == 0)
-			return NULL;
-
-		return $this->_data;
+	/**
+	 * Method returns the query expression.
+	 * @return array Returns an array of the items.
+	 */
+	public function getQuery()
+	{
+		throw new \Framework\Exceptions\EModelStructureException("Unable to get query without specific driver structure.");
 	}
 
 	/**
