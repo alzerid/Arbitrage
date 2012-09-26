@@ -128,7 +128,7 @@ Class CRenderableForm extends \Framework\Form\CForm implements \Framework\Interf
 		ob_clean();
 		
 		//Create model
-		$this->_values      = \Framework\Form\CFormModel::instantiate($this->_values);
+		$this->_values      = new \Framework\Form\CFormModel($this->_values);
 		$this->_initialized = true;
 	}
 
