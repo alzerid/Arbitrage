@@ -7,16 +7,10 @@ class CDateDataType extends \DateTime implements \Framework\Interfaces\IModelDat
 	 * Method instantiates the CDateDataType.
 	 * @param $data The variables to set as default data for this Model.
 	 */
-	static public function instantiate($date=NULL, $tz=NULL)
+	public function __construct($date=NULL, $tz=NULL)
 	{
-		//Construct
-		$class = get_called_class();
-		$obj   = new $class;
-
-		//Set date
-		$obj->setValue($date, $tz);
-
-		return $obj;
+		parent::__construct();
+		$this->setValue($date, $tz);
 	}
 
 	/**
