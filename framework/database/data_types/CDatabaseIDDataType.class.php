@@ -5,27 +5,16 @@ class CDatabaseIDDataType implements \Framework\Interfaces\IModelDataType
 {
 	protected $_id;
 
-	public function __construct()
-	{
-		$this->_id = NULL;
-	}
-
 	/**
 	 * Instantiate method creates a new ID
-	 * @param $id The id to instantiate.
-	 * @return \Framework\Database\DataTypes\CDatabaseIDDataType
+	 * @param $id The id to instantiate to.
 	 */
-	static public function instantiate($id=NULL)
+	public function __construct($id=NULL)
 	{
-		$class    = get_called_class();
-		$obj      = new $class;
-
 		if($id instanceof \Framework\Database\DataTypes\CDatabaseIDDataType)
-			$obj->_id = $id->_id;
+			$this->_id = $id->_id;
 		else
-			$obj->setValue($id);
-
-		return $obj;
+			$this->setValue($id);
 	}
 
 	/**
@@ -56,6 +45,5 @@ class CDatabaseIDDataType implements \Framework\Interfaces\IModelDataType
 	{
 		return $this->_id;
 	}
-
 }
 ?>
