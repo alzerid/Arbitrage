@@ -31,9 +31,9 @@ class CDatabaseDriver extends \Framework\Database\CDatabaseDriver
 	{
 		//Convert Native Type to Model Type
 		if($data instanceof \MongoDate)
-			return \Framework\Model\DataTypes\CDateDataType::instantiate($data->sec);
+			return new \Framework\Model\DataTypes\CDateDataType($data->sec);
 		elseif($data instanceof \MongoId)
-			return \Framework\Database\DataTypes\CDatabaseIDDataType::instantiate((string) $data);
+			return new \Framework\Database\DataTypes\CDatabaseIDDataType((string) $data);
 
 		throw new \Framework\Exceptions\EDatabaseDriverException("Unable to convert native data type '" . get_class($data) . " to model type.");
 	}
@@ -58,7 +58,7 @@ class CDatabaseDriver extends \Framework\Database\CDatabaseDriver
 	 * @param $data The data to convert.
 	 * @return Returns the the Model Structure.
 	 */
-	public function convertModelStructureToNativeStructure($data)
+	public function convertModelStructureToNativeStructure(\Framework\Interfaces\IDatabaseModelStructure $data)
 	{
 		//Grab class and namespace
 		$class     = "\\" . __NAMESPACE__ . "\\" . preg_replace('/Framework\\\Database\\\/i', '', get_class($data));
@@ -69,7 +69,11 @@ class CDatabaseDriver extends \Framework\Database\CDatabaseDriver
 		if(!$ret)
 			throw new \Framework\Exceptions\EDatabaseDriverException("Unable to require structure '$namespace'.");
 
-		return $class::instantiate($data);
+		//Instantiate native structure
+		$native = new $class($data);
+		$native->setDriver($this);
+
+		return $native;
 	}
 
 	/**
@@ -77,9 +81,15 @@ class CDatabaseDriver extends \Framework\Database\CDatabaseDriver
 	 * @param $data The data to convert.
 	 * @return Returns the the Native Structure.
 	 */
-	public function convertNativeStructureToModelStructure($data)
+	public function convertNativeStructureToModelStructure(\Framework\Interfaces\IDatabaseModelStructure $data)
 	{
-		die(__METHOD__);
+		//Ensure the structure is not already in native format
+		$class = get_class($data);
+		if(preg_match('/Framework\\\Database\\\Structures/', $class))
+			return $data;
+
+		//Convert
+		throw new \Exception("Code converting of native struct to model struct");
 	}
 
 	/**
@@ -89,7 +99,7 @@ class CDatabaseDriver extends \Framework\Database\CDatabaseDriver
 	 */
 	public function convertNativeIDtoModelID($id)
 	{
-		return \Framework\Database\DataTypes\CDatabaseIDDataType::instantiate((string) $id);
+		return new \Framework\Database\DataTypes\CDatabaseIDDataType((string) $id);
 	}
 
 	/**
