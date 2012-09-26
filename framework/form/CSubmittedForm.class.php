@@ -37,14 +37,14 @@ class CSubmittedForm
 			$form = new \Framework\Form\CForm(array('id' => $idx));
 
 		//Set variables
+		$arrs  = new \Framework\Utils\CArrayObject($vars);
+		$vars  = $arrs->toArray();
 		$model = $form->getModel();
 		foreach($vars as $key=>$val)
-			$model[$key] = $val;
+			$model->setAPathValue($key, $val);
 
 		//Create submitted form
-		$submitted = new \Framework\Form\CSubmittedForm($form);
-
-		return $submitted;
+		return new \Framework\Form\CSubmittedForm($form);
 	}
 
 	/**
