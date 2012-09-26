@@ -1,15 +1,14 @@
 <?
 namespace Framework\Database;
 
-abstract class CModel extends \Framework\Model\CMomentoModel implements \Framework\Interfaces\IDatabaseModelStructure
+//abstract class CModel extends \Framework\Model\CMomentoModel implements \Framework\Interfaces\IDatabaseModelStructure
+class CModel extends \Framework\Database\Structures\CHashStructure
 {
 	static private $_TYPES = array();
-	protected $_driver;
 
-	public function __construct()
+	public function __construct($data=NULL)
 	{
-		$this->_driver = NULL;
-		parent::__construct();
+		\Framework\Model\CMomentoModel::__construct($data);
 	}
 
 	/**
@@ -63,23 +62,6 @@ abstract class CModel extends \Framework\Model\CMomentoModel implements \Framewo
 	}
 
 	/**
-	 * Method instantiates a Defined Model.
-	 * 
-	 */
-	static public function instantiate($data=NULL, \Framework\Database\CDatabaseDriver $driver=NULL)
-	{
-		//Instantiate new model object
-		$class = get_called_class();
-		$obj   = new $class;
-
-		//Set driver and data
-		$obj->_driver = $driver;
-		$obj->_setModelData($data);
-
-		return $obj;
-	}
-
-	/**
 	 * Method converts the model to an array.
 	 * @return array The array representing this model.
 	 */
@@ -118,11 +100,18 @@ abstract class CModel extends \Framework\Model\CMomentoModel implements \Framewo
 			if($value instanceof \Framework\Interfaces\IModelDataType)
 				$value = $this->_driver->convertModelDataTypeToNativeDataType($value);
 			elseif($value instanceof \Framework\Database\CModel)
+			{
+				$value->setDriver($this->_driver);
 				$value = $this->getQuery();
+			}
 			elseif($value instanceof \Framework\Interfaces\IDatabaseModelStructure)
 			{
+				//Convert Native structure to Model
 				$struct = $this->_driver->convertModelStructureToNativeStructure($value);
-				$value  = $struct->getQuery();
+				$struct->setDriver($this->_driver);
+
+				//Get query
+				$value = $struct->getQuery();
 			}
 			elseif(is_object($value))
 			{
@@ -184,6 +173,8 @@ abstract class CModel extends \Framework\Model\CMomentoModel implements \Framewo
 		return ((count($ret)===0)? NULL : $ret);
 	}
 
+
+
 	/**
 	 * Method merges _variables into _data.
 	 */
@@ -213,7 +204,7 @@ abstract class CModel extends \Framework\Model\CMomentoModel implements \Framewo
 		//Set from data
 		foreach($this->_data as $key=>$val)
 			$model->$key = $this->$key;
-			
+
 		return $model;
 	}
 
@@ -240,13 +231,13 @@ abstract class CModel extends \Framework\Model\CMomentoModel implements \Framewo
 		//Check if data type and structure
 		if($this->_data[$name] instanceof \Framework\Interfaces\IDatabaseModelStructure)
 		{
-			echo "IDatabaseModelStructure";
-			die(__METHOD__);
+			var_dump($name, $data);
+			throw new \Exception("Not yet implemented");
 		}
 		if($this->_data[$name] instanceof \Framework\Interfaces\IModelDataType)
 		{
 			$class = get_class($this->_data[$name]);
-			$this->_variables[$name] = $class::instantiate($data);
+			$this->_variables[$name] = new $class($data);
 		}
 		elseif(!is_object($this->_data[$name]))
 			$this->_variables[$name] = $data;
@@ -268,20 +259,35 @@ abstract class CModel extends \Framework\Model\CMomentoModel implements \Framewo
 		$data        = (($data===NULL)? array() : $data);
 		foreach($this->_data as $key=>$val)
 		{
-			//TODO: Handle CModel instances of $val
 			if(!array_key_exists($key, $data) || $data[$key] === NULL)
 				continue;
 
-			if($this->_data[$key] instanceof \Framework\Model\CModel)
-				$this->_data[$key]->_setModelData($data[$key]);
+			//Check to see what type we are
+			if($this->_data[$key] instanceof \Framework\Database\CModel)
+			{
+				$model = $this->_data[$key];
+				$model->setDriver($this->_driver);
+				$model->_setModelData($data[$key]);
+			}
+			elseif($this->_data[$key] instanceof \Framework\Interfaces\IDatabaseModelStructure)
+			{
+				//Get struct
+				$struct = $this->_data[$key];
+				$struct->_setModelData($data[$key]);
+				$struct->setDriver($this->_driver);
+
+				//Convert to model structure
+				if($this->_driver)
+					$this->_data[$key] = $this->_driver->convertNativeStructureToModelStructure($struct);
+			}
 			elseif($this->_data[$key] instanceof \Framework\Interfaces\IModelDataType)
 			{
-				if($this->_data[$key] instanceof \Framework\Interfaces\IModelDataType)
-					$this->_data[$key]->setValue($this->_driver->convertNativeDataTypeToModelDataType($data[$key]));
+				if($this->_driver)
+					$this->_data[$key] = $this->_driver->convertNativeDataTypeToModelDataType($data[$key]);
 				else
-					$this->_data[$key]->setValue(\Framework\Database\CDatabaseDriver::convertPrimitiveDataTypeToModelDataType($data[$key], get_class($this->_data[$key])));
+					$this->_data[$key]->setValue($data[$key]);
 			}
-			else
+			else  //TODO: Possibly call convertPrimitiveDataTypeToModelDataType
 				$this->_data[$key] = $data[$key];
 		}
 	}
