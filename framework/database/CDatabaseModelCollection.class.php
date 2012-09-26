@@ -78,7 +78,7 @@ abstract class CDatabaseModelCollection implements \ArrayAccess, \Iterator
 	protected function _getModel(array $values)
 	{
 		$class = $this->_query->getClass();
-		$model = $class::instantiate($values, $this->_query->getDriver());
+		$model = new $class($values, $this->_query->getDriver());
 
 		return $model;
 	}
