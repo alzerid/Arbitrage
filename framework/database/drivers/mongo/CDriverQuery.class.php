@@ -70,7 +70,6 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 
 	public function remove($query)
 	{
-		die('remove');
 		$this->_cmd   = "remove";
 		$this->_query = $query;
 		$this->_data  = NULL;
@@ -157,10 +156,7 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 			return $this->_data['_id'];
 		}
 		elseif($this->_cmd == "remove")
-		{
-			die("CMongoModel::execute REMOVE");
 			$handle->remove($query);
-		}
 		else
 			throw new EModelException("Cannot do batch operation on '{$this->_cmd}'.");
 
