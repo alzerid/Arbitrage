@@ -5,10 +5,14 @@ class CMomentoModel extends \Framework\Model\CModel
 {
 	protected $_variables;
 
-	public function __construct()
+	/**
+	 * Constructor for the model class.
+	 * @param $data The variables to set as default data for this Model.
+	 */
+	public function __construct($data=NULL)
 	{
-		parent::__construct();
 		$this->_variables = array();
+		parent::__construct($data);
 	}
 
 	/**
@@ -87,6 +91,5 @@ class CMomentoModel extends \Framework\Model\CModel
 	/********************************/
 	/** END CObjectAccess Overload **/
 	/********************************/
-
 }
 ?>
