@@ -168,7 +168,7 @@ Class CForm
 		{
 			//Get parameters
 			$id      = $args[0];
-			$attribs = ((empty($args[1]))? array() : $args[1]);
+			$attribs = (!(array_key_exists(1, $args))? array() : $args[1]);
 			$class   = "\\Framework\\Form\\Elements\\C" . ucwords($name) . "FormElement";
 
 			//Create element and return
@@ -178,8 +178,8 @@ Class CForm
 		{
 			//Get parameters
 			$id      = $args[0];
-			$value   = ((empty($args[1]))? NULL : $args[1]);
-			$attribs = ((empty($args[2]))? array() : $args[2]);
+			$value   = (!(array_key_exists(1, $args))? NULL : $args[1]);
+			$attribs = (!(array_key_exists(2, $args))? array() : $args[2]);
 			$class   = "\\Framework\\Form\\Elements\\C" . ucwords($name) . "FormElement";
 
 			return new $class($this->_normalizeName($id), $this->_getValue($id, $attribs, $value), $attribs);
@@ -188,9 +188,9 @@ Class CForm
 		{
 			//Get parameters
 			$id       = $args[0];
-			$options  = ((empty($args[1]))? array('') : $args[1]);
-			$attribs  = ((empty($args[2]))? array() : $args[2]);
-			$selected = ((empty($args[3]))? array('') : $args[3]);
+			$options  = (!(array_key_exists(1, $args))? array('') : $args[1]);
+			$attribs  = (!(array_key_exists(2, $args))? array() : $args[2]);
+			$selected = (!(array_key_exists(3, $args))? array('') : $args[3]);
 
 			//Create element and return
 			return new \Framework\Form\Elements\CSelectFormElement($this->_normalizeName($id), $options, $attribs, $this->_getValue($id, $attribs), $attribs);
