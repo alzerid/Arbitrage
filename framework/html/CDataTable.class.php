@@ -23,7 +23,17 @@ abstract class CDataTable implements \Framework\Interfaces\IHTMLDataTable
 			$this->_attrs['class'] = ' datatable';
 	}
 
+	public function __toString()
+	{
+		return $this->_toString();
+	}
+
 	abstract public function render();
+
+	protected function _toString()
+	{
+		return $this->render();
+	}
 
 	protected function _normalizeValue($val)
 	{
