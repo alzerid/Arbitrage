@@ -102,7 +102,7 @@ class CModel extends \Framework\Database\Structures\CHashStructure
 			elseif($value instanceof \Framework\Database\CModel)
 			{
 				$value->setDriver($this->_driver);
-				$value = $this->getQuery();
+				$value = $value->getQuery();
 			}
 			elseif($value instanceof \Framework\Interfaces\IDatabaseModelStructure)
 			{
