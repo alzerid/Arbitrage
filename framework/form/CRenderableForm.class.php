@@ -3,7 +3,8 @@ namespace Framework\Form;
 
 Class CRenderableForm extends \Framework\Form\CForm implements \Framework\Interfaces\IViewFileRenderableContext
 {
-	private $_initialized;
+	protected $_initialized;
+	private $_removed;
 	private $_file;
 
 	public function __construct($render, array $attributes=array())
@@ -15,6 +16,7 @@ Class CRenderableForm extends \Framework\Form\CForm implements \Framework\Interf
 		$this->_values      = new \Framework\Model\CModel;
 		$this->_initialized = false;
 		$this->_file        = $render;
+		$this->_removed     = array();
 
 		//Transfrom _vaolues into CTypedFormModel
 		$this->_initializeModel();
@@ -36,6 +38,15 @@ Class CRenderableForm extends \Framework\Form\CForm implements \Framework\Interf
 	public function getFile()
 	{
 		return $this->_file;
+	}
+
+	/**
+	 * Method removes an element from rendering.
+	 * @param $namespace The arbitrage path to the element.
+	 */
+	public function removeElement($element)
+	{
+		$this->_removed[] = $element;
 	}
 
 	/**
@@ -151,6 +162,11 @@ Class CRenderableForm extends \Framework\Form\CForm implements \Framework\Interf
 		else
 		{
 			//Get element
+			$id = ((empty($args[0]))? "" : $args[0]);
+			if(in_array($id, $this->_removed))
+				return NULL;
+
+			//Create element
 			$id      = $args[0];
 			$element = $this->_values->getElement($id);
 		}
