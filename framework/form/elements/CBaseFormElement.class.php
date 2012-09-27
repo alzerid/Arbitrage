@@ -48,7 +48,7 @@ class CBaseFormElement implements \Framework\Interfaces\IFormElement
 	public function setValue($value)
 	{
 		if($value instanceof \Framework\Form\Elements\CBaseFormElement)
-			$value = $this->_value->getValue();
+			$value = $value->getValue();
 
 		$this->_value = $value;
 	}
