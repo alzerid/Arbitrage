@@ -163,7 +163,7 @@ class CDatabaseModel extends \Framework\Database\CModel implements \Framework\In
 
 		//Check if id is set
 		if($this->_idVal !== NULL)
-			$vars[self::$_ID_KEYS[get_called_class()]] = $this->_idVal;
+			$vars[self::$_ID_KEYS[get_called_class()]] = $this->_driver->convertModelDataTypeToNativeDataType($this->_idVal);
 
 		//Save using the Query Driver
 		$id = $query->save($vars);
@@ -253,7 +253,15 @@ class CDatabaseModel extends \Framework\Database\CModel implements \Framework\In
 
 		//Unset the _id and set locally if exists
 		if($id !== NULL)
-			$this->_idVal = $this->_driver->convertNativeIDtoModelID($id);
+		{
+			//Convert id if need be
+			if(!($id instanceof \Framework\Database\DataTypes\CDatabaseIDDataType))
+				$id = new \Framework\Database\DataTypes\CDatabaseIDDataType($id);
+			elseif($this->_driver)
+				$id = $this->_driver->convertNativeIDtoModelID($id);
+
+			$this->_idVal = $id;
+		}
 
 		//Call parent
 		parent::_setModelData($data);
