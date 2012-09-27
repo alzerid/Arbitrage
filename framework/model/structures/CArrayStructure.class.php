@@ -36,6 +36,16 @@ class CArrayStructure extends \Framework\Model\CModel implements \Iterator
 		return array_search($search, $this->_data);
 	}
 
+	/**
+	 * Method returns if the needle is in the array.
+	 * @param $needle The needle to search for.
+	 * @return Returns true or false.
+	 */
+	public function contains($needle)
+	{
+		return in_array($needle, $this->_data);
+	}
+
 	/*****************************/
 	/** Iterator Implementation **/
 	/*****************************/
