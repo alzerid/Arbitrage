@@ -73,6 +73,7 @@ final class EHTTPException extends EArbitrageException
 }
 
 final class ENotImplementedException extends \Exception { }
+final class EGeneralException extends \Exception { }
 final class EArbitrageKernelException extends \Exception { }
 final class EArbitrageServiceException extends \Exception { }
 final class EArbitragePackageException extends \Exception { }
