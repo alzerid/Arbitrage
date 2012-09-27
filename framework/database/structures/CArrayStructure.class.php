@@ -6,29 +6,21 @@ class CArrayStructure extends \Framework\Model\Structures\CArrayStructure implem
 	protected $_originals;
 	private $_driver;
 
-	public function __construct()
+	public function __construct($data=array(), $class=NULL)
 	{
-		parent::__construct();
+		parent::__construct($data, $class);
 		$this->_originals = array();
 		$this->_driver    = NULL;
 	}
 
 	/**
-	 * Method instantiates the data type.
-	 * @param $data The variables to set as default data for this Model.
-	 * @param $class The class associated with the values.
+	 * Method returns if the needle is in the array.
+	 * @param $needle The needle to search for.
+	 * @return Returns true or false.
 	 */
-	static public function instantiate($data=array(), $class=NULL)
+	public function contains($needle)
 	{
-		$obj = parent::instantiate($data, $class);
-
-		//Set originals
-		if($data instanceof \Framework\Database\Structures\CArrayStructure)
-			$obj->_originals = $data->_originals;
-		else
-			$obj->_originals = $obj->_data;
-
-		return $obj;
+		return in_array($needle, $this->_originals) || parent::contains($needle);
 	}
 
 	/**
