@@ -39,9 +39,9 @@ class CViewFileRenderable extends \Framework\Renderables\CViewFilePartialRendera
 		$content = parent::render($default);
 
 		//Now render layout
-		$layout = $this->_path . "/layout/{$this->_layout}.php";
-		if(!file_exists($layout))
-			throw new EArbitrageRenderableException("Layout does not exist '($layout).");
+		$layout = $this->_findPath("/layout/{$this->_layout}.php");
+		if($layout===NULL)
+			throw new \Framework\Exceptions\EArbitrageRenderableException("Layout does not exist '($layout).");
 
 		//Set header
 		header("Content-Type: text/html");

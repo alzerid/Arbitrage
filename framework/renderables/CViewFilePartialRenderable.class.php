@@ -58,9 +58,9 @@ class CViewFilePartialRenderable implements \Framework\Interfaces\IViewFileRende
 	public function renderPartial($file, $variables=NULL)
 	{
 		//Get view file
-		$path = $this->_path . "/$file.php";
-		if(!file_exists($path))
-			throw new EArbitrageRenderableException("Unable to load view file ($path).");
+		$path = $this->_findPath("/$file.php");
+		if($path===NULL)
+			throw new \Framework\Exceptions\EArbitrageRenderableException("Unable to load view file ($file).");
 
 		ob_start();
 		ob_implicit_flush(false);
@@ -76,6 +76,22 @@ class CViewFilePartialRenderable implements \Framework\Interfaces\IViewFileRende
 			extract($_vars);
 
 		require($file);
+	}
+
+	protected function _findPath($file)
+	{
+		$paths = $this->_path;
+		if(!is_array($paths))
+			$paths = array($paths);
+
+		//Iterate and find file
+		foreach($paths as $val)
+		{
+			if(file_exists($val . $file))
+				return $val . $file;
+		}
+
+		return NULL;
 	}
 }
 ?>
