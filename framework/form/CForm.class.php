@@ -204,8 +204,8 @@ Class CForm
 			//Create element and return
 			return new $class($this->_normalizeName($id), $this->_getValue($id), $args);
 		}
-		else
-			throw new \Framework\Exceptions\EFormException("Unknown element '$name'.");
+
+		throw new \Framework\Exceptions\EFormException("Unknown element '$name'.");
 	}
 
 	/**
