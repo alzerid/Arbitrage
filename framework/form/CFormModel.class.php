@@ -78,6 +78,21 @@ class CFormModel extends \Framework\Model\CModel
 	}
 
 	/**
+	 * Method recursively sets the values from the input paramater.
+	 * @param \Framework\Model\CModel $model The model to get the values from.
+	 */
+	public function setData(\Framework\Model\CModel $model)
+	{
+		$tmp = $this->flatten();
+		foreach($tmp as $key=>$value)
+		{
+			$val = $model->apath($key);
+			if($val !== NULL)
+				$this->setAPathValue($key, $val);
+		}
+	}
+
+	/**
 	 * Method flattens the model array.
 	 * @param $arr_key The current key.
 	 * @param $obj The model object to set.
@@ -106,6 +121,11 @@ class CFormModel extends \Framework\Model\CModel
 			//Check to see if it is a subform
 			if($value instanceof \Framework\Form\CForm)
 				$ret = array_merge($ret, $value->getModel()->flatten($key));
+			elseif($value instanceof \Framework\Model\CModel)
+			{
+				$value = new \Framework\Form\CFormModel($value);
+				$ret = array_merge($ret, $value->flatten($key));
+			}
 			elseif($element instanceof \Framework\Interfaces\IFormElement)
 				$ret[$key] = $element;
 			elseif(is_array($value))
@@ -156,6 +176,8 @@ class CFormModel extends \Framework\Model\CModel
 		//Check what to do
 		if($this->_data[$name] instanceof \Framework\Interfaces\IFormElement)
 			return $this->_data[$name]->getValue($name);
+		elseif($this->_data[$name] instanceof \Framework\Model\CModel && !($this->_data[$name] instanceof \Framework\Form\CFormModel))
+			$this->_data[$name] = new \Framework\Form\CFormModel($this->_data[$name]);
 
 		return parent::_getData($name);
 	}
