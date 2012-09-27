@@ -15,6 +15,7 @@ abstract class CController implements \Framework\Interfaces\IController, \Framew
 	protected $_files;            //List of files uploaded
 	protected $_flash;            //Flash variables
 	protected $_view;             //View variables that will passed into the view
+	protected $_view_path;        //View paths
 	protected $_application;      //The application the controller belongs to
 	protected $_package;          //The package the controller belongs to
 
@@ -35,15 +36,16 @@ abstract class CController implements \Framework\Interfaces\IController, \Framew
 		$session = ((isset($_SESSION))? $_SESSION : array());
 
 		//Setup PHP variables
-		$this->_get     = new CArrayObject($_GET);
-		$this->_post    = new CArrayObject($_POST);
-		$this->_request = new CArrayObject($_REQUEST);
-		$this->_session = new CArrayObject($session);
-		$this->_files   = new CArrayObject($files);
-		$this->_cookie  = new CArrayObject($_COOKIE);
-		$this->_view    = new CArrayObject();
-		$this->_chain   = new CFilterChain($this);
-		$this->_flash   = NULL;
+		$this->_get       = new CArrayObject($_GET);
+		$this->_post      = new CArrayObject($_POST);
+		$this->_request   = new CArrayObject($_REQUEST);
+		$this->_session   = new CArrayObject($session);
+		$this->_files     = new CArrayObject($files);
+		$this->_cookie    = new CArrayObject($_COOKIE);
+		$this->_view_path = new CArrayObject();
+		$this->_view      = new CArrayObject();
+		$this->_chain     = new CFilterChain($this);
+		$this->_flash     = NULL;
 
 		//Set controller variables
 		$this->_namespace = CKernel::getInstance()->convertPHPNamespaceToArbitrage(get_class($this));
@@ -189,6 +191,15 @@ abstract class CController implements \Framework\Interfaces\IController, \Framew
 	public function getLayout()
 	{
 		return $this->_layout;
+	}
+
+	/**
+	 * Method adds to the view directory search path.
+	 * @param $namespace The namespace the path resides in.
+	 */
+	public function addViewPath($namespace)
+	{
+		$this->_view_path[] = $this->_application->getPath() . strtolower(\Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPath($namespace)) . "/views";
 	}
 
 	/**
@@ -338,6 +349,7 @@ abstract class CController implements \Framework\Interfaces\IController, \Framew
 			{
 				$path = preg_replace('/(controllers|ajax).*$/i', 'views', CKernel::getInstance()->convertArbitrageNamespaceToPath($this->_namespace));
 				$path = $this->_application->getPath() . "/$path";
+				$path = array_merge(array($path), $this->_view_path->toArray());
 
 				//Setup default render
 				if(!isset($content['render']))
