@@ -39,6 +39,7 @@ class CModel extends \Framework\Utils\CObjectAccess
 		if(!isset($obj[$key]) && count($path))
 		{
 			$class     = get_called_class();
+			var_dump($class);
 			$obj[$key] = new $class;
 		}
 
@@ -137,6 +138,54 @@ class CModel extends \Framework\Utils\CObjectAccess
 	public function getIterator()
 	{
 		return new \Framework\Model\CModelIterator($this);
+	}
+
+	/**
+	 * Method flattens the model array.
+	 * @param $arr_key The current key.
+	 * @param $obj The model object to set.
+	 * @return \Framework\Form\CFormModel Returns the newly created flattened CFormModel.
+	 */
+	public function flatten($arr_key=NULL, $obj=NULL)
+	{
+		//If object is not set, set it
+		if($obj===NULL)
+		{
+			$class = get_called_class();
+			$obj   = new $class;
+
+			return $this->flatten($arr_key, $this);
+		}
+
+		//Iterate through object
+		$iterator = $obj->getIterator();
+		$ret      = array();
+		foreach($iterator as $key=>$value)
+		{
+			//Set array key
+			$element = $this->getElement($key);
+			$key     = ((!empty($arr_key))? "$arr_key.$key" : $key);
+
+			//Check to see if it is a subform
+			if($value instanceof \Framework\Model\CModel)
+				$ret = array_merge($ret, $value->flatten($key));
+			elseif(is_array($value))
+			{
+				$temp        = new \Framework\Model\CModel();
+				$temp->_data = $value;
+				$ret         = array_merge($ret, $temp->flatten($key, $temp));
+			}
+			else
+			{
+				//$obj->setAPathValue($key, $value);
+				echo "Simple set: ";
+				var_dump($arr_key, $key, $value, $element);
+				var_dump($obj);
+				die(__METHOD__);
+			}
+		}
+
+		return $ret;
 	}
 
 	/****************************/
