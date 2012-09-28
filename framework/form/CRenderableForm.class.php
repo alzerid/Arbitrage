@@ -175,6 +175,22 @@ Class CRenderableForm extends \Framework\Form\CForm implements \Framework\Interf
 	}
 
 	/**
+	 * Method sets the form state to the initialize state.
+	 */
+	protected function _startInitialize()
+	{
+		$this->_initialized = false;
+	}
+
+	/**
+	 * Method sets the form state to the endinitialize state.
+	 */
+	public function _stopInitialize()
+	{
+		$this->_initialized = true;
+	}
+
+	/**
 	 * Method that can be overridden that converts the object to a string.
 	 * return string Returns the string representing the object.
 	 */
