@@ -3,7 +3,7 @@ namespace Framework\Form;
 
 Class CRenderableForm extends \Framework\Form\CForm implements \Framework\Interfaces\IViewFileRenderableContext
 {
-	protected $_initialized;
+	private $_initialized;
 	private $_removed;
 	private $_file;
 
@@ -108,9 +108,10 @@ Class CRenderableForm extends \Framework\Form\CForm implements \Framework\Interf
 	 * Method creates a subform.
 	 * $param $name The name of the subform to associate to.
 	 * @param $class The class of the subform.
+	 * @param $options Any options to send to the renderable form.
 	 * @return Returns the subform.
 	 */
-	public function subform($name, $class)
+	public function subform($name, $class, $options=array())
 	{
 		if(!$this->_initialized)
 		{
@@ -120,7 +121,7 @@ Class CRenderableForm extends \Framework\Form\CForm implements \Framework\Interf
 				throw new \Framework\Exceptions\EFormException("subform '$class' must be of inherit \\Framework\\Form\\CRenderableForm");
 
 			//Create new form
-			$element = new $class($name, $this);
+			$element = new $class($name, $this, $options);
 			$this->_values->setAPathValue($name, $element);
 		}
 		else
@@ -175,6 +176,15 @@ Class CRenderableForm extends \Framework\Form\CForm implements \Framework\Interf
 	}
 
 	/**
+	 * Method returns the initialized flag value.
+	 * @return boolean The initalized flag is returned.
+	 */
+	protected function _getInitialized()
+	{
+		return $this->_initialized;
+	}
+
+	/**
 	 * Method sets the form state to the initialize state.
 	 */
 	protected function _startInitialize()
@@ -185,7 +195,7 @@ Class CRenderableForm extends \Framework\Form\CForm implements \Framework\Interf
 	/**
 	 * Method sets the form state to the endinitialize state.
 	 */
-	public function _stopInitialize()
+	public function _endInitialize()
 	{
 		$this->_initialized = true;
 	}
