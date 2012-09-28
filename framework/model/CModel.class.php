@@ -39,7 +39,6 @@ class CModel extends \Framework\Utils\CObjectAccess
 		if(!isset($obj[$key]) && count($path))
 		{
 			$class     = get_called_class();
-			var_dump($class);
 			$obj[$key] = new $class;
 		}
 
