@@ -5,19 +5,40 @@ class CArrayStructure extends \Framework\Database\Structures\CArrayStructure
 {
 	/**
 	 * Method returns the updated query.
+	 * @param $prened The key string to prepend.
 	 * @return array Retuns an array of the updated items.
 	 */
-	public function getUpdateQuery()
+	public function getUpdateQuery($prepend=NULL)
 	{
-		//TODO: Code smarter differences
-		if(count($this->_data) == 0)
-			return $this->_data;
+		//Iterate through
+		$ret  = array();
+		foreach($this->_data as $key=>$val)
+		{
+			$value = NULL;
+			$pkey  = (($prepend!==NULL)? "$prepend.$key" : $key);
+			if($val instanceof \Framework\Database\CModel)
+				$ret = array_merge($ret, $val->getUpdateQuery($pkey));
+			elseif($val instanceof \Framework\Interfaces\IDatabaseModelStructure)
+			{
+				$struct = $this->_driver->convertModelStructureToNativeStructure($val);
+				$value  = $struct->getUpdateQuery($pkey);
+			}
+			elseif($val instanceof \Framework\Interfaces\IModelDataType)
+				$value = $this->_driver->convertModelDataTypeToNativeDataType($val);
+			else
+				$value = $val;
 
-		$ret = array_diff($this->_data, $this->_originals);
-		if(count($ret) == 0)
-			return NULL;
+			//Set value
+			if($value!==NULL)
+			{
+				if(is_array($value))
+					$ret = array_merge($ret, $value);
+				else
+					$ret[$pkey] = $value;
+			}
+		}
 
-		return $this->_data;
+		return $ret;
 	}
 
 	/**
