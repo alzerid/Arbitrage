@@ -256,8 +256,9 @@ class CModel extends \Framework\Utils\CObjectAccess
 				if(array_keys($val) !== range(0, count($val)-1))
 				{
 					$this->_data[$key] = $val;
-					var_dump($this->_data);
-					die(__METHOD__ . " HASH!!");
+					var_dump($key, $val, $this->_data);
+
+					throw new \Framework\Exceptions\ENotImplementedException("HASH/CModel logic not implemented");
 				}
 				else
 					$this->_data[$key] = new \Framework\Model\Structures\CArrayStructure($val);
