@@ -14,7 +14,7 @@ class CFormModel extends \Framework\Model\CModel
 	/**
 	 * Method converts the model to a database model.
 	 * @param $namespace The namespace model.
-	 * @param @return \Framework\Database\CModel The database model or NULl.
+	 * @return \Framework\Database\CModel The database model or NULL.
 	 */
 	public function convertToModel($namespace)
 	{
