@@ -79,6 +79,7 @@ abstract class CDatabaseModelCollection implements \ArrayAccess, \Iterator
 	{
 		$class = $this->_query->getClass();
 		$model = new $class($values, $this->_query->getDriver());
+		$model->merge();
 
 		return $model;
 	}
