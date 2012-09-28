@@ -147,7 +147,7 @@ class CDatabaseModel extends \Framework\Database\CModel implements \Framework\In
 	public function save()
 	{
 		//Set properties for driver
-		$query = $this->_getQueryDriver($query);
+		$query = $this->_getQueryDriver();
 
 		//Get variables
 		$this->merge();
