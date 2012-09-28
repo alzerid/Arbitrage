@@ -97,26 +97,13 @@ class CModel extends \Framework\Database\Structures\CHashStructure
 		foreach($this->_data as $key=>$value)
 		{
 			$value = $this->$key;
-			if($value instanceof \Framework\Interfaces\IModelDataType)
-				$value = $this->_driver->convertModelDataTypeToNativeDataType($value);
-			elseif($value instanceof \Framework\Database\CModel)
-			{
-				$value->setDriver($this->_driver);
+			if($value instanceof \Framework\Database\CModel)
 				$value = $value->getQuery();
-			}
 			elseif($value instanceof \Framework\Interfaces\IDatabaseModelStructure)
 			{
 				//Convert Native structure to Model
 				$struct = $this->_driver->convertModelStructureToNativeStructure($value);
-				$struct->setDriver($this->_driver);
-
-				//Get query
-				$value = $struct->getQuery();
-			}
-			elseif(is_object($value))
-			{
-				var_dump($key, $value);
-				throw new \Framework\Exceptions\EModelDataException("Unable to handle query conversion");
+				$value  = $struct->getQuery();
 			}
 
 			//Assign values
@@ -128,9 +115,10 @@ class CModel extends \Framework\Database\Structures\CHashStructure
 
 	/**
 	 * Method returns the updated query.
+	 * @param $prepend The key string to prepend.
 	 * @return array Retuns an array of the updated items.
 	 */
-	public function getUpdateQuery()
+	public function getUpdateQuery($prepend=NULL)
 	{
 		//TODO: Handle ModelStructures
 
@@ -139,7 +127,20 @@ class CModel extends \Framework\Database\Structures\CHashStructure
 		{
 			//Item in variables array
 			$value = NULL;
+			$pkey  = (($prepend!==NULL)? "$prepend.$key" : $key);
 			if(array_key_exists($key, $this->_variables))
+				$value = $this->_variables[$key];
+			elseif($val instanceof \Framework\Database\CModel)
+				$value = $val->getUpdateQuery($pkey);
+			elseif($val instanceof \Framework\Interfaces\IDatabaseModelStructure)
+			{
+				//Convert the struct to the native driver type
+				var_dump($key, $this->_driver, $prepend);
+				$struct = $this->_driver->convertModelStructureToNativeStructure($this->_data[$key]);
+				$value  = $struct->getUpdateQuery($pkey);
+			}
+
+			/*if(array_key_exists($key, $this->_variables))
 			{
 				//Figure out how to handle this data
 				if($val instanceof \Framework\Interfaces\IModelDataType)
@@ -157,23 +158,26 @@ class CModel extends \Framework\Database\Structures\CHashStructure
 				}
 			}
 			elseif($val instanceof \Framework\Database\CModel)
-				$value = $val->getUpdateQuery();
+				$value = $val->getUpdateQuery($pkey);
 			elseif($val instanceof \Framework\Interfaces\IDatabaseModelStructure)
 			{
 				//Convert the struct to the native driver type
 				$struct = $this->_driver->convertModelStructureToNativeStructure($this->_data[$key]);
-				$value  = $struct->getUpdateQuery();
-			}
+				$value  = $struct->getUpdateQuery($pkey);
+			}*/
 
 			//Set data point to ret
 			if($value !== NULL)
-				$ret[$key] = $value;
+			{
+				if(is_array($value))
+					$ret = array_merge($ret, $value);
+				else
+					$ret[$pkey] = $value;
+			}
 		}
 
 		return ((count($ret)===0)? NULL : $ret);
 	}
-
-
 
 	/**
 	 * Method merges _variables into _data.
@@ -199,6 +203,7 @@ class CModel extends \Framework\Database\Structures\CHashStructure
 	 */
 	public function convertToBaseModel()
 	{
+		//TODO: Recursive convert any models
 		$model = new \Framework\Model\CModel;
 
 		//Set from data
@@ -234,7 +239,7 @@ class CModel extends \Framework\Database\Structures\CHashStructure
 			var_dump($name, $data);
 			throw new \Exception("Not yet implemented");
 		}
-		if($this->_data[$name] instanceof \Framework\Interfaces\IModelDataType)
+		elseif($this->_data[$name] instanceof \Framework\Interfaces\IModelDataType)
 		{
 			$class = get_class($this->_data[$name]);
 			$this->_variables[$name] = new $class($data);
@@ -273,8 +278,8 @@ class CModel extends \Framework\Database\Structures\CHashStructure
 			{
 				//Get struct
 				$struct = $this->_data[$key];
-				$struct->_setModelData($data[$key]);
 				$struct->setDriver($this->_driver);
+				$struct->_setModelData($data[$key]);
 
 				//Convert to model structure
 				if($this->_driver)
@@ -283,12 +288,15 @@ class CModel extends \Framework\Database\Structures\CHashStructure
 			elseif($this->_data[$key] instanceof \Framework\Interfaces\IModelDataType)
 			{
 				if($this->_driver)
-					$this->_data[$key] = $this->_driver->convertNativeDataTypeToModelDataType($data[$key]);
+					$this->_variables[$key] = $this->_driver->convertNativeDataTypeToModelDataType($data[$key]);
 				else
-					$this->_data[$key]->setValue($data[$key]);
+				{
+					$this->_variables[$key] = clone $this->_data[$key];
+					$this->_variables[$key]->setValue($data[$key]);
+				}
 			}
-			else  //TODO: Possibly call convertPrimitiveDataTypeToModelDataType
-				$this->_data[$key] = $data[$key];
+			else
+				$this->_variables[$key] = $data[$key];
 		}
 	}
 }
