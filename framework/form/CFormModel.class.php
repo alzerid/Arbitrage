@@ -140,7 +140,7 @@ class CFormModel extends \Framework\Model\CModel
 				echo "Simple set: ";
 				var_dump($arr_key, $key, $value, $element);
 				var_dump($obj);
-				die(__METHOD__);
+				throw new \Framework\Exceptions\ENotImplementedException("Simple set not yet implemented");
 			}
 		}
 
