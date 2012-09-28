@@ -43,6 +43,16 @@ interface IFormElement
 	public function getValue();
 }
 
+interface ISubForm extends IFormElement
+{
+	public function __construct($name, $form, $options=array());
+}
+
+interface ICustomFormElement extends IFormElement
+{
+	public function __construct($id, $value, $args=NULL);
+}
+
 /*************************/
 /** End Form Interfaces **/
 /*************************/
