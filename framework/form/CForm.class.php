@@ -13,7 +13,6 @@ Class CForm
 		static $dattributes = array('id'           => 'form-noname',
 		                            'method'       => 'POST',
 		                            'enctype'      => 'application/x-www-form-urlencoded');
-		                            /*'autocomplete' => 'on');*/
 
 		//Set attributes and value
 		$this->_attributes = \Framework\Utils\CArrayObject::mergeArray($dattributes, $attributes);
