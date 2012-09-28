@@ -76,5 +76,51 @@ class CHashStructure extends \Framework\Model\CMomentoModel implements \Framewor
 				$this->_data[$key] = $val;
 		}
 	}
+
+	/*protected function _setModelData($data)
+	{
+		//TODO: Types cast everything
+
+		//Set data to defaults
+		$this->_data = static::defaults();
+		$types       = static::types();
+		$data        = (($data===NULL)? array() : $data);
+		foreach($this->_data as $key=>$val)
+		{
+			if(!array_key_exists($key, $data) || $data[$key] === NULL)
+				continue;
+
+			//Check to see what type we are
+			if($this->_data[$key] instanceof \Framework\Database\CModel)
+			{
+				$model = $this->_data[$key];
+				$model->setDriver($this->_driver);
+				$model->_setModelData($data[$key]);
+			}
+			elseif($this->_data[$key] instanceof \Framework\Interfaces\IDatabaseModelStructure)
+			{
+				//Get struct
+				$struct = $this->_data[$key];
+				$struct->setDriver($this->_driver);
+				$struct->_setModelData($data[$key]);
+
+				//Convert to model structure
+				if($this->_driver)
+					$this->_data[$key] = $this->_driver->convertNativeStructureToModelStructure($struct);
+			}
+			elseif($this->_data[$key] instanceof \Framework\Interfaces\IModelDataType)
+			{
+				if($this->_driver)
+					$this->_variables[$key] = $this->_driver->convertNativeDataTypeToModelDataType($data[$key]);
+				else
+				{
+					$this->_variables[$key] = clone $this->_data[$key];
+					$this->_variables[$key]->setValue($data[$key]);
+				}
+			}
+			else
+				$this->_variables[$key] = $data[$key];
+		}
+	}*/
 }
 ?>
