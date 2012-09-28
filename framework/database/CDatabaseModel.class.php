@@ -101,17 +101,21 @@ class CDatabaseModel extends \Framework\Database\CModel implements \Framework\In
 	{
 		//Ensure _id is there
 		if(!isset($this->_idVal))
-			throw new EModelException("Cannot update without an ID.");
+			throw new \Framework\Exceptions\EModelException("Cannot update without an ID.");
+
+		//Set driver
+		$query = $this->_getQueryDriver();
 
 		//Grab $variables not originals
 		$vars = $this->getUpdateQuery();
 
-		$key  = self::$_ID_KEYS[get_called_class()];
-		$id   = $this->_driver->convertModelIDToNativeID($this->_idVal);
+		//Get ID
+		$key = self::$_ID_KEYS[get_called_class()];
+		$id  = $this->_driver->convertModelIDToNativeID($this->_idVal);
 
 		//Query
 		if($vars !== NULL)
-			self::query()->update(array($key => $id), $vars);
+			$query->update(array($key => $id), $vars);
 
 		//Merge variables to originals
 		$this->merge();
@@ -142,20 +146,8 @@ class CDatabaseModel extends \Framework\Database\CModel implements \Framework\In
 
 	public function save()
 	{
-		//TODO: Remove database and table parameters. User model properties for these actions --EMJ
-
-		//Get query driver
-		$query = self::query();
-		$prop  = $this->getProperties();
-		
-		if(isset($prop['database']))
-			$query->getDriver()->setDatabase($prop['database']);
-
-		if(isset($prop['table']))
-			$query->getDriver()->setTable($prop['table']);
-
-		//Set driver for model
-		$this->_driver = $query->getDriver();
+		//Set properties for driver
+		$query = $this->_getQueryDriver($query);
 
 		//Get variables
 		$this->merge();
@@ -245,6 +237,7 @@ class CDatabaseModel extends \Framework\Database\CModel implements \Framework\In
 		$key = self::idKey();
 		$id  = NULL;
 
+		//Check if id exists
 		if($key && isset($data[$key]))
 		{
 			$id = (string) $data[$key];
@@ -265,6 +258,27 @@ class CDatabaseModel extends \Framework\Database\CModel implements \Framework\In
 
 		//Call parent
 		parent::_setModelData($data);
+	}
+
+	/**
+	 * Method sets the query/driver properties and returns the object.
+	 * @param \Framework\Database\CDriverQuery $query The query object.
+	 * @return \Framework\Database\CDriverQuery $query The query object.
+	 */
+	private function _getQueryDriver()
+	{
+		$query = self::query();
+		$prop  = $this->getProperties();
+		if(isset($prop['database']))
+			$query->getDriver()->setDatabase($prop['database']);
+
+		if(isset($prop['table']))
+			$query->getDriver()->setTable($prop['table']);
+
+		//Set the model driver
+		$this->_driver = $query->getDriver();
+
+		return $query;
 	}
 }
 ?>
