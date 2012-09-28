@@ -93,9 +93,13 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 		//Get handle
 		$handle = $this->_driver->getHandle();
 		$handle = $handle->{$prop['database']}->{$prop['table']};
-		
+
 		//Normalize the query
 		$query = $this->_normalizeQuery($this->_query);
+
+		//Normalize the data
+		if($this->_data !== NULL)
+			$this->_data = $this->_normalizeData($this->_data);
 
 		//Query
 		if(in_array($this->_cmd, array('find', 'findOne', 'count')))
@@ -127,7 +131,7 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 			$update = array('$set' => $this->_smartFlatten($this->_data));
 
 			//Setup conditions
-			$query = \Framework\Utils\CArrayObject::instantiate($query); //new \Framework\Utils\CArrayObject($query);
+			$query = \Framework\Utils\CArrayObject::instantiate($query);
 			$query = $query->flatten()->toArray();
 
 			//Update
@@ -229,6 +233,27 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 				$value = $val;
 
 			$ret[$key] = $value;
+		}
+
+		return $ret;
+	}
+
+	/**
+	 * Method normalizes Data Types.
+	 * @param $data The data to normalize.
+	 */
+	private function _normalizeData($data)
+	{
+		$ret = array();
+		foreach($data as $key=>$val)
+		{
+			if($val instanceof \Framework\Interfaces\IModelDataType)
+				$val = $this->_driver->convertModelDataTypeToNativeDataType($val);
+			elseif(is_array($val))
+				$val = $this->_normalizeData($val);
+
+			//Set value
+			$ret[$key] = $val;
 		}
 
 		return $ret;
