@@ -44,6 +44,10 @@ class CDivDataTable extends \Framework\HTML\CDataTable
 					else
 						$val = $this->_normalizeValue($entry->apath($val));
 
+					//Check if empty
+					if(empty($val))
+						$val = "&nbsp;";
+
 					$html .= '<div class="entry">' . $val . '</div>';
 				}
 

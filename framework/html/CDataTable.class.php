@@ -1,7 +1,7 @@
 <?
 namespace Framework\HTML;
 
-abstract class CDataTable implements \Framework\Interfaces\IHTMLDataTable
+class CDataTable implements \Framework\Interfaces\IHTMLDataTable
 {
 	protected $_headers;
 	protected $_data;
@@ -28,7 +28,66 @@ abstract class CDataTable implements \Framework\Interfaces\IHTMLDataTable
 		return $this->_toString();
 	}
 
-	abstract public function render();
+	public function render()
+	{
+		$attrs = \Framework\DOM\CDOMGenerator::generateAttribs($this->_attrs);
+		$html  = "<table id=\"{$this->_id}\" $attrs>";
+			$html .= $this->_renderHeader();
+			$html .= $this->_renderData();
+		$html .= "</table>";
+
+		return $html;
+	}
+
+	protected function _renderHeader()
+	{
+		$html  = "<thead>";
+			$html .= "<tr>";
+
+				foreach($this->_headers as $title => $val)
+					$html .= "<th>$title</th>";
+				
+			$html .= "</tr>";
+		$html .= "</thead>";
+
+		return $html;
+	}
+
+	protected function _renderData()
+	{
+		$html  = "<tbody>";
+		
+		if(count($this->_data))
+		{
+			foreach($this->_data as $entry)
+			{
+				$html .= "<tr>";
+
+				foreach($this->_headers as $key => $val)
+				{
+					//Get value
+					if($val instanceof \Framework\Interfaces\IHTMLDataTableType)
+						$val = $val->render($this, $entry);
+					else
+						$val = $this->_normalizeValue($entry->apath($val));
+
+					//Check if empty
+					if(empty($val))
+						$val = "&nbsp;";
+
+					$html .= '<td>' . $val . '</td>';
+				}
+
+				$html .= "</tr>";
+			}
+		}
+		else
+			$html .= "There are no records.";
+
+		$html .= "</tbody>";
+
+		return $html;
+	}
 
 	protected function _toString()
 	{
