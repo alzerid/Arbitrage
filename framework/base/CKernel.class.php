@@ -209,7 +209,7 @@ class CKernel implements ISingleton
 
 		//Get class 
 		$class = $this->convertArbitrageNamespaceToPHP($namespace);
-		$info  = $this->_requireFile(preg_replace('/\.[^\.]+$/', '.application', $namespace));
+		$info  = $this->_requireFile($namespace);
 
 		//Ensure this class is of type CApplication
 		if(!is_subclass_of($class, '\Framework\Base\CApplication'))
