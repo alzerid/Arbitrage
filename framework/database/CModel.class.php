@@ -120,8 +120,6 @@ class CModel extends \Framework\Database\Structures\CHashStructure
 	 */
 	public function getUpdateQuery($prepend=NULL)
 	{
-		//TODO: Handle ModelStructures
-
 		$ret = array();
 		foreach($this->_data as $key=>$val)
 		{
@@ -135,36 +133,9 @@ class CModel extends \Framework\Database\Structures\CHashStructure
 			elseif($val instanceof \Framework\Interfaces\IDatabaseModelStructure)
 			{
 				//Convert the struct to the native driver type
-				var_dump($key, $this->_driver, $prepend);
 				$struct = $this->_driver->convertModelStructureToNativeStructure($this->_data[$key]);
 				$value  = $struct->getUpdateQuery($pkey);
 			}
-
-			/*if(array_key_exists($key, $this->_variables))
-			{
-				//Figure out how to handle this data
-				if($val instanceof \Framework\Interfaces\IModelDataType)
-					$value = $this->_driver->convertModelDataTypeToNativeDataType($this->_variables[$key]);
-				elseif(!is_object($val))
-				{
-					die("Unknown OBJECT: " . __METHOD__);
-					//TODO: set_type ?? Or set_type when we actually set the data in _setData ???
-					$ret[$key] = $this->_variables[$key];
-				}
-				else
-				{
-					var_dump($key, $this->_variables[$key]);
-					throw new \Framework\Exceptions\EModelDataException("Unable to handle data type.");
-				}
-			}
-			elseif($val instanceof \Framework\Database\CModel)
-				$value = $val->getUpdateQuery($pkey);
-			elseif($val instanceof \Framework\Interfaces\IDatabaseModelStructure)
-			{
-				//Convert the struct to the native driver type
-				$struct = $this->_driver->convertModelStructureToNativeStructure($this->_data[$key]);
-				$value  = $struct->getUpdateQuery($pkey);
-			}*/
 
 			//Set data point to ret
 			if($value !== NULL)
