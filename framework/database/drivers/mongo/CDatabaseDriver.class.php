@@ -71,8 +71,10 @@ class CDatabaseDriver extends \Framework\Database\CDatabaseDriver
 		if(!$ret)
 			throw new \Framework\Exceptions\EDatabaseDriverException("Unable to require structure '$namespace'.");
 
-		//Instantiate native structure
+		//Convert to native structure type
 		$native = new $class($data);
+
+		//Set driver
 		$native->setDriver($this);
 
 		return $native;
