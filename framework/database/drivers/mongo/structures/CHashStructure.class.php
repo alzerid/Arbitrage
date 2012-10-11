@@ -7,24 +7,33 @@ class CHashStructure extends \Framework\Database\Structures\CHashStructure
 	public function __construct(\Framework\Interfaces\IDatabaseModelStructure $struct)
 	{
 		parent::__construct(\Framework\Base\CKernel::getInstance()->convertPHPNamespaceToArbitrage($struct->_class), $struct->toArray());
+		$this->_variables = $struct->_variables;
 	}
 
 	/**
 	 * Method returns the updated query.
 	 * @return array Retuns an array of the updated items.
 	 */
-	public function getUpdateQuery()
+	public function getUpdateQuery($pkey=NULL)
 	{
-		die(__METHOD__);
-		//TODO: Code smarter differences
-		if(count($this->_data) == 0)
+		//Check count
+		if(count($this->_variables) == 0)
 			return $this->_data;
 
-		$ret = array_diff($this->_data, $this->_originals);
-		if(count($ret) == 0)
-			return NULL;
+		//Iterate through both _data and _variables, _data first
+		$ret = array();
+		$itr = array('_data', '_variables');
+		foreach($itr as $type)
+		{
+			//Go through values
+			if(count($this->$type))
+			{
+				foreach($this->$type as $key=>$val)
+					$ret = array_merge($ret, $val->getUpdateQuery((($pkey!==NULL)? "$pkey.$key" : $key)));
+			}
+		}
 
-		return $this->_data;
+		return $ret;
 	}
 
 	/**
