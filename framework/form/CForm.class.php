@@ -57,12 +57,12 @@ Class CForm
 
 	/**
 	 * Method adds tag element.
-	 * @param $name The tag name to use.
+	 * @param $tag The arbitrage tag name to use.
 	 * @param $class The class to use.
 	 */
-	static public function addCustomElementTag($name, $class)
+	static public function addCustomElementTag($tag, $class)
 	{
-		self::$_CUSTOM[$name] = $class;
+		self::$_CUSTOM[$tag] = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP($class);
 	}
 
 	/**
@@ -196,7 +196,7 @@ Class CForm
 		}
 		elseif(array_key_exists(strtolower($name), self::$_CUSTOM))
 		{
-			$id    = $args[0];
+			$id    = ((!empty($args[0]))? $args[0] : "");
 			$args  = array_slice($args, 1);
 			$class = self::$_CUSTOM[strtolower($name)];
 
