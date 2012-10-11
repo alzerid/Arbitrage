@@ -120,8 +120,14 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 
 				return $res;
 			}
-			elseif($this->_cmd == "findOne")
-				return array($res);
+			elseif($this->_cmd == "findOne" && !empty($res))
+			{
+				$class = $this->getClass();
+				$model = new $class($res, $this->getDriver());
+				$model->merge();
+
+				return $model;
+			}
 			else
 				return $res;
 		}
