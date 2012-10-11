@@ -90,6 +90,18 @@ Class CRenderableForm extends \Framework\Form\CForm implements \Framework\Interf
 	}
 
 	/**
+	 * Method renders something partially
+	 */
+	public function renderPartial($file, $_vars=NULL)
+	{
+		$renderer = new \Framework\Renderables\CViewFilePartialRenderable;
+		$renderer->initialize($this->getRenderPath(), array('render' => $file, 'variables' => $_vars));
+		$renderer->setContext($this);
+
+		return $renderer->render();
+	}
+
+	/**
 	 * Method that implements the \Framework\Interfaces\IViewFileRenderableContext interface.
 	 * @param string $file The file to render.
 	 * @param array $_vars Variables to extract and pass to the view file.

@@ -10,7 +10,12 @@ class CHashStructure extends \Framework\Model\CMomentoModel implements \Framewor
 
 	public function __construct($class=NULL, $data=NULL)
 	{
-		if($class !== NULL)
+		if($class instanceof \Framework\Database\Structures\CHashStructure)
+		{
+			$data  = $class;
+			$class = $data->getClass();
+		}
+		elseif($class !== NULL)
 			$class = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP($class);
 
 		$this->_class = $class;
@@ -21,7 +26,7 @@ class CHashStructure extends \Framework\Model\CMomentoModel implements \Framewor
 	 * Method returns the updated query.
 	 * @return array Retuns an array of the updated items.
 	 */
-	public function getUpdateQuery()
+	public function getUpdateQuery($pkey=NULL)
 	{
 		throw new \Framework\Exceptions\EModelStructureException("Unable to get query without specific driver structure.");
 	}
@@ -42,6 +47,15 @@ class CHashStructure extends \Framework\Model\CMomentoModel implements \Framewor
 	public function setDriver(\Framework\Interfaces\IDatabaseDriver $driver=NULL)
 	{
 		$this->_driver = $driver;
+	}
+
+	/**
+	 * Method returns the class associated with this hash structure.
+	 * @return Returns the class.
+	 */
+	public function getClass()
+	{
+		return $this->_class;
 	}
 
 	/**

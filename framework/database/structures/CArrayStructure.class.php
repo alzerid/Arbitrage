@@ -36,7 +36,7 @@ class CArrayStructure extends \Framework\Model\Structures\CArrayStructure implem
 	 * Method returns the updated query.
 	 * @return array Retuns an array of the updated items.
 	 */
-	public function getUpdateQuery()
+	public function getUpdateQuery($pkey=NULL)
 	{
 		throw new \Framework\Exceptions\EModelStructureException("Unable to get query without specific driver structure.");
 	}
