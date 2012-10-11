@@ -238,7 +238,7 @@ interface IDatabaseModel extends IModel
  */
 interface IDatabaseModelStructure
 {
-	public function getUpdateQuery();
+	public function getUpdateQuery($pkey=NULL);
 	public function getQuery();
 	public function toArray();
 	public function setDriver(\Framework\Interfaces\IDatabaseDriver $driver);
