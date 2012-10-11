@@ -11,10 +11,7 @@ class CCheckBoxFormElement extends \Framework\Form\Elements\CBaseFormElement
 	{
 		//Ensures boolean
 		if($value === NULL)
-		{
-			die(__METHOD__);
 			$this->_value = false;
-		}
 		elseif($value instanceof \Framework\Form\Elements\CCheckBoxFormElement)
 			$this->_value = $value->_value;
 		elseif(is_string($value))
