@@ -6,6 +6,7 @@ Class CRenderableForm extends \Framework\Form\CForm implements \Framework\Interf
 	private $_initialized;
 	private $_removed;
 	private $_file;
+	private $_view;
 
 	public function __construct($render, array $attributes=array())
 	{
@@ -17,6 +18,7 @@ Class CRenderableForm extends \Framework\Form\CForm implements \Framework\Interf
 		$this->_initialized = false;
 		$this->_file        = $render;
 		$this->_removed     = array();
+		$this->_view        = new \Framework\Utils\CArrayObject;
 
 		//Transfrom _vaolues into CTypedFormModel
 		$this->_initializeModel();
@@ -74,6 +76,15 @@ Class CRenderableForm extends \Framework\Form\CForm implements \Framework\Interf
 	}
 
 	/**
+	 * Returns the view variable object.
+	 * @return \Framework\Utils\CArrayObject
+	 */
+	public function getViewVariable()
+	{
+		return $this->_view;
+	}
+
+	/**
 	 * Method renders the view file associated with the Form object.
 	 */
 	public function render()
@@ -81,9 +92,12 @@ Class CRenderableForm extends \Framework\Form\CForm implements \Framework\Interf
 		//Require renderable
 		\Framework\Base\CKernel::getInstance()->getApplication()->requireRenderable('Framework.Renderables.CViewFilePartialRenderable');
 
+		//Get view variables if there are any
+		$view = $this->_view->toArray();
+
 		//Create renderer and render
 		$renderer = new \Framework\Renderables\CViewFilePartialRenderable;
-		$renderer->initialize($this->getRenderPath(), array('render' => $this->_file));
+		$renderer->initialize($this->getRenderPath(), array('render' => $this->_file, 'variables' => $view));
 		$renderer->setContext($this);
 
 		return $renderer->render();
