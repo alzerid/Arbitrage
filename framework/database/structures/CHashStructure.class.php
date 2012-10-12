@@ -80,7 +80,10 @@ class CHashStructure extends \Framework\Model\CMomentoModel implements \Framewor
 				if(preg_match('/Framework\\\Database\\\Structures\\\CHashStructure/', $class))
 					$this->_data[$key] = new $class(NULL, $val);
 				else
+				{
 					$this->_data[$key] = new $class($val);
+					$this->_data[$key]->merge();
+				}
 
 				//Set driver for Model and Structures
 				if(is_subclass_of($class, "\\Framework\\Interfaces\\IDatabaseModelStructure", true))

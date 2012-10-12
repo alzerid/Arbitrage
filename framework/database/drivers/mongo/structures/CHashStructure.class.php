@@ -73,6 +73,5 @@ class CHashStructure extends \Framework\Database\Structures\CHashStructure
 
 		return ((count($ret)===0)? NULL : $ret);
 	}
-
 }
 ?>
