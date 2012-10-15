@@ -56,8 +56,11 @@ class CDataTable implements \Framework\Interfaces\IHTMLDataTable
 	protected function _renderData()
 	{
 		$html  = "<tbody>";
-		
-		if(count($this->_data))
+
+		//TODO: Can we check for countable object? --EMJ
+		$count = (($this->_data instanceof \Iterator)? $this->_data->count() : count($this->_data));
+
+		if($count>0)
 		{
 			foreach($this->_data as $entry)
 			{
@@ -82,7 +85,7 @@ class CDataTable implements \Framework\Interfaces\IHTMLDataTable
 			}
 		}
 		else
-			$html .= "There are no records.";
+			$html .= "<tr><td colspan=\"" . count($this->_headers) . "\">There are no records.</td></tr>";
 
 		$html .= "</tbody>";
 
