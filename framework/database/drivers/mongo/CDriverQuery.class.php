@@ -19,15 +19,6 @@ class CMongoModelQuery extends \Framework\Database\CDriverQuery
 		return $this;
 	}
 
-	/*public function count($query=array())
-	{
-		die('count');
-		$this->_cmd   = 'count';
-		$this->_query = $query;
-
-		return $this;
-	}*/
-
 	public function update($query, $data)
 	{
 		$this->_cmd   = "update";
