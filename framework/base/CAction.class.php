@@ -24,6 +24,16 @@ class CAction implements IAction
 		}
 	}
 
+	/**
+	 * Returns the namespace of the controller.
+	 * @return string Returns the namespace of the controller.
+	 */
+	public function getArbitrageNamespace()
+	{
+		return $this->_controller->getArbitrageNamespace() . "." . $this->_name;
+	}
+
+
 	public function getName()
 	{
 		return strtolower(preg_replace('/Action$/i', '', $this->_name));
