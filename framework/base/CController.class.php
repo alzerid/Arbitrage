@@ -214,6 +214,15 @@ abstract class CController implements \Framework\Interfaces\IController, \Framew
 	}
 
 	/**
+	 * Returns the namespace of the controller.
+	 * @return string Returns the namespace of the controller.
+	 */
+	public function getArbitrageNamespace()
+	{
+		return $this->_namespace;
+	}
+
+	/**
 	 * Returns the action object.
 	 * @return \Framework\Base\CAction Returns the CAction associated with this controller.
 	 */
