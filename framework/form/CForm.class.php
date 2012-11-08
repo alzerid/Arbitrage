@@ -108,7 +108,7 @@ Class CForm
 	public function label($label, $attribs=array())
 	{
 		if(!empty($attribs['for']))
-			$attribs['for'] = $this->_normalizeName($attribs['for']);
+			$attribs['for'] = $this->_convertToID($attribs['for']);
 
 		return CDomGenerator::labelTag($label, $attribs);
 	}
@@ -127,14 +127,14 @@ Class CForm
 		else
 			$selected = $default;
 
-		$id      = $this->_normalizeName($id);
+		$id = $this->_convertToID($id);
 		return CDomGenerator::inputMultiSelect($this->_prependFormID($id), $values, $attribs, $selected);
 	}
 
 	/*public function selectState($id, $attribs=array(), $default=array())
 	{
 		$default = ((count($default) == 0)? $this->_getValue($id) : $default);
-		$id = $this->_normalizeName($id);
+		$id = $this->_convertToID($id);
 		return CDomGenerator::inputStateSelector($id, $attribs, $default);
 	}
 
@@ -156,34 +156,37 @@ Class CForm
 
 	/**
 	 * Method creates HTML Form Element Objects.
+	 * @param $element The element to create.
+	 * @param $args The arguments to pass.
 	 */
-	protected function _createElement($name, $args)
+	protected function _createElement($element, $args)
 	{
+		static $__file = 0;
 		$inputs = array('text', 'password', 'checkbox', 'submit', 'reset', 'file');
 		$valued = array('hidden', 'textarea', 'button');
 
-		$name  = strtolower($name);
-		if(in_array($name, $inputs))
+		$element  = strtolower($element);
+		if(in_array($element, $inputs))
 		{
 			//Get parameters
 			$id      = $args[0];
 			$attribs = (!(array_key_exists(1, $args))? array() : $args[1]);
-			$class   = "\\Framework\\Form\\Elements\\C" . ucwords($name) . "FormElement";
+			$class   = "\\Framework\\Form\\Elements\\C" . ucwords($element) . "FormElement";
 
 			//Create element and return
-			return new $class($this->_normalizeName($id), $this->_getValue($id, $attribs), $attribs);
+			return new $class($this->_convertToID($id), $this->_getValue($id, $attribs), $attribs);
 		}
-		elseif(in_array($name, $valued))
+		elseif(in_array($element, $valued))
 		{
 			//Get parameters
 			$id      = $args[0];
 			$value   = (!(array_key_exists(1, $args))? NULL : $args[1]);
 			$attribs = (!(array_key_exists(2, $args))? array() : $args[2]);
-			$class   = "\\Framework\\Form\\Elements\\C" . ucwords($name) . "FormElement";
+			$class   = "\\Framework\\Form\\Elements\\C" . ucwords($element) . "FormElement";
 
-			return new $class($this->_normalizeName($id), $this->_getValue($id, $attribs, $value), $attribs);
+			return new $class($this->_convertToID($id), $this->_getValue($id, $attribs, $value), $attribs);
 		}
-		elseif($name === "select")
+		elseif($element === "select")
 		{
 			//Get parameters
 			$id       = $args[0];
@@ -192,37 +195,29 @@ Class CForm
 			$selected = (!(array_key_exists(3, $args))? array('') : $args[3]);
 
 			//Create element and return
-			return new \Framework\Form\Elements\CSelectFormElement($this->_normalizeName($id), $options, $attribs, $this->_getValue($id, $attribs), $attribs);
+			return new \Framework\Form\Elements\CSelectFormElement($this->_convertToID($id), $options, $attribs, $this->_getValue($id, $attribs), $attribs);
 		}
-		elseif(array_key_exists(strtolower($name), self::$_CUSTOM))
+		elseif(array_key_exists(strtolower($element), self::$_CUSTOM))
 		{
 			$id    = ((!empty($args[0]))? $args[0] : "");
 			$args  = array_slice($args, 1);
-			$class = self::$_CUSTOM[strtolower($name)];
+			$class = self::$_CUSTOM[strtolower($element)];
 
 			//Create element and return
-			return new $class($this->_normalizeName($id), $this->_getValue($id), $args);
+			return new $class($this->_convertToID($id), $this->_getValue($id), $args);
 		}
 
-		throw new \Framework\Exceptions\EFormException("Unknown element '$name'.");
+		throw new \Framework\Exceptions\EFormException("Unknown element '$element'.");
 	}
 
 	/**
-	 * Method normalized the name from an arbitrage path to [] form notatoin.
+	 * Method normalizes the id from an arbitrage path.
 	 * @param $name The arbitrage path name to convert.
 	 */
-	protected function _normalizeName($name)
+	protected function _convertToID($name)
 	{
-		//Dot notation to array notation
-		$key   = explode(".", $name);
-		$value = "";
-		for($i=0; $i<count($key); $i++)
-			$value .= "[{$key[$i]}]";
-
 		//Prepend form name
-		$value = "{$this->_attributes['id']}$value";
-
-		return $value;
+		return "{$this->_attributes['id']}.$name";
 	}
 
 	/** 
