@@ -123,7 +123,6 @@ Class CRenderableForm extends \Framework\Form\CForm implements \Framework\Interf
 	public function renderContext($file, $_vars=NULL)
 	{
 		//Extract _vars
-		//$_vars = array_merge($this->_view->toArray(), $_vars);
 		extract($_vars);
 
 		//Require the file
@@ -194,7 +193,6 @@ Class CRenderableForm extends \Framework\Form\CForm implements \Framework\Interf
 				return NULL;
 
 			//Create element
-			$id      = $args[0];
 			$element = $this->_values->getElement($id);
 		}
 
