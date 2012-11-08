@@ -66,8 +66,8 @@ class CDOMGenerator
 
 	public static function createForm($id, $attribs=array())
 	{
-		$attribs = CDOMGenerator::generateAttribs($attribs);
-		$html    = "<form name=\"$id\">\n";
+		$attribs = CDOMGenerator::generateAttribs(array_merge($attribs, array('id' => $id)));
+		$html    = "<form $attribs>\n";
 
 		return $html;
 	}
@@ -79,24 +79,24 @@ class CDOMGenerator
 
 	public static function inputText($id, $attribs=array())
 	{
-		$attribs = CDOMGenerator::generateAttribs($attribs);
-		$html    = "<input type=\"text\" id=\"$id\" name=\"$id\" $attribs />\n";
+		$attribs = CDOMGenerator::generateAttribs(array_merge($attribs, array('id' => $id)));
+		$html    = "<input type=\"text\" $attribs />\n";
 
 		return $html;
 	}
 
 	public static function inputPassword($id, $attribs=array())
 	{
-		$attribs = CDOMGenerator::generateAttribs($attribs);
-		$html    = "<input type=\"password\" id=\"$id\" name=\"$id\" $attribs />\n";
+		$attribs = CDOMGenerator::generateAttribs(array_merge($attribs, array('id' => $id)));
+		$html    = "<input type=\"password\" $attribs />\n";
 
 		return $html;
 	}
 
 	public static function inputSelect($id, $values, $attribs=array(), $selected=-1)
 	{
-		$attribs = CDOMGenerator::generateAttribs($attribs);
-		$html  = "<select name=\"$id\" id=\"$id\" $attribs>\n";
+		$attribs = CDOMGenerator::generateAttribs(array_merge($attribs, array('id' => $id)));
+		$html  = "<select $attribs>\n";
 
 		if(count($values))
 		{
@@ -164,72 +164,72 @@ class CDOMGenerator
 
 	public static function inputCheckbox($id, $attribs=array())
 	{
-		$attribs = CDOMGenerator::generateAttribs($attribs);
-		$html    = "<input type=\"checkbox\" id=\"$id\" name=\"$id\" $attribs />\n";
+		$attribs = CDOMGenerator::generateAttribs(array_merge($attribs, array('id' => $id)));
+		$html    = "<input type=\"checkbox\" $attribs />\n";
 
 		return $html;
 	}
 
 	public static function inputRadio($id, $attribs=array())
 	{
-		$attribs = CDOMGenerator::generateAttribs($attribs);
-		$html    = "<input type=\"radio\" id=\"$id\" name=\"$id\" $attribs />\n";
+		$attribs = CDOMGenerator::generateAttribs(array_merge($attribs, array('id' => $id)));
+		$html    = "<input type=\"radio\" $attribs />\n";
 
 		return $html;
 	}
 
 	public static function submitButton($id, $value, $attribs=array())
 	{
-		$attribs = CDOMGenerator::generateAttribs($attribs);
-		$html    = "<input type=\"submit\" id=\"$id\" name=\"$id\" value=\"$value\" $attribs />\n";
+		$attribs = CDOMGenerator::generateAttribs(array_merge($attribs, array('id' => $id, 'value' => $value)));
+		$html    = "<input type=\"submit\" $attribs />\n";
 
 		return $html;	
 	}
         
 	public static function imageSubmitButton($id, $value, $src, $attribs=array())
 	{
-		$attribs = CDOMGenerator::generateAttribs($attribs);
-		$html    = "<input type=\"image\" id=\"$id\" name=\"$id\" value=\"$value\" src=\"$src\" alt=\"\" $attribs />\n";
+		$attribs = CDOMGenerator::generateAttribs(array_merge($attribs, array('id' => $id, 'value' => $value, 'src' => $src)));
+		$html    = "<input type=\"image\" $attribs />\n";
 
 		return $html;
 	}
 
 	public static function inputButton($id, $value, $attribs=array())
 	{
-		$attribs = CDOMGenerator::generateAttribs($attribs);
-		$html    = "<button id=\"$id\" name=\"$id\" $attribs>$value</button>\n";
+		$attribs = CDOMGenerator::generateAttribs(array_merge($attribs, array('id' => $id)));
+		$html    = "<button $attribs>$value</button>\n";
 
 		return $html;	
 	}
 
 	public static function inputHidden($id, $value, $attribs=array())
 	{
-		$attribs = CDOMGenerator::generateAttribs($attribs);
-		$html    = "<input type=\"hidden\" id=\"$id\" name=\"$id\" value=\"$value\" $attribs />\n";
+		$attribs = CDOMGenerator::generateAttribs(array_merge($attribs, array('id' => $id, 'value' => $value)));
+		$html    = "<input type=\"hidden\" $attribs />\n";
 
 		return $html;	
 	}
 
 	public static function inputTextArea($id, $value="", $attribs=array())
 	{
-		$attribs = CDOMGenerator::generateAttribs($attribs);
-		$html    = "<textarea name=\"$id\" id=\"$id\" $attribs >$value</textarea>\n";
+		$attribs = CDOMGenerator::generateAttribs(array_merge($attribs, array('id' => $id)));
+		$html    = "<textarea $attribs >$value</textarea>\n";
 
 		return $html;	
 	}
 
 	public static function inputFile($id, $attribs=array())
 	{
-		$attribs = CDOMGenerator::generateAttribs($attribs);
-		$html    = "<input type=\"file\" name=\"$id\" id=\"$id\" $attribs />\n";
+		$attribs = CDOMGenerator::generateAttribs(array_merge($attribs, array('id' => $id)));
+		$html    = "<input type=\"file\" $attribs />\n";
 
 		return $html;
 	}
 
 	public static function image($id, $src, $attribs=array())
 	{
-		$attribs = CDOMGenerator::generateAttribs($attribs);
-		$html    = "<img name=\"$id\" id=\"$id\" src=\"$src\" $attribs />\n";
+		$attribs = CDOMGenerator::generateAttribs(array_merge($attribs, array('id' => $id, 'src' => $src)));
+		$html    = "<img $attribs />\n";
 
 		return $html;
 	}
