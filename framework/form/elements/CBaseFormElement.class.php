@@ -12,6 +12,9 @@ class CBaseFormElement implements \Framework\Interfaces\IFormElement
 		$this->_attributes = $attributes;
 		$this->_id         = $id;
 
+		//Set name attribute
+		$this->_attributes['name'] = ((isset($this->_attributes['name']))? $this->_attributes['name'] : $this->_convertToNameFormat($this->_id));
+
 		//Set value
 		$this->setValue($value);
 	}
@@ -77,12 +80,7 @@ class CBaseFormElement implements \Framework\Interfaces\IFormElement
 	 */
 	public function getElementArbitragePath()
 	{
-		$path = preg_replace('/^[^\[]*(.*)$/', '$1', $this->_id);
-		$path = preg_replace('/\[/', '.', $path);
-		$path = preg_replace('/\]/', '', $path);
-		$path = preg_replace('/^\./', '', $path);
-
-		return $path;
+		return preg_replace('/^[^\.]+\.(.*)$/', '$1', $this->_id);
 	}
 
 	/**
@@ -113,6 +111,15 @@ class CBaseFormElement implements \Framework\Interfaces\IFormElement
 		$attribs['value'] = $this->getValue();
 
 		return \Framework\DOM\CDomGenerator::$method($this->_id, $attribs);
+	}
+
+	/**
+	 * Method converts the id to name [] format.
+	 * @param $id The id to convert.
+	 */
+	public function _convertToNameFormat($id)
+	{
+		return preg_replace('/\.([A-Za-z0-9]+)(\.|$)/', '[$1]', $id);
 	}
 }
 
