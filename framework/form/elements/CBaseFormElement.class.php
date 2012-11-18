@@ -119,7 +119,7 @@ class CBaseFormElement implements \Framework\Interfaces\IFormElement
 	 */
 	public function _convertToNameFormat($id)
 	{
-		return preg_replace('/\.([A-Za-z0-9]+)(\.|$)/', '[$1]', $id);
+		return preg_replace('/\.([A-Za-z0-9_\-]+)/', '[$1]', $id);
 	}
 }
 

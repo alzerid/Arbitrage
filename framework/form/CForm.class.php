@@ -10,9 +10,9 @@ Class CForm
 
 	public function __construct(array $attributes=array())
 	{
-		static $dattributes = array('id'           => 'form-noname',
-		                            'method'       => 'POST',
-		                            'enctype'      => 'application/x-www-form-urlencoded');
+		static $dattributes = array('id'      => 'form-noname',
+		                            'method'  => 'POST',
+		                            'enctype' => 'application/x-www-form-urlencoded');
 
 		//Set attributes and value
 		$this->_attributes = \Framework\Utils\CArrayObject::mergeArray($dattributes, $attributes);
