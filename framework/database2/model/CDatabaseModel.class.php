@@ -49,10 +49,6 @@ class CDatabaseModel extends \Framework\Model\CMomentoModel
 		$properties = static::properties();
 		$driver     = ((isset($properties['config']))? $properties['config'] : '_default');
 		$driver     = self::$SERVICE->getDriver($driver);
-		var_dump($driver);
-		die();
-		//$driver     = \Framework\Database2\CDatabaseService::getDriver(
-		die(__METHOD__);
 
 		//Now get native model properties (native to db)
 

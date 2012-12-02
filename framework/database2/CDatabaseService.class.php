@@ -34,7 +34,6 @@ class CDatabaseService extends \Framework\Base\CService implements \Framework\In
 			$this->requireServiceFile("Drivers.$driver.CDriver");
 			$this->requireServiceFile("Drivers.$driver.CQueryDriver");
 
-
 			//Get or create driver
 			$this->_drivers[$name] = $this->createDriver($properties);
 		}
@@ -50,9 +49,14 @@ class CDatabaseService extends \Framework\Base\CService implements \Framework\In
 	 */
 	public function createDriver($properties)
 	{
-		$driver = $properties['driver'];
+		//TODO: Ensure driver exists as a class
 
-		//TODO: Create the Driver and the CDriver class
+		//Get driver
+		$driver = ucwords($properties['driver']);
+		$driver = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP("Framework.Database2.Drivers.$driver.CDriver");
+
+		//Create new driver
+		return new $driver($properties['host'], $properties['port']);
 	}
 
 	/**
@@ -62,8 +66,7 @@ class CDatabaseService extends \Framework\Base\CService implements \Framework\In
 	 */
 	public function getDriver($driver)
 	{
-		die(__METHOD__);
-		//return $this->
+		return ((isset($this->_drivers[$driver]))? $this->_drivers[$driver] : NULL);
 	}
 
 	/**
