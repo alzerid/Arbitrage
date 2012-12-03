@@ -3,10 +3,14 @@ namespace Framework\Database2\Drivers;
 
 abstract class CDriver
 {
-	protected $_driver_type;
-	protected $_handle;
-	protected $_host;
-	protected $_port;
+	protected $_driver_type;    //driver type
+	protected $_properties;     //properties for the 
+	protected $_handle;         //driver handle
+
+	public function __construct(array $properties=array())
+	{
+		$this->_properties = array_merge(array('host' => '127.0.0.1', 'port' => 0, 'database' => ''), $properties);
+	}
 
 	/**
 	 * Method returns a the driver type.
@@ -32,7 +36,7 @@ abstract class CDriver
 	 */
 	public function getHost()
 	{
-		return $this->_host;
+		return $this->_properties['host'];
 	}
 
 	/**

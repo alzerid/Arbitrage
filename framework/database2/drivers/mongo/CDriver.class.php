@@ -6,16 +6,26 @@ class CDriver extends \Framework\Database2\Drivers\CDriver
 	/**
 	 * Method constructs the Mongo Driver
 	 */
-	public function __construct($host="127.0.0.1", $port=27017)
+	public function __construct(array $properties=array())
 	{
+		//Call parent
+		parent::__construct($properties);
+		$this->_properties['port'] = 27017;
+
 		//Assign variables
 		$this->_driver_type = 'mongo';
-		$this->_host        = $host;
-		$this->_port        = $port;
 
 		//Create handle and connect
-		$uri = "mongodb://{$this->_host}:{$this->_port}";
+		$uri = "mongodb://{$this->_properties['host']}:{$this->_properties['port']}";
 		$this->_handle = new \Mongo($uri);
+	}
+
+	/**
+	 * Method returns the properties.
+	 */
+	public function getProperties()
+	{
+		return $this->_properties;
 	}
 
 	/**

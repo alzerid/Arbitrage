@@ -10,21 +10,23 @@ class CDatabaseModel extends \Framework\Model\CMomentoModel
 	 */
 	static public function query()
 	{
+		//TODO: Cache query??
+
 		//Grab the properties and determine what todo
 		$properties = static::properties();
-		var_dump($properties);
-		die(__METHOD__);
 		$driver     = ((isset($properties['connection']))? $properties['connection'] : '_default');
 		$driver     = self::$SERVICE->getDriver($driver);
+		$properties = array_merge($driver->getProperties(), $properties);
 		$type       = ucwords($driver->getDriverType());
 
-		$query = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP("Framework.Database2.$type.CDriver");
-		//$query = new $query($driver, $properties['
-		var_dump($query, $properties, $driver);
+		//Unset properties
+		unset($properties['connection']);
 
-		//TODO: Grab the database query driver
+		//Create query object
+		$query = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP("Framework.Database2.Drivers.$type.CQueryDriver");
+		$query = new $query($driver, $properties['database'], $properties['table']);
 
-		die(__METHOD__);
+		return new \Framework\Database2\Model\CQueryModel($query, \Framework\Base\CKernel::getInstance()->convertPHPNamespaceToArbitrage(get_called_class()));
 	}
 
 	/** Model instance methods **/

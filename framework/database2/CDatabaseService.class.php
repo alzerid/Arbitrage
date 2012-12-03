@@ -12,9 +12,10 @@ class CDatabaseService extends \Framework\Base\CService implements \Framework\In
 	public function initialize()
 	{
 		//TODO: Load up all model classes
-		$this->requireServiceFile('Model.CDatabaseModel');
 		$this->requireServiceFile('Drivers.CDriver');
 		$this->requireServiceFile('Drivers.CQueryDriver');
+		$this->requireServiceFile('Model.CDatabaseModel');
+		$this->requireServiceFile('Model.CQueryModel');
 
 		//Include all selectors
 		$this->requireServiceFile('Selectors.CSelector');
@@ -56,7 +57,7 @@ class CDatabaseService extends \Framework\Base\CService implements \Framework\In
 		$driver = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP("Framework.Database2.Drivers.$driver.CDriver");
 
 		//Create new driver
-		return new $driver($properties['host'], $properties['port']);
+		return new $driver($properties->toArray());
 	}
 
 	/**
