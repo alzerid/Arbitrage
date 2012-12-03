@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Database2\Model;
 
-class CCollectionModel implements \ArrayAccess, \Iterator
+abstract class CCollectionModel implements \ArrayAccess, \Iterator
 {
 	protected $_query_driver;   //Query driver
 	protected $_results;        //Results
@@ -14,63 +14,37 @@ class CCollectionModel implements \ArrayAccess, \Iterator
 		$this->_model        = $model;
 	}
 
-	/**************************/
-	/** Array Access Methods **/
-	/**************************/
-	public function offsetExists($offer)
+	/**
+	 * Method returns the count of the collection.
+	 * @return Returns the count.
+	 */
+	abstract public function count();
+
+	/****************************/
+	/** Query Driver Modifiers **/
+	/****************************/
+
+	/**
+	 * Method limit  modifier for the query.
+	 * @param $limit The limit.
+	 */
+	public function limit($limit)
 	{
-		die(__METHOD__);
+		$this->_query_driver->limit($limit);
+		return $this;
 	}
 
-	public function offsetGet($offset)
+	/**
+	 * Method sort modifier for the query.
+	 * @param $sort The sort.
+	 */
+	public function sort($sort)
 	{
-		die(__METHOD__);
+		$this->_query_driver->sort($sort);
+		return $this;
 	}
-
-	public function offsetSet($offset, $val)
-	{
-		die(__METHOD__);
-	}
-
-	public function offsetUnset($offset)
-	{
-		die(__METHOD__);
-	}
-	/******************************/
-	/** End Array Access Methods **/
-	/******************************/
-
-	/*****************************/
-	/** Iterator Implementation **/
-	/*****************************/
-
-	public function rewind()
-	{
-	}
-
-	public function current()
-	{
-	}
-
-	public function key()
-	{
-	}
-
-	public function next()
-	{
-	}
-
-	public function valid()
-	{
-	}
-
-	/*********************************/
-	/** End Iterator Implementation **/
-	/*********************************/
-
-
-
-
-
+	/********************************/
+	/** End Query Driver Modifiers **/
+	/********************************/
 }
 ?>
