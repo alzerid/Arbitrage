@@ -78,8 +78,17 @@ abstract class CQueryDriver
 	}
 
 	/**
-	 * Method executs the actual query.
+	 * Method executes the actual query.
 	 */
 	abstract public function execute();
+
+	/**
+	 * Method returns the driver.
+	 * @return \Framework\Database2\Drivers\CDriver Returns the driver.
+	 */
+	public function getDriver()
+	{
+		return $this->_driver;
+	}
 }
 ?>

@@ -20,8 +20,6 @@ class CQueryDriver extends \Framework\Database2\Drivers\CQueryDriver
 			case "findAll":
 				$action = "find";
 
-			case "findOne":
-				
 				//Get results
 				$results = $handle->$database->$table->$action($condition);
 
@@ -33,13 +31,29 @@ class CQueryDriver extends \Framework\Database2\Drivers\CQueryDriver
 				if($this->_sort !== NULL)
 					$restuls->sort($this->_sort);
 
-				//TODO: Return the results in a collection
 				return $results;
+
+			case "findOne":
+
+				//Get results
+				$result = $handle->$database->$table->$action($condition);
+				return $result;
 		
 			//TODO: Insert, update, upsert --EMJ
 		}
 
 		throw new \Framework\Exceptoins\EDatabaseException("Unknown action '$action'.");
 	}
+
+	/**
+	 * Method creates the collection.
+	 * @param $results The results to associate the collection to.
+	 * @return \Framework\Database2\Model\CCollectionModel Returns the collection.
+	 */
+	/*public function createCollection($results)
+	{
+		return new \Mongo
+		die(__METHOD__);
+	}*/
 }
 ?>

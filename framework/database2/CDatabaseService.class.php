@@ -16,6 +16,7 @@ class CDatabaseService extends \Framework\Base\CService implements \Framework\In
 		$this->requireServiceFile('Drivers.CQueryDriver');
 		$this->requireServiceFile('Model.CDatabaseModel');
 		$this->requireServiceFile('Model.CQueryModel');
+		$this->requireServiceFile('Model.CCollectionModel');
 
 		//Include all selectors
 		$this->requireServiceFile('Selectors.CSelector');
@@ -34,6 +35,8 @@ class CDatabaseService extends \Framework\Base\CService implements \Framework\In
 			$this->requireServiceFile("Drivers.$driver.CDatabaseModel");
 			$this->requireServiceFile("Drivers.$driver.CDriver");
 			$this->requireServiceFile("Drivers.$driver.CQueryDriver");
+			$this->requireServiceFile("Drivers.$driver.CCollectionModel");
+
 
 			//Get or create driver
 			$this->_drivers[$name] = $this->createDriver($properties);
