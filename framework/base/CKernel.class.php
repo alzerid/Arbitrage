@@ -412,6 +412,17 @@ class CKernel implements ISingleton
 	}
 
 	/**
+	 * Method instantiates an object via an Arbitrage namespace.
+	 * @param $namespace The namespace of the object to instantiate.
+	 * @param $arguments Arguments to pass
+	 * @return Returns the object.
+	 */
+	public function instantiate($namespace, $arguments=array())
+	{
+		die(__METHOD__);
+	}
+
+	/**
 	 * Methods requires a file.
 	 * @param $namespace The namespace to convert to a file name.
 	 * @param $opt_variables Optional parameter that pases variables into the required file.
