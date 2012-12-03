@@ -11,8 +11,16 @@ class CDatabaseModel extends \Framework\Model\CMomentoModel
 	static public function query()
 	{
 		//Grab the properties and determine what todo
-		$properties = self::_getProperties();
-		var_dump($properties, self::$SERVICE);
+		$properties = static::properties();
+		var_dump($properties);
+		die(__METHOD__);
+		$driver     = ((isset($properties['connection']))? $properties['connection'] : '_default');
+		$driver     = self::$SERVICE->getDriver($driver);
+		$type       = ucwords($driver->getDriverType());
+
+		$query = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP("Framework.Database2.$type.CDriver");
+		//$query = new $query($driver, $properties['
+		var_dump($query, $properties, $driver);
 
 		//TODO: Grab the database query driver
 
