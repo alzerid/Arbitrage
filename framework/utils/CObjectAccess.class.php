@@ -1,7 +1,7 @@
 <?
 namespace Framework\Utils;
 
-abstract class CObjectAccess implements \ArrayAccess, \Framework\Interfaces\IAPath/*, \Framework\Interfaces\IXPath*/
+abstract class CObjectAccess implements \ArrayAccess, \Framework\Interfaces\IAPath
 {
 	/** Object Access Pattern **/
 	public function __get($name)
