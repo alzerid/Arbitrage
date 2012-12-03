@@ -40,6 +40,7 @@ abstract class CQueryDriver
 	public function limit($limit)
 	{
 		$this->_limit = $limit;
+		return $this;
 	}
 
 	/**
@@ -49,6 +50,7 @@ abstract class CQueryDriver
 	public function sort($sort)
 	{
 		$this->_sort = $sort;
+		return $this;
 	}
 
 	/*****************************/
