@@ -28,9 +28,39 @@ class CDatabaseModel extends \Framework\Model\CMomentoModel
 
 		return new \Framework\Database2\Model\CQueryModel($query, \Framework\Base\CKernel::getInstance()->convertPHPNamespaceToArbitrage(get_called_class()));
 	}
+	
+	/**
+	 * Method returnd default.
+	 */
+	static public function defaults()
+	{
+		throw new \Framework\Exceptions\EDatabaseException("Model must have defaults.");
+	}
+
+	/**
+	 * Method returns the properties of the model.
+	 * @return array Returns the array of properties.
+	 */
+	static public function properties()
+	{
+		return array();
+	}
+
+	/**
+	 * Method creates, converts raw database data into a database model.
+	 */
+	static public function create(array $data)
+	{
+		//Create model
+		$class = get_called_class();
+		$model = new $class;
+
+		//Convert data to specific types
+		var_dump($class, $data);
+		die(__METHOD__);
+	}
 
 	/** Model instance methods **/
-
 	public function save()
 	{
 		die(__METHOD__);
