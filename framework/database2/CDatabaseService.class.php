@@ -17,6 +17,9 @@ class CDatabaseService extends \Framework\Base\CService implements \Framework\In
 		$this->requireServiceFile('Model.CDatabaseModel');
 		$this->requireServiceFile('Model.CQueryModel');
 		$this->requireServiceFile('Model.CCollectionModel');
+		$this->requireServiceFile('Model.Structures.CStructure');
+		$this->requireServiceFile('Model.Structures.CArray');
+		//$this->requireServiceFile('Model.Structures.CHash');
 
 		//Include all selectors
 		$this->requireServiceFile('Selectors.CSelector');
