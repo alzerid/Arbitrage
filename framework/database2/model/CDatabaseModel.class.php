@@ -1,11 +1,38 @@
 <?php
 namespace Framework\Database2\Model;
 
+//TODO: Save typecasts
+
 class CDatabaseModel extends \Framework\Model\CMomentoModel
 {
 	static public $SERVICE;
 
-	/* Method returns a query object for querying the database.
+	/**
+	 * Method constructs the model.
+	 */
+	public function __construct($data=array())
+	{
+		//Get properties of model
+		$properties = $this->_getProperties();
+		$defaults   = static::defaults();
+
+		//Set id from _idKey
+		if(!isset($defaults[$properties['idKey']]))
+			$defaults[$properties['idKey']] = new \Framework\Database2\Model\DataTypes\CDatabaseID;
+		elseif(!($defaults[$properties['idKey']] instanceof \Framework\Database2\Model\DataTypes\CDatabaseID))
+			throw new \Framework\Exceptions\EDatabaseDriverException("ID Key '{$data[$properties['idKey']]}' is not a CDatabaseID DataType.");
+
+		//Set defaults
+		\Framework\Model\CModel::__construct($defaults);
+
+		//Ensure variables is in defaults
+		$this->_setVariables($data);
+		die(__METHOD__);
+		$this->merge();
+	}
+
+	/**
+	 * Method returns a query object for querying the database.
 	 * @return \Framework\Database2\CDatabaseQuery Returns a database query.
 	 */
 	static public function query()
@@ -38,7 +65,7 @@ class CDatabaseModel extends \Framework\Model\CMomentoModel
 	 */
 	static public function defaults()
 	{
-		throw new \Framework\Exceptions\EDatabaseException("Model must have defaults.");
+		throw new \Framework\Exceptions\EDatabaseDriverException("Model must have defaults.");
 	}
 
 	/**
@@ -58,12 +85,14 @@ class CDatabaseModel extends \Framework\Model\CMomentoModel
 		//Create model
 		$class = get_called_class();
 		$model = new $class($data);
+		var_dump($class);
+		die(__METHOD__);
 
 		//Merge
 		$model->merge();
 
 		//Convert data to specific types
-		var_dump($class, $data);
+		var_dump($model);
 		die(__METHOD__);
 
 		return $model;
@@ -102,7 +131,35 @@ class CDatabaseModel extends \Framework\Model\CMomentoModel
 	 */
 	public function merge()
 	{
+		//TODO: Handle structure classes
+
+		//Recursively merge
+		foreach($this->_variables as $key=>$val)
+		{
+			var_dump($key);
+			die(__METHOD__);
+		}
+
 		die(__METHOD__);
+	}
+
+	/**
+	 * Method overrides the set magic method.
+	 * @param $name The variable name to set.
+	 * @param $val The value to set to.
+	 */
+	protected function _setData($name, $val)
+	{
+		//Check if $name exists in $this->_data
+		$class = get_called_class();
+		if(!array_key_exists($name, $this->_data))
+			throw new \Framework\Exceptions\EDatabaseDriverException("Variable '$name' not in model '$class'.");
+
+		//TODO: If DataType Object ensure the same DataType Object
+		//TODO: Ensure same type
+
+		//Set variables
+		$this->_variables[$name] = $val;
 	}
 
 	/**
@@ -119,11 +176,24 @@ class CDatabaseModel extends \Framework\Model\CMomentoModel
 		$driver     = self::$SERVICE->getDriver($driver);
 
 		//Now get native model properties (native to db)
-
-		var_dump($properties);
-		die(__METHOD__);
+		$type  = ucwords($driver->getDrivertype());
+		$class = "\\Framework\\Database2\\Drivers\\{$type}\\CDatabaseModel";
+		
+		//Merge properties
+		$properties = array_merge($class::properties(), $properties);
 
 		return $properties;
+	}
+
+	/**
+	 * Method sets the variable array.
+	 * @param $variables The variables array.
+	 */
+	private function _setVariables($data)
+	{
+		//TODO: If type is Structure, call _setVariable
+		foreach($data as $key=>$val)
+			$this->$key = $val;
 	}
 }
 ?>
