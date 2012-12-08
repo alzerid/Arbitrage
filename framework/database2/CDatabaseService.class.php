@@ -35,8 +35,8 @@ class CDatabaseService extends \Framework\Base\CService implements \Framework\In
 			$this->requireServiceFile("Drivers.$driver.CDatabaseModel");
 			$this->requireServiceFile("Drivers.$driver.CDriver");
 			$this->requireServiceFile("Drivers.$driver.CQueryDriver");
+			$this->requireServiceFile("Drivers.$driver.CQueryModel");
 			$this->requireServiceFile("Drivers.$driver.CCollectionModel");
-
 
 			//Get or create driver
 			$this->_drivers[$name] = $this->createDriver($properties);
@@ -81,6 +81,7 @@ class CDatabaseService extends \Framework\Base\CService implements \Framework\In
 	{
 		static $loaded = array();
 
+		//Model autoload
 		if(preg_match('/Model$/', $event->class))
 		{
 			//Check if we already loaded
@@ -96,6 +97,23 @@ class CDatabaseService extends \Framework\Base\CService implements \Framework\In
 			//Throw exception if unable to load model
 			if(!$ret)
 				throw new \Framework\Exceptions\EDatabaseDriverException("Unable to load model '$namespace'.");
+
+			//Loaded, prevent from propagating
+			$event->stopPropagation();
+		}
+		elseif(preg_match('/\\\Model\\\DataTypes/i', $event->class)) //DataType autoload
+		{
+			$class = "\\{$event->class}";
+			if(isset($loaded[$class]))
+				return;
+
+			//Require the file
+			$namespace = \Framework\Base\CKernel::getInstance()->convertPHPNamespaceToArbitrage($class);
+			$ret       = \Framework\Base\CKernel::getInstance()->requireFile($namespace, false);
+
+			//Throw an expcetion if we are unable to load the DataType
+			if(!$ret)
+				throw new \Framework\Exceptions\EDatabaseDriverException("Unable to load data type model '$namespace'.");
 
 			//Loaded, prevent from propagating
 			$event->stopPropagation();
