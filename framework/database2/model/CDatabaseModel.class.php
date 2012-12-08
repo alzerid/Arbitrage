@@ -26,7 +26,11 @@ class CDatabaseModel extends \Framework\Model\CMomentoModel
 		$query = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP("Framework.Database2.Drivers.$type.CQueryDriver");
 		$query = new $query($driver, $properties['database'], $properties['table']);
 
-		return new \Framework\Database2\Model\CQueryModel($query, \Framework\Base\CKernel::getInstance()->convertPHPNamespaceToArbitrage(get_called_class()));
+		//Create CQuery Model from driver
+		$model = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP("Framework.Database2.Drivers.$type.CQueryModel");
+		$model = new $model($query, \Framework\Base\CKernel::getInstance()->convertPHPNamespaceToArbitrage(get_called_class()));
+
+		return $model;
 	}
 	
 	/**
@@ -49,33 +53,57 @@ class CDatabaseModel extends \Framework\Model\CMomentoModel
 	/**
 	 * Method creates, converts raw database data into a database model.
 	 */
-	static public function create(array $data)
+	static public function create(array $data=array())
 	{
 		//Create model
 		$class = get_called_class();
-		$model = new $class;
+		$model = new $class($data);
+
+		//Merge
+		$model->merge();
 
 		//Convert data to specific types
 		var_dump($class, $data);
 		die(__METHOD__);
+
+		return $model;
 	}
 
 	/** Model instance methods **/
+
+	/**
+	 * Method saves the model into the database.
+	 */
 	public function save()
 	{
+		//TODO: Merge
 		die(__METHOD__);
 	}
 
+	/**
+	 * Method inserts the model into the database.
+	 */
 	public function insert()
 	{
 		die(__METHOD__);
 	}
 
+	/**
+	 * Method updates the data base entries from th emode.
+	 */
 	public function update()
 	{
 		die(__METHOD__);
 	}
 	/** End model instance methods **/
+
+	/** 
+	 * Method merges the variables array into the data array.
+	 */
+	public function merge()
+	{
+		die(__METHOD__);
+	}
 
 	/**
 	 * Method returns the properties for this model.
