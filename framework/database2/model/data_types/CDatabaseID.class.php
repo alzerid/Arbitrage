@@ -18,7 +18,7 @@ class CDatabaseID extends \Framework\Database2\Model\DataTypes\CDataType
 	 */
 	protected function _toString()
 	{
-		die(__METHOD__);
+		return (string) $this->_val;
 	}
 }
 ?>
