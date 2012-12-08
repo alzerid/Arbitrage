@@ -1,10 +1,10 @@
 <?php
 namespace Framework\Database2\Model;
 
-class CQueryModel
+abstract class CQueryModel
 {
-	private $_query_driver;   //Query Driver
-	private $_model;          //Model
+	protected $_query_driver;   //Query Driver
+	protected $_model;          //Model
 
 	/**
 	 * Method constructs a CQueryModel.
@@ -25,15 +25,24 @@ class CQueryModel
 		$valid = array('findOne', 'findAll');
 
 		if(!in_array($method, $valid))
-			throw new \Framework\Exceptions\EDatabaseException("Unknown method call '$method'.");
+			throw new \Framework\Exceptions\EDatabaseDriverException("Unknown method call '$method'.");
 
 		switch($method)
 		{
 			case 'findOne':
-				$this->_query_driver->$method($args[0]);
-				die(__METHOD__ . " FIND ONE");
+				$ret = $this->_query_driver->$method($args[0])->execute();
 
-				break;
+				//Convert the returned results to model data types
+				$this->_convertNativeToModel($ret);
+
+				//set into model
+				if($ret)
+				{
+					$class = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP($this->_model);
+					$ret   = $class::create($ret);
+				}
+
+				return $ret;
 
 			case 'findAll':
 				$condition  = ((isset($args[0]))? $args[0] : NULL);
@@ -44,7 +53,20 @@ class CQueryModel
 		}
 	}
 
-	//TODO: Execute findOne, findAll, etc....
+	/**
+	 * Method converts a native DataTypes into model DataTypes.
+	 * @param $data The data array to convert.
+	 * @return The newly converted data array.
+	 */
+
+	abstract protected function _convertNativeToModel(array &$data);
+
+	/**
+	 * Method converts a model DataTypes into native DataTypes.
+	 * @param $data The data array to convert.
+	 * @return The newly converted data array.
+	 */
+	abstract protected function _convertModelToNative(array &$data);
 
 	/**
 	 * Method creates a collection class with the results.
