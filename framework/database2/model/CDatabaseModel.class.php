@@ -27,8 +27,6 @@ class CDatabaseModel extends \Framework\Model\CMomentoModel
 
 		//Ensure variables is in defaults
 		$this->_setVariables($data);
-		die(__METHOD__);
-		$this->merge();
 	}
 
 	/**
@@ -85,15 +83,9 @@ class CDatabaseModel extends \Framework\Model\CMomentoModel
 		//Create model
 		$class = get_called_class();
 		$model = new $class($data);
-		var_dump($class);
-		die(__METHOD__);
 
 		//Merge
 		$model->merge();
-
-		//Convert data to specific types
-		var_dump($model);
-		die(__METHOD__);
 
 		return $model;
 	}
@@ -132,15 +124,19 @@ class CDatabaseModel extends \Framework\Model\CMomentoModel
 	public function merge()
 	{
 		//TODO: Handle structure classes
+		//TODO: Handle DataTypes???
 
 		//Recursively merge
 		foreach($this->_variables as $key=>$val)
 		{
-			var_dump($key);
-			die(__METHOD__);
+			if($val instanceof \Framework\Database2\Model\Structures\CArray)
+				$val->merge();
+			else
+				$this->_data[$key] = $val;
 		}
 
-		die(__METHOD__);
+		//Reset _variables
+		$this->_variables = array();
 	}
 
 	/**
@@ -158,8 +154,10 @@ class CDatabaseModel extends \Framework\Model\CMomentoModel
 		//TODO: If DataType Object ensure the same DataType Object
 		//TODO: Ensure same type
 
-		//Set variables
-		$this->_variables[$name] = $val;
+		if($this->_data[$name] instanceof \Framework\Database2\Model\Structures\CArray)
+			$this->_data[$name]->set($val);
+		else
+			$this->_variables[$name] = $val;  //Set variables
 	}
 
 	/**
@@ -191,9 +189,18 @@ class CDatabaseModel extends \Framework\Model\CMomentoModel
 	 */
 	private function _setVariables($data)
 	{
+		//TODO: _setVariables special method that copies CStructures _variables to _data
 		//TODO: If type is Structure, call _setVariable
 		foreach($data as $key=>$val)
-			$this->$key = $val;
+		{
+			if($val instanceof \Framework\Database2\Model\DataType\CDataType)
+			{
+				echo 'DATATYPE ';
+				die(__METHOD__);
+			}
+			else
+				$this->$key = $val;
+		}
 	}
 }
 ?>
