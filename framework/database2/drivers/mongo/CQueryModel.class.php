@@ -8,7 +8,7 @@ class CQueryModel extends \Framework\Database2\Model\CQueryModel
 	 * @param $data The data array to convert.
 	 * @return The newly converted data array.
 	 */
-	protected function _convertNativeToModel(array &$data, $defaults=NULL)
+	public function convertNativeToModel(array &$data, $defaults=NULL)
 	{
 		static $model_defaults = array();
 
@@ -36,7 +36,7 @@ class CQueryModel extends \Framework\Database2\Model\CQueryModel
 					//TODO: Get defaults from class model in array
 
 					//Convert what's in the array
-					$this->_convertNativeToModel($val, array());
+					$this->convertNativeToModel($val, array());
 
 					//Convert to CArray
 					$data[$key] = new \Framework\Database2\Model\Structures\CArray($class, $val);
@@ -61,7 +61,7 @@ class CQueryModel extends \Framework\Database2\Model\CQueryModel
 	 * @param $data The data array to convert.
 	 * @return The newly converted data array.
 	 */
-	protected function _convertModelToNative(array &$data)
+	public function convertModelToNative(array &$data)
 	{
 		var_dump($this->_model);
 		die(__METHOD__);

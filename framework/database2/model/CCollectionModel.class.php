@@ -4,14 +4,16 @@ namespace Framework\Database2\Model;
 abstract class CCollectionModel implements \ArrayAccess, \Iterator
 {
 	protected $_query_driver;   //Query driver
+	protected $_query_model;    //Query model
 	protected $_results;        //Results
 	protected $_model;          //Model
 
-	public function __construct(\Framework\Database2\Drivers\CQueryDriver $driver, $results, $model)
+	public function __construct(\Framework\Database2\Model\CQueryModel $query_model, $results)
 	{
-		$this->_query_driver = $driver;
+		$this->_query_model  = $query_model;
+		$this->_query_driver = $this->_query_model->getQueryDriver();
+		$this->_model        = $this->_query_model->getModel();
 		$this->_results      = $results;
-		$this->_model        = $model;
 	}
 
 	/**

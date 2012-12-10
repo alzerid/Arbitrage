@@ -6,10 +6,10 @@ class CCollectionModel extends \Framework\Database2\Model\CCollectionModel
 	protected $_idx;
 	private $_cnt;
 
-	public function __construct(\Framework\Database2\Drivers\CQueryDriver $driver, $results, $model)
+	public function __construct(\Framework\Database2\Model\CQueryModel $query_model, $results)
 	{
 		//Parent company
-		parent::__construct($driver, $results, $model);
+		parent::__construct($query_model, $results);
 
 		//Set iterator value
 		$this->_idx = -1;
@@ -64,11 +64,12 @@ class CCollectionModel extends \Framework\Database2\Model\CCollectionModel
 		//Get current
 		$current = $this->_results->current();
 
+		//Convert to Model Structure and DataTypes
+		$this->_query_model->convertNativeToModel($current);
+
 		//Convert the data into a model
 		$class = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP($this->_model);
 		$model = $class::create($current);
-		var_dump($model);
-		die(__METHOD__);
 
 		return $model;
 	}

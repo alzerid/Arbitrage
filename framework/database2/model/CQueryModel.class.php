@@ -30,8 +30,8 @@ abstract class CQueryModel
 		switch($method)
 		{
 			case 'findOne':
+				//Get entry
 				$ret = $this->_query_driver->$method($args[0])->execute();
-
 
 				//set into model
 				if($ret)
@@ -56,19 +56,37 @@ abstract class CQueryModel
 	}
 
 	/**
+	 * Method returns the query driver.
+	 * @return \Framework\Database2\Drivers\CQueryDriver Returns the query driver.
+	 */
+	public function getQueryDriver()
+	{
+		return $this->_query_driver;
+	}
+
+	/** 
+	 * Method returns the model associated with this query driver.
+	 * @return Returns the model associated with this query driver.
+	 */
+	public function getModel()
+	{
+		return $this->_model;
+	}
+
+	/**
 	 * Method converts a native DataTypes into model DataTypes.
 	 * @param $data The data array to convert.
 	 * @return The newly converted data array.
 	 */
 
-	abstract protected function _convertNativeToModel(array &$data);
+	abstract public function convertNativeToModel(array &$data);
 
 	/**
 	 * Method converts a model DataTypes into native DataTypes.
 	 * @param $data The data array to convert.
 	 * @return The newly converted data array.
 	 */
-	abstract protected function _convertModelToNative(array &$data);
+	abstract public function convertModelToNative(array &$data);
 
 	/**
 	 * Method creates a collection class with the results.
@@ -80,7 +98,7 @@ abstract class CQueryModel
 		//Get type
 		$type  = ucwords($this->_query_driver->getDriver()->getDriverType());
 		$class = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP("Framework.Database2.Drivers.$type.CCollectionModel");
-		$obj   = new $class($this->_query_driver, $results, $this->_model);
+		$obj   = new $class($this, $results);
 
 		//$args = array($this->_query_driver, $results, $this->_model);
 		//$obj   = \Framework\Base\CKernel::getInstance()->instantiate("Framework.Database2.Drivers.$type.CCollectionModel");
