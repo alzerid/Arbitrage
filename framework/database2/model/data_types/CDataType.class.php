@@ -21,6 +21,15 @@ abstract class CDataType
 	abstract public function set($val);
 
 	/**
+	 * Method returns the raw value.
+	 * @return Returns the value.
+	 */
+	public function getValue()
+	{
+		return $this->_val;
+	}
+
+	/**
 	 * Abstract method converts the data type to a string.
 	 * @return string Returns a string.
 	 */
