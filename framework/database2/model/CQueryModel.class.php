@@ -32,12 +32,14 @@ abstract class CQueryModel
 			case 'findOne':
 				$ret = $this->_query_driver->$method($args[0])->execute();
 
-				//Convert the returned results to model data types
-				$this->_convertNativeToModel($ret);
 
 				//set into model
 				if($ret)
 				{
+					//Convert the returned results to model data types
+					$this->_convertNativeToModel($ret);
+
+					//Create model
 					$class = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP($this->_model);
 					$ret   = $class::create($ret);
 				}
