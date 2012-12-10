@@ -419,7 +419,10 @@ class CKernel implements ISingleton
 	 */
 	public function instantiate($namespace, $arguments=array())
 	{
-		die(__METHOD__);
+		$namespace  = $this->convertArbitrageNamespaceToPHP($namespace);
+		$reflection = new \ReflectionClass($namespace);
+
+		return $reflection->newInstanceArgs($arguments);
 	}
 
 	/**
