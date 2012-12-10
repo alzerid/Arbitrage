@@ -12,7 +12,7 @@ abstract class CDataType
 
 	public function __toString()
 	{
-		$this->_toString();
+		return $this->_toString();
 	}
 
 	/**
