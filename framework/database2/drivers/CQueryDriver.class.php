@@ -78,6 +78,16 @@ abstract class CQueryDriver
 	}
 
 	/**
+	 * Method called to save an entry.
+	 */
+	public function save($data, $condition=NULL)
+	{
+		$this->_action    = 'save';
+		$this->_condition = $condition;
+		return $this;
+	}
+
+	/**
 	 * Method executes the actual query.
 	 */
 	abstract public function execute();
