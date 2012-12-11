@@ -5,13 +5,15 @@ namespace Framework\Database2\Model\Structures;
 //todo: code set magic methods
 //TODO: Use _variables and _data appropriately
 
-class CArray extends \Framework\Database2\Model\Structures\CStructure implements \ArrayAccess, \Countable/*, \Iterator*/
+class CArray extends \Framework\Database2\Model\Structures\CStructure implements \ArrayAccess, \Countable, \Iterator
 {
 	protected $_class;
+	private $_idx;
 
 	public function __construct($class=NULL, $data=array())
 	{
 		$this->_class = $class;
+		$this->_idx   = -1;
 
 		//TODO: Call CModel
 		\Framework\Model\CModel::__construct($data);
@@ -32,7 +34,7 @@ class CArray extends \Framework\Database2\Model\Structures\CStructure implements
 	 */
 	public function merge()
 	{
-		die(__METHOD__);
+		//TODO: CODE ME
 	}
 
 	/**
@@ -109,13 +111,43 @@ class CArray extends \Framework\Database2\Model\Structures\CStructure implements
 
 	public function count()
 	{
-		die(__METHOD__);
+		return count($this->_data);
 	}
 
 	/**********************************/
 	/** End Countable Implementation **/
 	/**********************************/
 
+	/***********************************/
+	/** Start Iterator Implementation **/
+	/***********************************/
+	public function current()
+	{
+		return $this->_data[$this->_idx];
+	}
 
+	public function next()
+	{
+		$this->_idx++;
+	}
+
+	public function key()
+	{
+		return $this->_idx;
+	}
+
+	public function valid()
+	{
+		return array_key_exists($this->_idx, $this->_data);
+	}
+
+	public function rewind()
+	{
+		$this->_idx = 0;
+	}
+
+	/*********************************/
+	/** End Iterator Implementation **/
+	/*********************************/
 }
 ?>
