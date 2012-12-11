@@ -90,9 +90,11 @@ class CModel extends \Framework\Model\CMomentoModel
 	protected function _setData($name, $val)
 	{
 		//Check if $name exists in $this->_data
-		$class = get_called_class();
 		if(!array_key_exists($name, $this->_data))
+		{
+			$class = get_called_class();
 			throw new \Framework\Exceptions\EDatabaseDriverException("Variable '$name' not in model '$class'.");
+		}
 
 		//TODO: If DataType Object ensure the same DataType Object
 		//TODO: Ensure same type
@@ -102,11 +104,32 @@ class CModel extends \Framework\Model\CMomentoModel
 			$this->_variables[$name] = $val;  //Set variables
 	}
 
+	/** 
+	 * Method overrides the get magic method.
+	 * @param $name The variable name to get.
+	 */
+	public function _getData($name)
+	{
+		//Check to see if $name exists in model
+		if(!array_key_exists($name, $this->_data))
+		{
+			$class = get_called_class();
+			throw new \Framework\Exceptions\EDatabaseDriverException("Variable '$name' not in model '$class'.");
+		}
+
+		//Return _variables first
+		if(array_key_exists($name, $this->_variables))
+			return $this->_variables[$name];
+
+		//Return _data by default
+		return $this->_data[$name];
+	}
+
 	/**
 	 * Method sets the variable array.
 	 * @param $variables The variables array.
 	 */
-	private function _setVariables($data)
+	protected function _setVariables($data)
 	{
 		//TODO: _setVariables special method that copies CStructures _variables to _data
 		//TODO: If type is Structure, call _setVariable
@@ -121,6 +144,5 @@ class CModel extends \Framework\Model\CMomentoModel
 				$this->$key = $val;
 		}
 	}
-
 }
 ?>
