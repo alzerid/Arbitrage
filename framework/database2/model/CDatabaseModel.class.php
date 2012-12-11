@@ -11,15 +11,22 @@ class CDatabaseModel extends \Framework\Database2\Model\CModel
 	public function __construct($data=array())
 	{
 		//Get properties of model
-		parent::__construct($data);
+		$properties = $this->_getProperties();
+		$defaults   = static::defaults();
 
 		//Set id from _idKey
 		$properties = $this->_getProperties();
 		$idKey      = $properties['idKey'];
-		if(!isset($this->_data[$idKey]))
-			$this->_data[$idKey] = new \Framework\Database2\Model\DataTypes\CDatabaseID;
-		elseif(!($data[$idKey] instanceof \Framework\Database2\Model\DataTypes\CDatabaseID))
-			throw new \Framework\Exceptions\EDatabaseDriverException("ID Key '{$data[$idKey]}' is not a CDatabaseID DataType.");
+		if(!isset($default[$idKey]))
+			$defaults[$idKey] = new \Framework\Database2\Model\DataTypes\CDatabaseID;
+		elseif(!($defaults[$idKey] instanceof \Framework\Database2\Model\DataTypes\CDatabaseID))
+			throw new \Framework\Exceptions\EDatabaseDriverException("ID Key '{$defaults[$idKey]}' is not a CDatabaseID DataType.");
+
+		//Set defaults
+		\Framework\Model\CModel::__construct($defaults);
+
+		//Ensure variables is in defaults
+		$this->_setVariables($data);
 	}
 
 	/**
