@@ -14,6 +14,7 @@ class CDatabaseService extends \Framework\Base\CService implements \Framework\In
 		//TODO: Load up all model classes
 		$this->requireServiceFile('Drivers.CDriver');
 		$this->requireServiceFile('Drivers.CQueryDriver');
+		$this->requireServiceFile('Model.CModel');
 		$this->requireServiceFile('Model.CDatabaseModel');
 		$this->requireServiceFile('Model.CQueryModel');
 		$this->requireServiceFile('Model.CCollectionModel');
@@ -26,7 +27,7 @@ class CDatabaseService extends \Framework\Base\CService implements \Framework\In
 		$this->requireServiceFile('Selectors.CArraySelector');
 
 		//Set $SERVICE static variable
-		\Framework\Database2\Model\CDatabaseModel::$SERVICE = $this;
+		\Framework\Database2\Model\CModel::$SERVICE = $this;
 
 		//TODO: Load up all drivers
 		$config = $this->getConfig();
