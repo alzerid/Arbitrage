@@ -30,6 +30,10 @@ abstract class CQueryModel
 	 */
 	public function findOne($query=NULL)
 	{
+		//Convert query
+		if($query)
+			$query = $this->convertModelToNative($query);
+
 		//Query
 		$ret = $this->_query_driver->findOne($query)->execute();
 
@@ -54,6 +58,11 @@ abstract class CQueryModel
 	 */
 	public function findAll($query=NULL)
 	{
+		//Convert query
+		if($query)
+			$query = $this->convertModelToNative($query);
+
+		//Send db call
 		$ret        = $this->_query_driver->findAll($query)->execute();
 		$collection = $this->_createCollection($ret);
 
