@@ -92,6 +92,25 @@ abstract class CQueryDriver
 	}
 
 	/**
+	 * Method inserts new data to the DB.
+	 */
+	public function insert($data)
+	{
+		die(__METHOD__);
+	}
+
+	/**
+	 * Method removes an item.
+	 * @param $condition The condition we base our remove on.
+	 */
+	public function remove($condition=NULL)
+	{
+		$this->_action    = 'remove';
+		$this->_condition = $condition;
+		return $this;
+	}
+
+	/**
 	 * Method executes the actual query.
 	 */
 	abstract public function execute();
