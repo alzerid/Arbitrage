@@ -1,6 +1,8 @@
 <?php
 namespace Framework\Database2\Model;
 
+//TODO: Conver to use selector classes --EMJ
+
 abstract class CQueryModel
 {
 	protected $_query_driver;   //Query Driver
@@ -17,43 +19,67 @@ abstract class CQueryModel
 		$this->_model        = $model;
 	}
 
+	/****************************/
+	/** Start Selector Methods **/
+	/****************************/
+
 	/**
-	 * Method hijacked and properly calls query driver.
+	 * Method finds on instance of an entry within the database.
+	 * @param $query The query to use for finding the entry.
+	 * @return Returns NULL or the Model entry.
 	 */
-	public function __call($method, $args)
+	public function findOne($query=NULL)
 	{
-		$valid = array('findOne', 'findAll');
+		//Query
+		$ret = $this->_query_driver->findOne($query)->execute();
 
-		if(!in_array($method, $valid))
-			throw new \Framework\Exceptions\EDatabaseDriverException("Unknown method call '$method'.");
-
-		switch($method)
+		//Create model if we have an entry
+		if($ret)
 		{
-			case 'findOne':
-				//Get entry
-				$ret = $this->_query_driver->$method($args[0])->execute();
+			//Convert the returned results to model data types
+			$this->convertNativeToModel($ret);
 
-				//set into model
-				if($ret)
-				{
-					//Convert the returned results to model data types
-					$this->_convertNativeToModel($ret);
-
-					//Create model
-					$class = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP($this->_model);
-					$ret   = $class::create($ret);
-				}
-
-				return $ret;
-
-			case 'findAll':
-				$condition  = ((isset($args[0]))? $args[0] : NULL);
-				$ret        = $this->_query_driver->$method($condition)->execute();
-				$collection = $this->_createCollection($ret);
-
-				return $collection;
+			//Create model
+			$class = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP($this->_model);
+			$ret   = $class::create($ret);
 		}
+
+		return $ret;
 	}
+
+	/**
+	 * Method finds all entries within the database.
+	 * @param $query The query to use for finding the entries.
+	 * @return Returns a CCollection class.
+	 */
+	public function findAll($query=NULL)
+	{
+		$ret        = $this->_query_driver->findAll($query)->execute();
+		$collection = $this->_createCollection($ret);
+
+		return $collection;
+	}
+
+	/**************************/
+	/** End Selector Methods **/
+	/**************************/
+
+	/****************************/
+	/** Start Modifier Methods **/
+	/****************************/
+
+	public function save($data)
+	{
+		//Convert the data to native type
+		$this->convertModelToNative($data);
+		var_dump($data);
+
+		$this->_query_driver->save($data)->execute();
+	}
+
+	/**************************/
+	/** End Modifier Methods **/
+	/**************************/
 
 	/**
 	 * Method returns the query driver.
@@ -96,14 +122,8 @@ abstract class CQueryModel
 	private function _createCollection($results)
 	{
 		//Get type
-		$type  = ucwords($this->_query_driver->getDriver()->getDriverType());
-		$class = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP("Framework.Database2.Drivers.$type.CCollectionModel");
-		$obj   = new $class($this, $results);
-
-		//$args = array($this->_query_driver, $results, $this->_model);
-		//$obj   = \Framework\Base\CKernel::getInstance()->instantiate("Framework.Database2.Drivers.$type.CCollectionModel");
-
-		return $obj;
+		$type = ucwords($this->_query_driver->getDriver()->getDriverType());
+		return \Framework\Base\CKernel::getInstance()->instantiate("Framework.Database2.Drivers.$type.CCollectionModel", array($this, $results));
 	}
 }
 ?>
