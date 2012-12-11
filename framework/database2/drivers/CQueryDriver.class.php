@@ -33,6 +33,24 @@ abstract class CQueryDriver
 		$this->_sort  = NULL;
 	}
 
+	/**
+	 * Method sets the database for this query driver.
+	 * @param $database The database to set to.
+	 */
+	public function setDatabase($database)
+	{
+		$this->_database = $database;
+	}
+
+	/**
+	 * Method sets the table for this query driver.
+	 * @param $table The table to set to.
+	 */
+	public function setTable($table)
+	{
+		$this->_table = $table;
+	}
+
 	/*************************/
 	/**** Query Modifiers ****/
 	/*************************/
