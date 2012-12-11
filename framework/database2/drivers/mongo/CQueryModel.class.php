@@ -12,6 +12,8 @@ class CQueryModel extends \Framework\Database2\Model\CQueryModel
 	{
 		static $model_defaults = array();
 
+		//TODO: Attempt to reuse objects instead of instantiating new ones
+
 		//Get defualts
 		if($defaults==NULL)
 		{
@@ -31,23 +33,50 @@ class CQueryModel extends \Framework\Database2\Model\CQueryModel
 			{
 				if($defaults[$key] instanceof \Framework\Database2\Model\Structures\CArray)
 				{
-					$class = NULL;
-					//TODO: Get class model in array
-					//TODO: Get defaults from class model in array
+					$class = (($defaults[$key]->getClass())? \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP($defaults[$key]->getClass()) : NULL);
+					if($class)
+					{
+						$ret       = array();
+						$cdefaults = $class::defaults();
+						foreach($val as $akey=>$adata)
+						{
+							//Convert data to model data
+							$this->convertNativeToModel($adata, $cdefaults);
 
-					//Convert what's in the array
-					$this->convertNativeToModel($val, array());
+							//Create class
+							$model = new $class($adata);
+							$model->merge();
 
-					//Convert to CArray
-					$data[$key] = new \Framework\Database2\Model\Structures\CArray($class, $val);
-					//$data[$key]->merge();
+							//Add to array
+							$ret[] = $model;
+						}
+					}
+					else
+						$ret = $val;
+
+					//Create CArray
+					$data[$key] = new \Framework\Database2\Model\Structures\CArray(\Framework\Base\CKernel::getInstance()->convertPHPNamespaceToArbitrage($class), $ret);
+					$data[$key]->merge();
 				}
 				elseif($defaults[$key] instanceof \Framework\Database2\Model\Structures\CHash)
 				{
 					die("HASH " . __METHOD__);
 				}
+				elseif($defaults[$key] instanceof \Framework\Database2\Model\CModel)
+				{
+					//Get class
+					$class = get_class($defaults[$key]);
+
+					//Send $val to convertNativeToMOdel
+					$this->convertNativeToModel($val, $class::defaults());
+
+					//Create class
+					$data[$key] = new $class($val);
+					$data[$key]->merge();
+				}
 				else
 				{
+					var_dump($val);
 					die("UNKNOWN " . __METHOD__);
 				}
 			}
