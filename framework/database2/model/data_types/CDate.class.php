@@ -8,11 +8,11 @@ class CDate extends \Framework\Database2\Model\DataTypes\CDataType
 	 * @param $val The value to set to.
 	 * @param $tz The timezone to use.
 	 */
-	abstract public function set($val, $tz=NULL)
+	public function set($val, $tz=NULL)
 	{
 		if(is_string($val))
 			$this->_val = new \DateTime($val, $tz);
-		elseif(gettype($val) == "int")
+		elseif(gettype($val) == "integer")
 		{
 			$this->_val = new \DateTime("now", $tz);
 			$this->_val->setTimestamp($val);
@@ -21,8 +21,10 @@ class CDate extends \Framework\Database2\Model\DataTypes\CDataType
 			$this->_val = clone $val;
 		elseif($val instanceof \Framework\Database2\Model\DataTypes\CDate)
 			$this->_val = clone $val->getValue();
+		elseif($val === NULL)
+			$this->_val = new \DateTime();
 		else
-			throw new \Framework\Exceptions\EDatabaseDataTypeException("Unable to handle data value '$val.");
+			throw new \Framework\Exceptions\EDatabaseDataTypeException("Unable to handle data value '$val'.");
 	}
 
 	/**
@@ -32,6 +34,15 @@ class CDate extends \Framework\Database2\Model\DataTypes\CDataType
 	public function setTimezone(\DateTimeZone $tz)
 	{
 		$this->_val->setTimeZone($tz);
+	}
+
+	/**
+	 * Method returns the unix timestamp.
+	 * @return int Returns the unix timestamp.
+	 */
+	public function getTimestamp()
+	{
+		return $this->_val->getTimestamp();
 	}
 
 	/**
