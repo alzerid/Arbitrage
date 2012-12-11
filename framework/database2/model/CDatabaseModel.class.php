@@ -5,11 +5,18 @@ namespace Framework\Database2\Model;
 
 class CDatabaseModel extends \Framework\Database2\Model\CModel
 {
+	private $_database;   //Variable that override properties
+	private $_table;      //Variable that ovveride properties
+
 	/**
 	 * Method constructs the model.
 	 */
 	public function __construct($data=array())
 	{
+		//Set variables
+		$this->_database = NULL;
+		$this->_table    = NULL;
+
 		//Get properties of model
 		$properties = $this->_getProperties();
 		$defaults   = static::defaults();
@@ -31,9 +38,11 @@ class CDatabaseModel extends \Framework\Database2\Model\CModel
 
 	/**
 	 * Method returns a query object for querying the database.
+	 * @param $database Database to use instead of what's in properties.
+	 * @param $table Table to use instead of what's in properties.
 	 * @return \Framework\Database2\CDatabaseQuery Returns a database query.
 	 */
-	static public function query()
+	static public function query($database=NULL, $table=NULL)
 	{
 		//TODO: Cache query??
 
@@ -47,8 +56,12 @@ class CDatabaseModel extends \Framework\Database2\Model\CModel
 		//Unset properties
 		unset($properties['connection']);
 
+		//Setup database and table
+		$database = (($database===NULL)? $properties['database'] : $database);
+		$table    = (($table===NULL)? $properties['table'] : $table);
+
 		//Create query object and CQueryModel
-		$query = \Framework\Base\CKernel::getInstance()->instantiate("Framework.Database2.Drivers.$type.CQueryDriver", array($driver, $properties['database'], $properties['table']));
+		$query = \Framework\Base\CKernel::getInstance()->instantiate("Framework.Database2.Drivers.$type.CQueryDriver", array($driver, $database, $table));
 		$model = \Framework\Base\CKernel::getInstance()->instantiate("Framework.Database2.Drivers.$type.CQueryModel", array($query, \Framework\Base\CKernel::getInstance()->convertPHPNamespaceToArbitrage(get_called_class())));
 
 		return $model;
@@ -89,7 +102,7 @@ class CDatabaseModel extends \Framework\Database2\Model\CModel
 			unset($data['_id']);
 
 		//Save using the query model
-		$this->query()->save($data);
+		$this->getQuery()->save($data);
 	}
 
 	/**
@@ -111,5 +124,30 @@ class CDatabaseModel extends \Framework\Database2\Model\CModel
 	/** End Database Model Instance Methods **/
 	/*****************************************/
 
+	/**
+	 * Method returns a query driver.
+	 */
+	public function getQuery()
+	{
+		return self::query($this->_database, $this->_table);
+	}
+
+	/**
+	 * Method overrides the default database to use.
+	 * @param $database The database to set to.
+	 */
+	public function setDatabase($database)
+	{
+		$this->_database = $database;
+	}
+
+	/**
+	 * Method overrides the default table to use.
+	 * @param $table The table to use.
+	 */
+	public function setTable($table)
+	{
+		$this->_table = $table;
+	}
 }
 ?>
