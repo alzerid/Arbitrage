@@ -3,30 +3,23 @@ namespace Framework\Database2\Model;
 
 //TODO: Save typecasts
 
-class CDatabaseModel extends \Framework\Model\CMomentoModel
+class CDatabaseModel extends \Framework\Database2\Model\CModel
 {
-	static public $SERVICE;
-
 	/**
 	 * Method constructs the model.
 	 */
 	public function __construct($data=array())
 	{
 		//Get properties of model
-		$properties = $this->_getProperties();
-		$defaults   = static::defaults();
+		parent::__construct($data);
 
 		//Set id from _idKey
-		if(!isset($defaults[$properties['idKey']]))
-			$defaults[$properties['idKey']] = new \Framework\Database2\Model\DataTypes\CDatabaseID;
-		elseif(!($defaults[$properties['idKey']] instanceof \Framework\Database2\Model\DataTypes\CDatabaseID))
-			throw new \Framework\Exceptions\EDatabaseDriverException("ID Key '{$data[$properties['idKey']]}' is not a CDatabaseID DataType.");
-
-		//Set defaults
-		\Framework\Model\CModel::__construct($defaults);
-
-		//Ensure variables is in defaults
-		$this->_setVariables($data);
+		$properties = $this->_getProperties();
+		$idKey      = $properties['idKey'];
+		if(!isset($this->_data[$idKey]))
+			$this->_data[$idKey] = new \Framework\Database2\Model\DataTypes\CDatabaseID;
+		elseif(!($data[$idKey] instanceof \Framework\Database2\Model\DataTypes\CDatabaseID))
+			throw new \Framework\Exceptions\EDatabaseDriverException("ID Key '{$data[$idKey]}' is not a CDatabaseID DataType.");
 	}
 
 	/**
@@ -47,34 +40,13 @@ class CDatabaseModel extends \Framework\Model\CMomentoModel
 		//Unset properties
 		unset($properties['connection']);
 
-		//Create query object
-		$query = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP("Framework.Database2.Drivers.$type.CQueryDriver");
-		$query = new $query($driver, $properties['database'], $properties['table']);
-
-		//Create CQuery Model from driver
-		$model = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP("Framework.Database2.Drivers.$type.CQueryModel");
-		$model = new $model($query, \Framework\Base\CKernel::getInstance()->convertPHPNamespaceToArbitrage(get_called_class()));
+		//Create query object and CQueryModel
+		$query = \Framework\Base\CKernel::getInstance()->instantiate("Framework.Database2.Drivers.$type.CQueryDriver", array($driver, $properties['database'], $properties['table']));
+		$model = \Framework\Base\CKernel::getInstance()->instantiate("Framework.Database2.Drivers.$type.CQueryModel", array($query, \Framework\Base\CKernel::getInstance()->convertPHPNamespaceToArbitrage(get_called_class())));
 
 		return $model;
 	}
 	
-	/**
-	 * Method returnd default.
-	 */
-	static public function defaults()
-	{
-		throw new \Framework\Exceptions\EDatabaseDriverException("Model must have defaults.");
-	}
-
-	/**
-	 * Method returns the properties of the model.
-	 * @return array Returns the array of properties.
-	 */
-	static public function properties()
-	{
-		return array();
-	}
-
 	/**
 	 * Method creates, converts raw database data into a database model.
 	 */
@@ -90,15 +62,20 @@ class CDatabaseModel extends \Framework\Model\CMomentoModel
 		return $model;
 	}
 
-	/** Model instance methods **/
+	/*************************************/
+	/** Database Model Instance Methods **/
+	/*************************************/
 
 	/**
 	 * Method saves the model into the database.
 	 */
 	public function save()
 	{
-		//TODO: Merge
-		die(__METHOD__);
+		//Merge the data
+		$this->merge();
+
+		//Save using the query model
+		$this->query()->save($this->_data);
 	}
 
 	/**
@@ -116,91 +93,9 @@ class CDatabaseModel extends \Framework\Model\CMomentoModel
 	{
 		die(__METHOD__);
 	}
-	/** End model instance methods **/
+	/*****************************************/
+	/** End Database Model Instance Methods **/
+	/*****************************************/
 
-	/** 
-	 * Method merges the variables array into the data array.
-	 */
-	public function merge()
-	{
-		//TODO: Handle structure classes
-		//TODO: Handle DataTypes???
-
-		//Recursively merge
-		foreach($this->_variables as $key=>$val)
-		{
-			if($val instanceof \Framework\Database2\Model\Structures\CArray)
-				$val->merge();
-			else
-				$this->_data[$key] = $val;
-		}
-
-		//Reset _variables
-		$this->_variables = array();
-	}
-
-	/**
-	 * Method overrides the set magic method.
-	 * @param $name The variable name to set.
-	 * @param $val The value to set to.
-	 */
-	protected function _setData($name, $val)
-	{
-		//Check if $name exists in $this->_data
-		$class = get_called_class();
-		if(!array_key_exists($name, $this->_data))
-			throw new \Framework\Exceptions\EDatabaseDriverException("Variable '$name' not in model '$class'.");
-
-		//TODO: If DataType Object ensure the same DataType Object
-		//TODO: Ensure same type
-
-		if($this->_data[$name] instanceof \Framework\Database2\Model\Structures\CArray)
-			$this->_data[$name]->set($val);
-		else
-			$this->_variables[$name] = $val;  //Set variables
-	}
-
-	/**
-	 * Method returns the properties for this model.
-	 * @return array Returns the properties.
-	 */
-	static private function _getProperties()
-	{
-		//TODO: Add to static variable here to cache properties
-
-		//Get model properties
-		$properties = static::properties();
-		$driver     = ((isset($properties['config']))? $properties['config'] : '_default');
-		$driver     = self::$SERVICE->getDriver($driver);
-
-		//Now get native model properties (native to db)
-		$type  = ucwords($driver->getDrivertype());
-		$class = "\\Framework\\Database2\\Drivers\\{$type}\\CDatabaseModel";
-		
-		//Merge properties
-		$properties = array_merge($class::properties(), $properties);
-
-		return $properties;
-	}
-
-	/**
-	 * Method sets the variable array.
-	 * @param $variables The variables array.
-	 */
-	private function _setVariables($data)
-	{
-		//TODO: _setVariables special method that copies CStructures _variables to _data
-		//TODO: If type is Structure, call _setVariable
-		foreach($data as $key=>$val)
-		{
-			if($val instanceof \Framework\Database2\Model\DataType\CDataType)
-			{
-				echo 'DATATYPE ';
-				die(__METHOD__);
-			}
-			else
-				$this->$key = $val;
-		}
-	}
 }
 ?>
