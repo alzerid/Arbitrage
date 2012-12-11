@@ -38,11 +38,15 @@ class CQueryDriver extends \Framework\Database2\Drivers\CQueryDriver
 				//Get results
 				$result = $handle->$database->$table->$action($condition);
 				return $result;
+
+			case "save":
+				$handle->$database->$table->$action($this->_data);
+				return;
 		
 			//TODO: Insert, update, upsert --EMJ
 		}
 
-		throw new \Framework\Exceptoins\EDatabaseException("Unknown action '$action'.");
+		throw new \Framework\Exceptions\EDatabaseDriverException("Unknown action '$action'.");
 	}
 
 	/**

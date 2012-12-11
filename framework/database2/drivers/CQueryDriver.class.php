@@ -8,6 +8,7 @@ abstract class CQueryDriver
 	protected $_table;      //The table to query on
 
 	protected $_condition;  //The condition to use for the query
+	protected $_data;       //Data associated with an action
 	protected $_action;     //The action to take
 	protected $_limit;      //Indicates a limit
 	protected $_sort;       //Sorting
@@ -20,9 +21,12 @@ abstract class CQueryDriver
 	 */
 	public function __construct(\Framework\Database2\Drivers\CDriver $driver, $database, $table)
 	{
-		$this->_driver   = $driver;
-		$this->_database = $database;
-		$this->_table    = $table;
+		$this->_driver    = $driver;
+		$this->_database  = $database;
+		$this->_table     = $table;
+		$this->_condition = NULL;
+		$this->_data      = NULL;
+		$this->_action    = NULL;
 
 		//Setup modifiers
 		$this->_limit = NULL;
@@ -80,10 +84,10 @@ abstract class CQueryDriver
 	/**
 	 * Method called to save an entry.
 	 */
-	public function save($data, $condition=NULL)
+	public function save($data)
 	{
-		$this->_action    = 'save';
-		$this->_condition = $condition;
+		$this->_action = 'save';
+		$this->_data   = $data;
 		return $this;
 	}
 
