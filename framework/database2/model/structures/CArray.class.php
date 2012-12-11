@@ -3,10 +3,11 @@ namespace Framework\Database2\Model\Structures;
 
 //TODO: code get magic methods
 //todo: code set magic methods
+//TODO: Use _variables and _data appropriately
 
-class CArray extends \Framework\Model\CMomentoModel implements \ArrayAccess, \Countable/*, \Iterator*/
+class CArray extends \Framework\Database2\Model\Structures\CStructure implements \ArrayAccess, \Countable/*, \Iterator*/
 {
-	private $_class;
+	protected $_class;
 
 	public function __construct($class=NULL, $data=array())
 	{
@@ -15,6 +16,15 @@ class CArray extends \Framework\Model\CMomentoModel implements \ArrayAccess, \Co
 		//TODO: Call CModel
 		\Framework\Model\CModel::__construct($data);
 		$this->_variables = array();
+	}
+
+	/**
+	 * Method returns the class associated with the entries in the array.
+	 * @return Returns the class associated with the entries in the array.
+	 */
+	public function getClass()
+	{
+		return $this->_class;
 	}
 
 	/** 
@@ -70,7 +80,14 @@ class CArray extends \Framework\Model\CMomentoModel implements \ArrayAccess, \Co
 	 */
 	public function offsetSet($offset, $value)
 	{
-		die(__METHOD__);
+		if($offset === NULL)
+			$offset = count($this->_data);
+
+		$class = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP($this->_class);
+		if($this->_class && !($value instanceof $class))
+			throw new \Framework\Exceptions\EDatabaseDatTypeException("Value must be instanceof '{$this->_class}'.");
+
+		$this->_data[$offset] = $value;
 	}
 
 	/**
