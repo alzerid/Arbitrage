@@ -352,4 +352,41 @@ interface IXPath
 {
 	public function xpath($path);
 }
+
+
+/****************************/
+/** Start Arguments Parser **/
+/****************************/
+
+interface IArgument { }
+
+interface ICommandArgument extends IArgument
+{
+	public function execute();
+	public function setApplication(\Framework\Base\CCLIApplication $application);
+	public function getCommand();
+	public function getDescription();
+	public function parse(array $args);
+	public function help();
+}
+
+interface ICommandParentArgument extends ICommandArgument
+{
+	public function addChildCommand(\Framework\CLI\ICommandArgument $command);
+	public function getChildCommand($command);
+	public function childCommandExists($command);
+	public function childHelp();
+}
+
+interface IOptionArgument extends IArgument
+{
+	public function getLongOpt();
+	public function getShortOpt();
+	public function getValue();
+	public function setValue($arg);
+}
+
+/**************************/
+/** End Arguments Parser **/
+/**************************/
 ?>
