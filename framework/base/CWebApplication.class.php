@@ -112,6 +112,26 @@ class CWebApplication extends CApplication
 	}
 
 	/**
+	 * Method adds a route rule to the routing logic.
+	 * @param $match The URL to match.
+	 * @param $url The url to route to.
+	 * @param $opt_prepend Optional parameter indiciating if we should prepend the route.
+	 */
+	public function addRoute($match, $url, $prepend=false)
+	{
+		$routes = $this->getRoutes()->toArray();
+
+		//Check if we are prepending or not
+		if($prepend)
+			$routes = array_merge(array($match => $url), $routes);
+		else
+			$routes = array_merge($routes, array($match => $url));
+
+		//Set new routes
+		$this->getRoutes()->setData($routes);
+	}
+
+	/**
 	 * Method loads the controller.
 	 * @param string $route URL formatted route that specifies the controller.
 	 * @param boolean $ajax Determines if the controller is an AJAX controller.
