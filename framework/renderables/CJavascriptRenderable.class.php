@@ -15,7 +15,6 @@ class CJavascriptRenderable implements \Framework\Interfaces\IContentRenderable
 		ob_start();
 		ob_implicit_flush(false);
 		header("Content-Type: application/javascript");
-
 		echo $this->_content['render'];
 
 		return ob_get_clean();
