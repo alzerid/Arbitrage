@@ -60,7 +60,7 @@ class CViewFilePartialRenderable implements \Framework\Interfaces\IViewFileRende
 		//Get view file
 		$path = $this->_findPath("/$file.php");
 		if($path===NULL)
-			throw new \Framework\Exceptions\EArbitrageRenderableException("Unable to load view file ($file).");
+			throw new \Framework\Exceptions\EArbitrageRenderableException("View file does not exist: $file.");
 
 		ob_start();
 		ob_implicit_flush(false);
