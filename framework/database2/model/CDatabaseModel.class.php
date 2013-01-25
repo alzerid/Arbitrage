@@ -110,7 +110,7 @@ class CDatabaseModel extends \Framework\Database2\Model\CModel
 	 */
 	public function insert()
 	{
-		die(__METHOD__);
+		throw new \Framework\Exceptions\ENotImplementedException("Update not implemented.");
 	}
 
 	/**
@@ -118,7 +118,7 @@ class CDatabaseModel extends \Framework\Database2\Model\CModel
 	 */
 	public function update()
 	{
-		die(__METHOD__);
+		throw new \Framework\Exceptions\ENotImplementedException("Update not implemented.");
 	}
 	/*****************************************/
 	/** End Database Model Instance Methods **/
