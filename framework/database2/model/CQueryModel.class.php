@@ -32,7 +32,7 @@ abstract class CQueryModel
 	{
 		//Convert query
 		if($query)
-			$query = $this->convertModelToNative($query);
+			$this->convertModelToNative($query);
 
 		//Query
 		$ret = $this->_query_driver->findOne($query)->execute();
