@@ -97,13 +97,11 @@ class CQueryModel extends \Framework\Database2\Model\CQueryModel
 		foreach($data as $key => $val)
 		{
 			if($val instanceof \Framework\Database2\Model\DataTypes\CDataType)
-				$data[$key] = $this->_convertModelToNativeDataType($val);
+				$data[$key] = $this->_convertModelDataTypeToNativeDataType($val);
 			elseif($val instanceof \Framework\Database2\Model\Structures\CStructure)
-				$data[$key] = $this->_convertModelToNativeStructure($val);
+				$data[$key] = $this->_convertModelStructureToNativeStructure($val);
 			elseif($val instanceof \Framework\Database2\Model\CModel)
-			{
-				die(__METHOD__ . " HANDLE MODEL");
-			}
+				$data[$key] = $this->_convertModelToNative($val);
 		}
 	}
 
@@ -112,7 +110,7 @@ class CQueryModel extends \Framework\Database2\Model\CQueryModel
 	 * @param $value The value to convert.
 	 * @return Returns the new converted value.
 	 */
-	private function _convertModelToNativeDataType(\Framework\Database2\Model\DataTypes\CDataType $val)
+	private function _convertModelDataTypeToNativeDataType(\Framework\Database2\Model\DataTypes\CDataType $val)
 	{
 		if($val instanceof \Framework\Database2\Model\DataTypes\CDatabaseID)
 		{
@@ -133,7 +131,7 @@ class CQueryModel extends \Framework\Database2\Model\CQueryModel
 	 * @param $value The value to convert.
 	 * @return The newly converted data.
 	 */
-	private function _convertModelToNativeStructure(\Framework\Database2\Model\Structures\CStructure $val)
+	private function _convertModelStructureToNativeStructure(\Framework\Database2\Model\Structures\CStructure $val)
 	{
 		if($val instanceof \Framework\Database2\Model\Structures\CArray)
 		{
@@ -158,6 +156,16 @@ class CQueryModel extends \Framework\Database2\Model\CQueryModel
 
 		//Throw exception
 		throw new \Framework\Exceptions\EDatabaseDataTypeExceptoin('Unable to convert Structure.');
+	}
+
+
+	public function _convertModelToNative(\Framework\Database2\Model\CModel $val)
+	{
+		//Merge the data
+		$val->merge();
+
+		//Return data
+		return $val->getData();
 	}
 }
 ?>

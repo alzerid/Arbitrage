@@ -59,5 +59,7 @@ class CQueryDriver extends \Framework\Database2\Drivers\CQueryDriver
 		return new \Mongo
 		die(__METHOD__);
 	}*/
+
+	//TODO: Abstract method _convert* see mongo/CQueryModel
 }
 ?>

@@ -22,7 +22,7 @@ class CModel extends \Framework\Model\CMomentoModel
 	}
 
 	/**
-	 * Method returnd default.
+	 * Method returns default values of the model.
 	 */
 	static public function defaults()
 	{
@@ -47,12 +47,15 @@ class CModel extends \Framework\Model\CMomentoModel
 		//TODO: Handle DataTypes???
 
 		//Recursively merge
-		foreach($this->_variables as $key=>$val)
+		if($this->_variables)
 		{
-			if($val instanceof \Framework\Database2\Model\Structures\CArray)
-				$val->merge();
-			else
-				$this->_data[$key] = $val;
+			foreach($this->_variables as $key=>$val)
+			{
+				if($val instanceof \Framework\Database2\Model\Structures\CArray)
+					$val->merge();
+				else
+					$this->_data[$key] = $val;
+			}
 		}
 
 		//Reset _variables
@@ -108,7 +111,7 @@ class CModel extends \Framework\Model\CMomentoModel
 	 * Method overrides the get magic method.
 	 * @param $name The variable name to get.
 	 */
-	public function _getData($name)
+	protected function _getData($name)
 	{
 		//Check to see if $name exists in model
 		if(!array_key_exists($name, $this->_data))
@@ -118,7 +121,7 @@ class CModel extends \Framework\Model\CMomentoModel
 		}
 
 		//Return _variables first
-		if(array_key_exists($name, $this->_variables))
+		if($this->_variables && array_key_exists($name, $this->_variables))
 			return $this->_variables[$name];
 
 		//Return _data by default
