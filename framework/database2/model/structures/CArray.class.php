@@ -149,5 +149,18 @@ class CArray extends \Framework\Database2\Model\Structures\CStructure implements
 	/*********************************/
 	/** End Iterator Implementation **/
 	/*********************************/
+
+	/**
+	 * Method searches for the needle in the array.
+	 * @param $needle The needle to search for.
+	 * \return Returns true if the needle is in the array.
+	 */
+	public function contains($needle)
+	{
+		if($this->_variables && in_array($needle, $this->_variables))
+			return true;
+
+		return in_array($needle, $this->_data);
+	}
 }
 ?>
