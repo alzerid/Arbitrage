@@ -28,20 +28,41 @@ abstract class CObjectAccess implements \ArrayAccess, \Framework\Interfaces\IAPa
 	/* ArrayAccess methods */
 	public function offsetExists($offset)
 	{
-		return $this->{$offset};
+		return $this->_offsetExists($offset);
 	}
 
 	public function offsetGet($offset)
 	{
-		return $this->{$offset};
+		return $this->_offsetGet($offset);
 	}
 
 	public function offsetSet($offset, $val)
 	{
-		$this->{$offset} = $val;
+		$this->_offsetSet($offset, $val);
 	}
 
 	public function offsetUnset($offset)
+	{
+		$this->_offsetUnset($offset);
+	}
+
+	//These are needed for method override patterns
+	protected function _offsetExists($offset)
+	{
+		return $this->{$offset};
+	}
+
+	protected function _offsetGet($offset)
+	{
+		return $this->{$offset};
+	}
+
+	protected function _offsetSet($offset, $val)
+	{
+		$this->{$offset} = $val;
+	}
+
+	protected function _offsetUnset($offset)
 	{
 		unset($this->{$offset});
 	}
