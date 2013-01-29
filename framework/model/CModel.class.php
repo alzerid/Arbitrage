@@ -131,6 +131,21 @@ class CModel extends \Framework\Utils\CObjectAccess
 	}
 
 	/**
+	 * Method converts the model to a database model.
+	 * @param $namespace The namespace model.
+	 * @return \Framework\Database\CModel The database model or NULL.
+	 */
+	public function convertToModel($namespace)
+	{
+		$class = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP($namespace);
+		if(!class_exists($class))
+			throw new \Framework\Exceptions\EModelException("Model '$class' does not exist!");
+
+		//Create object
+		return new $class($this->toArray());
+	}
+
+	/**
 	 * Method retuns the iterator for this Model.
 	 * @return \Framework\Model\CModelIterator Returns the iterator for this model.
 	 */

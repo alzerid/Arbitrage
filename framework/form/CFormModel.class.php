@@ -12,21 +12,6 @@ class CFormModel extends \Framework\Model\CModel
 	}
 
 	/**
-	 * Method converts the model to a database model.
-	 * @param $namespace The namespace model.
-	 * @return \Framework\Database\CModel The database model or NULL.
-	 */
-	public function convertToModel($namespace)
-	{
-		$class = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP($namespace);
-		if(!class_exists($class))
-			throw new \Framework\Exceptions\EModelException("Database model '$class' does not exist!");
-
-		//Create object
-		return new $class($this->toArray());
-	}
-
-	/**
 	 * Method returns the array key value pairs.
 	 */
 	public function toArray()
