@@ -83,7 +83,10 @@ class CArray extends \Framework\Database2\Model\Structures\CStructure implements
 	 */
 	public function offsetGet($offset)
 	{
-		die(__METHOD__);
+		if(!isset($this->_data[$offset]))
+			return NULL;
+
+		return $this->_data[$offset];
 	}
 
 	/**
