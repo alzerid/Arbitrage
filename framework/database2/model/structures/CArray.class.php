@@ -62,8 +62,6 @@ class CArray extends \Framework\Database2\Model\Structures\CStructure implements
 		}
 		else
 			throw new \Framework\Exceptions\ENotImplementedException("Unable to handle data type.");
-
-
 	}
 
 	/**************************************/
@@ -111,7 +109,8 @@ class CArray extends \Framework\Database2\Model\Structures\CStructure implements
 	 */
 	public function offsetUnset($offset)
 	{
-		die(__METHOD__);
+		unset($this->_data[$offset]);
+		$this->_data = array_values($this->data);
 	}
 
 	/************************************/
