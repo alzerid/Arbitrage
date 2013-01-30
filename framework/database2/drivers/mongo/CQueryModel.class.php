@@ -60,7 +60,7 @@ class CQueryModel extends \Framework\Database2\Model\CQueryModel
 				}
 				elseif($defaults[$key] instanceof \Framework\Database2\Model\Structures\CHash)
 				{
-					die("HASH " . __METHOD__);
+					throw new \Framework\Exceptions\ENotImplementedException("Conversion from native model to driver for CHash not implemented.");
 				}
 				elseif($defaults[$key] instanceof \Framework\Database2\Model\CModel)
 				{
@@ -102,6 +102,8 @@ class CQueryModel extends \Framework\Database2\Model\CQueryModel
 				$data[$key] = $this->_convertModelStructureToNativeStructure($val);
 			elseif($val instanceof \Framework\Database2\Model\CModel)
 				$data[$key] = $this->_convertModelToNative($val);
+			elseif(is_object($val))
+				throw new \Framework\Exceptions\EDatabaseDataTypeException("Unable to convert DataType '" . get_class($val) . "'.");
 		}
 	}
 
@@ -155,7 +157,7 @@ class CQueryModel extends \Framework\Database2\Model\CQueryModel
 		}
 
 		//Throw exception
-		throw new \Framework\Exceptions\EDatabaseDataTypeExceptoin('Unable to convert Structure.');
+		throw new \Framework\Exceptions\EDatabaseDataTypeException('Unable to convert Structure.');
 	}
 
 

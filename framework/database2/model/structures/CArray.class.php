@@ -5,7 +5,7 @@ namespace Framework\Database2\Model\Structures;
 //todo: code set magic methods
 //TODO: Use _variables and _data appropriately
 
-class CArray extends \Framework\Database2\Model\Structures\CStructure implements \ArrayAccess, \Countable, \Iterator
+class CArray extends \Framework\Database2\Model\Structures\CStructure implements \Countable, \Iterator
 {
 	protected $_class;
 	private $_idx;
@@ -34,7 +34,16 @@ class CArray extends \Framework\Database2\Model\Structures\CStructure implements
 	 */
 	public function merge()
 	{
-		//TODO: CODE ME
+		//TODO: We will need to wensure _variables is merged as well
+		if(count($this->_variables))
+			throw new \Framework\Exceptions\ENotImplementedException("Merging of _variables not yet implemented.");
+
+		//Iterate through each object (if there is a class associated with it)
+		foreach($this->_data as $data)
+		{
+			if($data instanceof \Framework\Database2\Model\CModel)
+				$data->merge();
+		}
 	}
 
 	/**
@@ -51,6 +60,10 @@ class CArray extends \Framework\Database2\Model\Structures\CStructure implements
 			$this->_data      = $data->_data;
 			$this->_variables = $data->_variables;
 		}
+		else
+			throw new \Framework\Exceptions\ENotImplementedException("Unable to handle data type.");
+
+
 	}
 
 	/**************************************/
@@ -80,14 +93,14 @@ class CArray extends \Framework\Database2\Model\Structures\CStructure implements
 	 * @param $offset The offset to set the entry to.
 	 * @param $value The value set to the offset.
 	 */
-	public function offsetSet($offset, $value)
+	protected function _offsetSet($offset, $value)
 	{
 		if($offset === NULL)
 			$offset = count($this->_data);
 
 		$class = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP($this->_class);
 		if($this->_class && !($value instanceof $class))
-			throw new \Framework\Exceptions\EDatabaseDatTypeException("Value must be instanceof '{$this->_class}'.");
+			throw new \Framework\Exceptions\EDatabaseDataTypeException("Value must be instanceof '{$this->_class}'.");
 
 		$this->_data[$offset] = $value;
 	}

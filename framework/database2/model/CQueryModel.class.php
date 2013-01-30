@@ -81,6 +81,8 @@ abstract class CQueryModel
 	{
 		//Convert the data to native type
 		$this->convertModelToNative($data);
+
+		//Save
 		$this->_query_driver->save($data)->execute();
 	}
 

@@ -42,6 +42,11 @@ class CQueryDriver extends \Framework\Database2\Drivers\CQueryDriver
 			case "save":
 				$handle->$database->$table->$action($this->_data);
 				return;
+
+			case "insert":
+			case "update":
+			case "upsert":
+				throw new \Framework\Exceptions\ENotImplementedException("$action not implemented.");
 		
 			//TODO: Insert, update, upsert --EMJ
 		}

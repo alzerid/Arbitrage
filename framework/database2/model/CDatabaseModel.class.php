@@ -37,6 +37,14 @@ class CDatabaseModel extends \Framework\Database2\Model\CModel
 	}
 
 	/**
+	 * Method is a no-op to load the Model.
+	 */
+	static public function load()
+	{
+		/* NO OP */
+	}
+
+	/**
 	 * Method returns a query object for querying the database.
 	 * @param $database Database to use instead of what's in properties.
 	 * @param $table Table to use instead of what's in properties.

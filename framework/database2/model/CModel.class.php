@@ -46,16 +46,13 @@ class CModel extends \Framework\Model\CMomentoModel
 		//TODO: Handle structure classes
 		//TODO: Handle DataTypes???
 
-		//Recursively merge
-		if($this->_variables)
+		//Recursively merge, use data for merging
+		foreach($this->_data as $key=>$val)
 		{
-			foreach($this->_variables as $key=>$val)
-			{
-				if($val instanceof \Framework\Database2\Model\Structures\CArray)
-					$val->merge();
-				else
-					$this->_data[$key] = $val;
-			}
+			if($val instanceof \Framework\Database2\Model\Structures\CArray)
+				$val->merge();
+			elseif(array_key_exists($key, $this->_variables))
+				$this->_data[$key] = $this->_variables[$key];
 		}
 
 		//Reset _variables
