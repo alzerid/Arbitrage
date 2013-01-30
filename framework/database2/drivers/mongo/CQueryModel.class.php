@@ -102,6 +102,8 @@ class CQueryModel extends \Framework\Database2\Model\CQueryModel
 				$data[$key] = $this->_convertModelStructureToNativeStructure($val);
 			elseif($val instanceof \Framework\Database2\Model\CModel)
 				$data[$key] = $this->_convertModelToNative($val);
+			elseif($val instanceof \MongoRegEx)
+				$data[$key] = $val;
 			elseif(is_object($val))
 				throw new \Framework\Exceptions\EDatabaseDataTypeException("Unable to convert DataType '" . get_class($val) . "'.");
 		}
