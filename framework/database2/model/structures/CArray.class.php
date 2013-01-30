@@ -110,7 +110,7 @@ class CArray extends \Framework\Database2\Model\Structures\CStructure implements
 	public function offsetUnset($offset)
 	{
 		unset($this->_data[$offset]);
-		$this->_data = array_values($this->data);
+		$this->_data = array_values($this->_data);
 	}
 
 	/************************************/
