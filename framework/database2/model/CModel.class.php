@@ -51,7 +51,9 @@ class CModel extends \Framework\Model\CMomentoModel
 		{
 			if($val instanceof \Framework\Database2\Model\Structures\CArray)
 				$val->merge();
-			elseif(array_key_exists($key, $this->_variables))
+			elseif($val instanceof \Framework\Database2\Model\CModel)
+				$val->merge();
+			elseif($this->_variables && array_key_exists($key, $this->_variables))
 				$this->_data[$key] = $this->_variables[$key];
 		}
 
@@ -136,10 +138,9 @@ class CModel extends \Framework\Model\CMomentoModel
 		foreach($data as $key=>$val)
 		{
 			if($val instanceof \Framework\Database2\Model\DataType\CDataType)
-			{
-				echo 'DATATYPE ';
-				die(__METHOD__);
-			}
+				throw new \Framework\Exceptions\ENotImplemented("Conversion of datatype not implemented");
+			elseif($val instanceof \Framework\Database2\Model\CModel)
+				$this->$key->_setVariables($val->toArray());
 			else
 				$this->$key = $val;
 		}

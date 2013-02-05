@@ -128,6 +128,11 @@ class CDatabaseModel extends \Framework\Database2\Model\CModel
 	{
 		throw new \Framework\Exceptions\ENotImplementedException("Update not implemented.");
 	}
+
+	public function remove()
+	{
+		$this->getQuery()->remove(array('_id' => $this->_data['_id']));
+	}
 	/*****************************************/
 	/** End Database Model Instance Methods **/
 	/*****************************************/

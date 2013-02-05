@@ -114,7 +114,7 @@ abstract class CQueryDriver
 	 */
 	public function insert($data)
 	{
-		die(__METHOD__);
+		throw new \Framework\Exceptions\ENotImplementedException("Insert not implemented.");
 	}
 
 	/**

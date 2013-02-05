@@ -77,6 +77,15 @@ abstract class CQueryModel
 	/** Start Modifier Methods **/
 	/****************************/
 
+	public function remove($condition)
+	{
+		//Convert the condition
+		$this->convertModelToNative($condition);
+
+		//Remove
+		$this->_query_driver->remove($condition)->execute();
+	}
+
 	public function save($data)
 	{
 		//Convert the data to native type

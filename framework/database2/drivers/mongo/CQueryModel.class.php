@@ -14,7 +14,7 @@ class CQueryModel extends \Framework\Database2\Model\CQueryModel
 
 		//TODO: Attempt to reuse objects instead of instantiating new ones
 
-		//Get defualts
+		//Get defaults
 		if($defaults==NULL)
 		{
 			$class = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP($this->_model);
@@ -43,7 +43,6 @@ class CQueryModel extends \Framework\Database2\Model\CQueryModel
 							//Convert data to model data
 							$this->convertNativeToModel($adata, $cdefaults);
 
-							//Create class
 							$model = new $class($adata);
 							$model->merge();
 
@@ -59,15 +58,13 @@ class CQueryModel extends \Framework\Database2\Model\CQueryModel
 					$data[$key]->merge();
 				}
 				elseif($defaults[$key] instanceof \Framework\Database2\Model\Structures\CHash)
-				{
 					throw new \Framework\Exceptions\ENotImplementedException("Conversion from native model to driver for CHash not implemented.");
-				}
 				elseif($defaults[$key] instanceof \Framework\Database2\Model\CModel)
 				{
 					//Get class
 					$class = get_class($defaults[$key]);
 
-					//Send $val to convertNativeToMOdel
+					//Send $val to convertNativeToModel
 					$this->convertNativeToModel($val, $class::defaults());
 
 					//Create class
@@ -77,7 +74,7 @@ class CQueryModel extends \Framework\Database2\Model\CQueryModel
 				else
 				{
 					var_dump($val);
-					die("UNKNOWN " . __METHOD__);
+					throw new \Exception("???");
 				}
 			}
 			elseif($val instanceof \MongoId)
