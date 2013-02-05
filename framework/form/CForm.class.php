@@ -190,12 +190,12 @@ Class CForm
 		{
 			//Get parameters
 			$id       = $args[0];
-			$options  = (!(array_key_exists(1, $args))? array('') : $args[1]);
+			$options  = (!(array_key_exists(1, $args))? array() : $args[1]);
 			$attribs  = (!(array_key_exists(2, $args))? array() : $args[2]);
-			$selected = (!(array_key_exists(3, $args))? array('') : $args[3]);
+			$selected = (!(array_key_exists(3, $args))? NULL : $args[3]);
 
 			//Create element and return
-			return new \Framework\Form\Elements\CSelectFormElement($this->_convertToID($id), $options, $attribs, $this->_getValue($id, $attribs), $attribs);
+			return new \Framework\Form\Elements\CSelectFormElement($this->_convertToID($id), $options, $attribs, $this->_getValue($id, $attribs, $selected));
 		}
 		elseif(array_key_exists(strtolower($element), self::$_CUSTOM))
 		{
@@ -234,6 +234,7 @@ Class CForm
 		if(!empty($attribs['value']))
 			return $attribs['value'];
 
+		//Return if checked
 		if(!empty($attribs['checked']))
 			return $attribs['checked'];
 
