@@ -4,10 +4,10 @@ use \Framework\Exceptions\EArbitrageServiceException;
 
 abstract class CService
 {
+	protected $_config;         //The config object related to the service
 	private $_application;    //The application this service is tied to
 	private $_service_type;   //Service type
 	private $_namespace;      //The namespace of the service
-	private $_config;         //The config object related to the service
 	private $_fs_path;        //Filesystem path
 
 	/**
