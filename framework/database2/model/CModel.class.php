@@ -94,8 +94,13 @@ class CModel extends \Framework\Model\CMomentoModel
 		//Check if $name exists in $this->_data
 		if(!array_key_exists($name, $this->_data))
 		{
-			$class = get_called_class();
-			throw new \Framework\Exceptions\EDatabaseDriverException("Variable '$name' not in model '$class'.");
+			if(self::$SERVICE->getConfig()->strictAssignment)
+			{
+				$class = get_called_class();
+				throw new \Framework\Exceptions\EDatabaseDriverException("Strict Assignemnt: Variable '$name' not defined in model '$class'.");
+			}
+
+			return;
 		}
 
 		//TODO: If DataType Object ensure the same DataType Object
