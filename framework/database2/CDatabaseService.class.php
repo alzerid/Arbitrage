@@ -11,6 +11,8 @@ class CDatabaseService extends \Framework\Base\CService implements \Framework\In
 	 */
 	public function initialize()
 	{
+		static $defaults = array('strictAssignment' => true);
+
 		//TODO: Load up all model classes
 		$this->requireServiceFile('Drivers.CDriver');
 		$this->requireServiceFile('Drivers.CQueryDriver');
@@ -29,10 +31,18 @@ class CDatabaseService extends \Framework\Base\CService implements \Framework\In
 		//Set $SERVICE static variable
 		\Framework\Database2\Model\CModel::$SERVICE = $this;
 
+		//Setup defaults for config
+		$dconfig = new \Framework\Config\CArbitrageConfigProperty($defaults);
+		$dconfig->merge($this->_config->toArray());
+		$this->_config = $dconfig;
+
 		//TODO: Load up all drivers
 		$config = $this->getConfig();
 		foreach($config as $name=>$properties)
 		{
+			if(!($properties instanceof \Framework\Utils\CArrayObject))
+				continue;
+
 			$driver = ucwords($properties['driver']);
 
 			//Require driver specific files
