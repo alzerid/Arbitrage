@@ -142,12 +142,30 @@ class CModel extends \Framework\Model\CMomentoModel
 		//TODO: If type is Structure, call _setVariable
 		foreach($data as $key=>$val)
 		{
+			//First check if the val is of any special type
 			if($val instanceof \Framework\Database2\Model\DataType\CDataType)
 				throw new \Framework\Exceptions\ENotImplemented("Conversion of datatype not implemented");
+
+			//Incoming value is a model
 			elseif($val instanceof \Framework\Database2\Model\CModel)
 				$this->$key->_setVariables($val->toArray());
+
+			//Now check if the val is an array
+			elseif(is_array($val))
+			{
+				//Data is of type CModel
+				if($this->_data[$key] instanceof \Framework\Database2\Model\CModel)
+					$this->$key->_setVariables($val);
+
+				//TODO: Handle array structures
+				//TODO: Handle hash structures
+			}
+
+			//All other values, basic variable types
 			else
 				$this->$key = $val;
+
+
 		}
 	}
 }

@@ -51,12 +51,9 @@ class CArray extends \Framework\Database2\Model\Structures\CStructure implements
 	 */
 	public function set($data)
 	{
-		//TODO: Handle array
-
 		//Handle CArray
 		if($data instanceof \Framework\Database2\Model\Structures\CArray)
 		{
-			//TODO: Set _data and _variables
 			$this->_data      = $data->_data;
 			$this->_variables = $data->_variables;
 		}
@@ -168,7 +165,7 @@ class CArray extends \Framework\Database2\Model\Structures\CStructure implements
 	/**
 	 * Method searches for the needle in the array.
 	 * @param $needle The needle to search for.
-	 * \return Returns true if the needle is in the array.
+	 * @return Returns true if the needle is in the array.
 	 */
 	public function contains($needle)
 	{
