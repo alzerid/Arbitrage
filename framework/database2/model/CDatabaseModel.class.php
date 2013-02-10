@@ -106,7 +106,7 @@ class CDatabaseModel extends \Framework\Database2\Model\CModel
 		$data = $this->_data;
 
 		//unset
-		if($data['_id']->getValue() === NULL)
+		if($data['_id'] === NULL || $data['_id']->getValue() === NULL)
 			unset($data['_id']);
 
 		//Save using the query model
