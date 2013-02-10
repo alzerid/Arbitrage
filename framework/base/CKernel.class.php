@@ -232,7 +232,7 @@ class CKernel implements ISingleton
 	 */
 	public function createCLIApplication($namespace)
 	{
-		//Ensure we bootstrap web applications
+		//Ensure we bootstrap cli applications
 		$this->_bootstrapCLIApplication();
 
 		//Get class 
@@ -507,7 +507,7 @@ class CKernel implements ISingleton
 		{
 			$this->requireFrameworkFile('CLI.CCommand');
 			$this->requireFrameworkFile('CLI.CArgumentParser');
-			$this->requireFrameworkFile('Base.CCLIApplication');                 //Web application class
+			$this->requireFrameworkFile('Base.CCLIApplication');                 //CLI Application class
 			$this->_bootstrap_cli = true;
 		}
 	}
