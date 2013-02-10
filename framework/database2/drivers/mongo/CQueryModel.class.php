@@ -115,7 +115,12 @@ class CQueryModel extends \Framework\Database2\Model\CQueryModel
 	{
 		if($val instanceof \Framework\Database2\Model\DataTypes\CDatabaseID)
 		{
-			$val = (($val->getValue()!==NULL)? $val->getValue() : str_repeat('0', 24));
+			$val = $val->getValue();
+			if($val == -1)
+				$val = NULL;
+			elseif($val === NULL)
+				$val = str_repeat('0', 24);
+
 			return new \MongoId($val);
 		}
 		elseif($val instanceof \Framework\Database2\Model\DataTypes\CDate)
