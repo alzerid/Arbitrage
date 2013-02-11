@@ -17,6 +17,12 @@ abstract class CCLIApplication extends CApplication
 		//Call parent
 		parent::initialize();
 		$this->_description = "UNKNOWN DESCRIPTION";
+
+		//Create relavent services
+		$this->_initializeServices();
+
+		//Initialize Packages
+		//$this->_initializePackages();
 	}
 
 	/**
@@ -65,6 +71,18 @@ abstract class CCLIApplication extends CApplication
 		$event->preventDefault();
 	}
 	/** End Overloaded Error Handling Methods **/
+
+	/**
+	 * Method overloads the CPackage _getConfigurationPath.
+	 * @return Returns the path to the configuration file.
+	 */
+	protected function _getConfigurationPath()
+	{
+		$path = CKernel::getInstance()->convertArbitrageNamespaceToPath($this->getNamespace() . ".config");
+		$file = $this->getPath() . "/" . preg_replace('/([^\/]*)\/.*(\/[^\/]*)$/', '\1\2', $path) . "/config.php";
+
+		return $file;
+	}
 
 	/**
 	 * Method prints out in HTML format the error or exception event.

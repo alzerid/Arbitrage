@@ -105,14 +105,26 @@ class CPackage
 	}
 
 	/**
+	 * Method returns the configuration path for the package.
+	 * @return Returns the path to the configuration file.
+	 */
+	protected function _getConfigurationPath()
+	{
+		$cpath  = $this->_path . "/" . CKernel::getInstance()->convertArbitrageNamespaceToPath($this->_namespace . ".config");
+		$file   = $cpath . "/config"  . '.php';
+
+		return $file;
+	}
+
+	/**
 	 * Loads the configuration file.
 	 */
 	private function _loadConfiguration()
 	{
 		//Setup paths
-		$env    = ((isset($_SERVER['ARBITRAGE2_ENVIRONMENT']))? $_SERVER['ARBITRAGE2_ENVIRONMENT'] : 'development');
-		$cpath  = $this->_path . "/" . CKernel::getInstance()->convertArbitrageNamespaceToPath($this->_namespace . ".config");
-		$file   = $cpath . "/config"  . '.php';
+		$env   = ((isset($_SERVER['ARBITRAGE2_ENVIRONMENT']))? $_SERVER['ARBITRAGE2_ENVIRONMENT'] : 'development');
+		$file  = $this->_getConfigurationPath();
+		$cpath = dirname($file);
 
 		//Require file
 		if(file_exists($file))
