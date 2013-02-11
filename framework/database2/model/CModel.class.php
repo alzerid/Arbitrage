@@ -54,7 +54,12 @@ class CModel extends \Framework\Model\CMomentoModel
 			elseif($val instanceof \Framework\Database2\Model\CModel)
 				$val->merge();
 			elseif($this->_variables && array_key_exists($key, $this->_variables))
-				$this->_data[$key] = $this->_variables[$key];
+			{
+				if($this->_data[$key] instanceof \Framework\Database2\Model\DataTypes\CDataType && !($this->_variables[$key] instanceof \Framework\Database2\Model\DataTypes\CDataType))
+					$this->_data[$key]->set($this->_variables[$key]);
+				else
+					$this->_data[$key] = $this->_variables[$key];
+			}
 		}
 
 		//Reset _variables
