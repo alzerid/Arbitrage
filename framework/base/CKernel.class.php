@@ -237,7 +237,11 @@ class CKernel implements ISingleton
 
 		//Get class 
 		$class = $this->convertArbitrageNamespaceToPHP($namespace);
-		$info  = $this->_requireFile(preg_replace('/\.[^\.]+$/', '.application', $namespace));
+		$class = preg_replace('/\\\[^\\\]*$/', '', $class);
+		$class = preg_replace('/(.*)\\\([^\\\]*)$/', '$1\\\$2\\\$2', $class);
+
+		//Require file
+		$info  = $this->_requireFile($namespace);
 
 		//Ensure this class is of type CApplication
 		if(!is_subclass_of($class, '\Framework\Base\CApplication'))
@@ -372,7 +376,7 @@ class CKernel implements ISingleton
 
 	/**
 	 * Method converts a PHP namespace to the equivalent Arbitrage namespace.
-	 * @param string $namespace The PHP namesace to convert.
+	 * @param string $namespace The PHP namespace to convert.
 	 * @return string Returns the Arbitrage namespace.
 	 */
 	public function convertPHPNamespaceToArbitrage($namespace)
