@@ -33,7 +33,7 @@ class CWebApplication extends CApplication
 		CKernel::getInstance()->requireFrameworkFile("Base.CAction");
 		CKernel::getInstance()->requireFrameworkFile('Base.CRouter');
 		CKernel::getInstance()->requireFrameworkFile('Base.CFilterChain');
-		//CKernel::getInstance()->requireFrameworkFile('Base.CWebPackage');
+		CKernel::getInstance()->requireFrameworkFile('Base.CWebPackage');
 		CKernel::getInstance()->requireFrameworkFile('Utils.CFlashPropertyObject');
 		CKernel::getInstance()->requireFrameworkFile('DOM.CDOMGenerator');
 		CKernel::getInstance()->requireFrameworkFile('Form.Elements.CBaseFormElement');
