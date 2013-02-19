@@ -93,6 +93,16 @@ Class CForm
 	}
 
 	/**
+	 * Method should be overridden for validation purposes.
+	 * @return Returns an array of key value pairs, where key is
+	 * name of element and value is an array of error messages.
+	 */
+	public function validate()
+	{
+		return array();
+	}
+
+	/**
 	 * Method starts the form
 	 */
 	public function start()
