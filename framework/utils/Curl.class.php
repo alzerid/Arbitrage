@@ -1,4 +1,5 @@
 <?php
+namespace Framework\Utils;
 
 class Curl
 {
@@ -115,13 +116,12 @@ class Curl
 			$this->myData = curl_exec($this->_myCurl);
 
 			if($this->myData === false || curl_errno($this->_myCurl))
-				throw new Exception("Could not connect to '$url' " . curl_errno($this->_myCurl));
+				throw new \Exception("Could not connect to '$url' " . curl_errno($this->_myCurl));
 		}
 		catch(Exception $e)
 		{
 			throw $e;
 		}
-
 		return $this->myData;
 	}
 

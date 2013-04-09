@@ -155,6 +155,8 @@ class CFormModel extends \Framework\Model\CModel
 	 */
 	protected function _getData($name)
 	{
+		// echo "<pre>", print_r($this->_data);
+		// die();
 		if(!array_key_exists($name, $this->_data))
 			throw new \Framework\Exceptions\EFormException("Attribute '$name' not in form.");
 		
