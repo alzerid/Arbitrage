@@ -25,30 +25,11 @@ class CEnum extends \Framework\Database2\Model\DataTypes\CDataType
 	}
 
 	/**
-	 * Method sets the timezone.
-	 * @param $tz The timezone to set to.
-	 */
-	public function setTimezone(\DateTimeZone $tz)
-	{
-		$this->_val->setTimeZone($tz);
-	}
-
-	/**
-	 * Returns a string formatted date.
-	 * @param $format The format to use.
-	 * @return Returns the formatted string.
-	 */
-	public function format($format)
-	{
-		return $this->_val->format($format);
-	}
-
-	/**
 	 * Returns a string.
 	 */
 	protected function _toString()
 	{
-		return $this->format("Y/m/d H:i:s e");
+		return $this->_val;
 	}
 }
 ?>
