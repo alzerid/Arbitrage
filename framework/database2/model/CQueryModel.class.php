@@ -32,7 +32,10 @@ abstract class CQueryModel
 	{
 		//Convert query
 		if($query)
+		{
+			//$this->_convertNormalToModel($query);
 			$this->convertModelToNative($query);
+		}
 
 		//Query
 		$ret = $this->_query_driver->findOne($query)->execute();
@@ -60,7 +63,7 @@ abstract class CQueryModel
 	{
 		//Convert query
 		if($query)
-			$query = $this->convertModelToNative($query);
+			$this->convertModelToNative($query);
 
 		//Send db call
 		$ret        = $this->_query_driver->findAll($query)->execute();
@@ -148,6 +151,24 @@ abstract class CQueryModel
 	 * @return The newly converted data array.
 	 */
 	abstract public function convertModelToNative(array &$data);
+
+	/**
+	 * Method converts query array values to the correct types associated with the model.
+	 * @param $query The query to modify.
+	 */
+	protected function _convertNormalToModel(array &$data)
+	{
+		$model    = \Framework\Base\CKernel::getInstance()->convertArbitrageNamespaceToPHP($this->_model);
+		var_dump($model::defaults());
+		die();
+		foreach($data as $key => $val)
+		{
+			var_dump($key, $val, $this->_model);
+			die("IN");
+		}
+		var_dump($data);
+		die(__METHOD__);
+	}
 
 	/**
 	 * Method creates a collection class with the results.
