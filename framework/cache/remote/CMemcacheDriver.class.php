@@ -15,6 +15,9 @@ class CMemcacheDriver implements \Framework\Interfaces\IDriver, \Framework\Inter
 
 	public function connect()
 	{
+		$host = $this->_config->host;
+		$port = $this->_config->port;
+
 		$ret = @$this->_cache->connect($host, $port);
 		if($ret === false)
 			throw new \Framework\Exceptions\EArbitrageRemoteCacheException("Unable to connect to memcache '$host:$port'.");
