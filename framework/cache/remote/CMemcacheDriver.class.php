@@ -1,31 +1,23 @@
 <?
 namespace Framework\Cache\Remote;
-use \Framework\Interfaces\IRemoteCache;
-use \Framework\Exceptions\EArbitrageRemoteCacheException;
 
-class CMemcache implements IRemoteCache
+class CMemcacheDriver implements \Framework\Interfaces\IDriver, \Framework\Interfaces\IRemoteCache
 {
 	static private $_instance = NULL;
 	private $_cache;
+	private $_config;
 
-	public function __construct()
+	public function __construct($config)
 	{
-		$this->_cache = new Memcache();
+		$this->_config = $config;
+		$this->_cache  = new \Memcache();
 	}
 
-	static public function getInstance()
-	{
-		if(self::$_isntance === NULL)
-			self::$_instance = new CMemcache();
-
-		return self::$_instance;
-	}
-
-	public function connect($host, $port)
+	public function connect()
 	{
 		$ret = @$this->_cache->connect($host, $port);
 		if($ret === false)
-			throw new EArbitrageRemoteCacheException("Unable to connect to memcache '$host:$port'.");
+			throw new \Framework\Exceptions\EArbitrageRemoteCacheException("Unable to connect to memcache '$host:$port'.");
 	}
 
 	public function close()
@@ -95,6 +87,28 @@ class CMemcache implements IRemoteCache
 	public function rightPop($key)
 	{
 		die("MEMCACHE: rightPop");
+	}
+
+	/***********************/
+	/** IDriver Interface **/
+	/***********************/
+
+	/*
+	 * Method returns the raw handle of the driver.
+	 * @return Returns the handle.
+	 */
+	public function getHandle()
+	{
+		return $this->_handle;
+	}
+
+	/**
+	 * Method retuns the configuration of this driver.
+	 * @returns array Returns driver configuration.
+	 */
+	public function getConfig()
+	{
+		return $this->_config;
 	}
 }
 ?>
