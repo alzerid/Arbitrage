@@ -85,6 +85,30 @@ class CQueryModel extends \Framework\Database2\Model\CQueryModel
 	}
 
 	/**
+	 * Method converts a query array DataTypes into native DataTypes.
+	 * @param $data The data array to convert.
+	 * @return The newly converted data array.
+	 */
+	public function convertModelQueryToNative(array &$data)
+	{
+		foreach($data as $key => $val)
+		{
+			if($val instanceof \Framework\Database2\Model\DataTypes\CDataType)
+				$data[$key] = $this->_convertModelDataTypeToNativeDataType($val);
+			elseif($val instanceof \Framework\Database2\Model\Structures\CStructure)
+				$data[$key] = $this->_convertModelStructureToNativeStructure($val);
+			elseif($val instanceof \Framework\Database2\Model\CModel)
+				$data[$key] = $this->_convertModelToNative($val);
+			elseif($val instanceof \MongoRegEx)
+				$data[$key] = $val;
+			elseif(is_array($val))
+				$this->convertModelQueryToNative($data[$key]);
+			elseif(is_object($val))
+				throw new \Framework\Exceptions\EDatabaseDataTypeException("Unable to convert DataType '" . get_class($val) . "'.");
+		}
+	}
+
+	/**
 	 * Method converts a model DataTypes into native DataTypes.
 	 * @param $data The data array to convert.
 	 * @return The newly converted data array.

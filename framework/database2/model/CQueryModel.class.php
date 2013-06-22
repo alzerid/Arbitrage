@@ -32,10 +32,7 @@ abstract class CQueryModel
 	{
 		//Convert query
 		if($query)
-		{
-			//$this->_convertNormalToModel($query);
-			$this->convertModelToNative($query);
-		}
+			$this->convertModelQueryToNative($query);
 
 		//Query
 		$ret = $this->_query_driver->findOne($query)->execute();
@@ -63,9 +60,10 @@ abstract class CQueryModel
 	{
 		//Convert query
 		if($query)
-			$this->convertModelToNative($query);
+			$this->convertModelQueryToNative($query);
 
 		//Send db call
+		var_dump($query);
 		$ret        = $this->_query_driver->findAll($query)->execute();
 		$collection = $this->_createCollection($ret);
 
@@ -83,7 +81,7 @@ abstract class CQueryModel
 	public function remove($condition)
 	{
 		//Convert the condition
-		$this->convertModelToNative($condition);
+		$this->convertModelQueryToNative($condition);
 
 		//Remove
 		$this->_query_driver->remove($condition)->execute();
@@ -92,7 +90,7 @@ abstract class CQueryModel
 	public function save($data)
 	{
 		//Convert the data to native type
-		$this->convertModelToNative($data);
+		$this->convertModelQueryToNative($data);
 
 		//Save
 		$this->_query_driver->save($data)->execute();
@@ -151,6 +149,13 @@ abstract class CQueryModel
 	 * @return The newly converted data array.
 	 */
 	abstract public function convertModelToNative(array &$data);
+
+	/**
+	 * Method converts a model query DataTypes into native DataTypes.
+	 * @param $data The data array to convert.
+	 * @return The newly converted data array.
+	 */
+	abstract public function convertModelQueryToNative(array &$data);
 
 	/**
 	 * Method converts query array values to the correct types associated with the model.
