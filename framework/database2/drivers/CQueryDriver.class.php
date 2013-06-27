@@ -110,6 +110,17 @@ abstract class CQueryDriver
 	}
 
 	/**
+	 * Method called to update an entry.
+	 */
+	public function update($condition, $data)
+	{
+		$this->_action    = 'update';
+		$this->_condition = $condition;
+		$this->_data      = $data;
+		return $this;
+	}
+
+	/**
 	 * Method inserts new data to the DB.
 	 */
 	public function insert($data)

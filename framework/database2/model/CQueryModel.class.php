@@ -96,6 +96,18 @@ abstract class CQueryModel
 		$this->_query_driver->save($data)->execute();
 	}
 
+	public function update($cond, $data)
+	{
+		//Convert condition
+		$this->convertModelQueryToNative($cond);
+		
+		//Convert the data
+		$this->convertModelQueryToNative($data);
+
+		//Update
+		$this->_query_driver->update($cond, array('$set' => $data))->execute();
+	}
+
 	/**************************/
 	/** End Modifier Methods **/
 	/**************************/

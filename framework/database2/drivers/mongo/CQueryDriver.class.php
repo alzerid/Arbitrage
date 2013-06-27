@@ -43,6 +43,10 @@ class CQueryDriver extends \Framework\Database2\Drivers\CQueryDriver
 				$handle->$database->$table->$action($this->_data);
 				return;
 
+			case "update":
+				$handle->$database->$table->$action($condition, $this->_data);
+				return;
+
 			case "remove":
 				$handle->$database->$table->$action($condition);
 				return;

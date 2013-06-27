@@ -106,6 +106,7 @@ class CDatabaseModel extends \Framework\Database2\Model\CModel
 		$data = $this->_data;
 
 		//unset
+		//TODO: Use the $idKey!!
 		if($data['_id'] === NULL || $data['_id']->getValue() === NULL)
 			unset($data['_id']);
 
@@ -114,21 +115,40 @@ class CDatabaseModel extends \Framework\Database2\Model\CModel
 	}
 
 	/**
+	 * Method updates the data base entries from the model.
+	 */
+	public function update()
+	{
+		//We must have an ID associated
+		//TODO: Use the $idKey!!
+		$id = ((isset($this->_variables['_id']))? $this->_variables['_id'] : (($this->_data['_id'])? $this->_data['_id'] : NULL));
+		if($id == NULL)
+			throw new \Framework\Exceptions\EDatabaseDriverException("Model must contain an ID to update!");
+		else if(isset($this->_variables['_id']))
+			unset($this->_variables['_id']);
+
+		//Get data
+		$data = $this->_variables;
+		if(count($data) == 0)
+			return;
+
+		//Update
+		$this->getQuery()->update(array('_id' => $id), $data);
+	}
+
+	/**
 	 * Method inserts the model into the database.
 	 */
 	public function insert()
 	{
+
+	
 		throw new \Framework\Exceptions\ENotImplementedException("Update not implemented.");
 	}
 
 	/**
-	 * Method updates the data base entries from th emode.
-	 */
-	public function update()
-	{
-		throw new \Framework\Exceptions\ENotImplementedException("Update not implemented.");
-	}
-
+	 * Method removes an entry from the database.
+	 /
 	public function remove()
 	{
 		$this->getQuery()->remove(array('_id' => $this->_data['_id']));
