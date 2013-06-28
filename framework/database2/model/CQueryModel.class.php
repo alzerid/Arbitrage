@@ -63,7 +63,6 @@ abstract class CQueryModel
 			$this->convertModelQueryToNative($query);
 
 		//Send db call
-		var_dump($query);
 		$ret        = $this->_query_driver->findAll($query)->execute();
 		$collection = $this->_createCollection($ret);
 
