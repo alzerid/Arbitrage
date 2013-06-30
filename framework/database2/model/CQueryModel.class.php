@@ -86,13 +86,27 @@ abstract class CQueryModel
 		$this->_query_driver->remove($condition)->execute();
 	}
 
-	public function save($data)
+	public function save(&$data)
 	{
+		//copy data to ignore reference
+		$d = $data;
+
+		//unset
+		//TODO: Use the $idKey!!
+		if($d['_id'] === NULL || $d['_id']->getValue() === NULL)
+			unset($d['_id']);
+
 		//Convert the data to native type
-		$this->convertModelQueryToNative($data);
+		$this->convertModelQueryToNative($d);
+		$new = !(array_key_exists('_id', $d));
 
 		//Save
-		$this->_query_driver->save($data)->execute();
+		$this->_query_driver->save($d)->execute();
+
+		//Check if we need to set _id
+		//TODO: Use the $idKey!!
+		if($new)
+			$data['_id'] = new \Framework\Database2\Model\DataTypes\CDatabaseID((string) $d['_id']);
 	}
 
 	public function update($cond, $data)

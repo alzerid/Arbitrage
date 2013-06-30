@@ -142,8 +142,10 @@ class CQueryModel extends \Framework\Database2\Model\CQueryModel
 			$val = $val->getValue();
 			if($val == -1)
 				$val = NULL;
-			elseif($val === NULL)
+			elseif($val === 0)
 				$val = str_repeat('0', 24);
+			elseif($val === NULL)
+				return NULL;
 
 			return new \MongoId($val);
 		}

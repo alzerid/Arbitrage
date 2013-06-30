@@ -99,19 +99,16 @@ class CDatabaseModel extends \Framework\Database2\Model\CModel
 	 */
 	public function save()
 	{
+		//TODO: This should be db specific
+
 		//Merge the data
 		$this->merge();
 
 		//If ID is 000 then remove
-		$data = $this->_data;
-
-		//unset
-		//TODO: Use the $idKey!!
-		if($data['_id'] === NULL || $data['_id']->getValue() === NULL)
-			unset($data['_id']);
+		//$data = &$this->_data;
 
 		//Save using the query model
-		$this->getQuery()->save($data);
+		$this->getQuery()->save($this->_data);
 	}
 
 	/**
