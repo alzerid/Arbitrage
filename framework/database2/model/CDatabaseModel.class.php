@@ -148,7 +148,7 @@ class CDatabaseModel extends \Framework\Database2\Model\CModel
 
 	/**
 	 * Method removes an entry from the database.
-	 /
+	 */
 	public function remove()
 	{
 		$this->getQuery()->remove(array('_id' => $this->_data['_id']));
