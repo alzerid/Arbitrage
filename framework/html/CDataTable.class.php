@@ -85,7 +85,7 @@ class CDataTable implements \Framework\Interfaces\IHTMLDataTable
 			}
 		}
 		else
-			$html .= "<tr><td colspan=\"" . count($this->_headers) . "\">There are no records.</td></tr>";
+			$html .= "<tr class=\"empty\"><td colspan=\"" . count($this->_headers) . "\">There are no records.</td></tr>";
 
 		$html .= "</tbody>";
 
