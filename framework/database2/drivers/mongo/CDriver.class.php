@@ -17,7 +17,7 @@ class CDriver extends \Framework\Database2\Drivers\CDriver
 
 		//Create handle and connect
 		$uri = "mongodb://{$this->_properties['host']}:{$this->_properties['port']}";
-		$this->_handle = new \Mongo($uri);
+		$this->_handle = ((class_exists("\\MongoClient"))? new \MongoClient($uri) : new \Mongo($uri));
 	}
 
 	/**
