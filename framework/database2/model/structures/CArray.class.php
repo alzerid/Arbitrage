@@ -34,7 +34,7 @@ class CArray extends \Framework\Database2\Model\Structures\CStructure implements
 	 */
 	public function merge()
 	{
-		//TODO: We will need to wensure _variables is merged as well
+		//TODO: We will need to ensure _variables is merged as well
 		if(count($this->_variables))
 			throw new \Framework\Exceptions\ENotImplementedException("Merging of _variables not yet implemented.");
 
@@ -57,8 +57,11 @@ class CArray extends \Framework\Database2\Model\Structures\CStructure implements
 			$this->_data      = $data->_data;
 			$this->_variables = $data->_variables;
 		}
+		//TODO: We should set _variables --EMJ
+		else if(is_array($data))
+			$this->_data = $data;
 		else
-			throw new \Framework\Exceptions\ENotImplementedException("Unable to handle data type.");
+			throw new \Framework\Exceptions\ENotImplementedException("Unable to handle data type '" . gettype($data) . "'.");
 	}
 
 	/**************************************/
