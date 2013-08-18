@@ -72,7 +72,12 @@ class CDataTable implements \Framework\Interfaces\IHTMLDataTable
 					if($val instanceof \Framework\Interfaces\IHTMLDataTableType)
 						$val = $val->render($this, $entry);
 					else
+					{
+						if(!is_object($entry))
+							throw new \Framework\Exceptions\EDataTableException('entry is not an object');
+
 						$val = $this->_normalizeValue($entry->apath($val));
+					}
 
 					//Check if empty
 					if(empty($val))
