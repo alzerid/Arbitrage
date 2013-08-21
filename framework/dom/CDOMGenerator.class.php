@@ -34,7 +34,7 @@ class CDOMGenerator
 	public static function style($attribs=array())
 	{
 		$attribs = CDOMGenerator::generateAttribs($attribs);
-		$html    = "<link rel=\"stylesheet\" type=\"text/css\" $attribs></script>\n";
+		$html    = "<link rel=\"stylesheet\" type=\"text/css\" $attribs>\n";
 
 		return $html;
 	}

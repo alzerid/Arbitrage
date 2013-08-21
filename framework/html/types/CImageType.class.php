@@ -3,13 +3,13 @@ namespace Framework\HTML\Types;
 
 class CImageType implements \Framework\Interfaces\IHTMLDataTableType
 {
-	private $_path;
+	private $_apath;
 	private $_default;
 
-	public function __construct($path, $default)
+	public function __construct($apath, $default)
 	{
 		//set variables
-		$this->_path    = "/" . preg_replace('/\./', '/', $path);
+		$this->_apath   = $apath;
 		$this->_default = $default;
 	}
 
@@ -22,7 +22,7 @@ class CImageType implements \Framework\Interfaces\IHTMLDataTableType
 		else
 			throw new \Exception("Unable to handle!");
 
-		$val = $arr->apath($this->_path);
+		$val = $arr->apath($this->_apath);
 		if($val == NULL)
 			$val = $this->_default;
 
