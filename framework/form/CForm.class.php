@@ -216,7 +216,9 @@ Class CForm
 			//Create element and return
 			return new $class($this->_convertToID($id), $this->_getValue($id), $args);
 		}
-
+		
+		echo "<pre>", print_r($element);
+		die();
 		throw new \Framework\Exceptions\EFormException("Unknown element '$element'.");
 	}
 
